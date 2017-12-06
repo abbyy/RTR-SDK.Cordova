@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/preferenceButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="5dp"
+        android:background="#00000000"
+        android:gravity="center_vertical"
+        android:onClick="onPreferenceButtonClick"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textSize="15dp"
+        tools:ignore="SpUsage"
+        tools:text="English" />
+
+    <TextView
+        android:id="@+id/scenarioDescription"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/preferenceButton"
+        android:layout_marginLeft="25dp"
+        android:background="#00000000"
+        android:textColor="#FFFFFF"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:textSize="10dp" />
+
+    <TextView
+        android:id="@+id/warningText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/scenarioDescription"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="15dp"
+        android:gravity="left"
+        android:textColor="#FFFF0000"
+        tools:text="warningText" />
+
+    <TextView
+        android:id="@+id/errorText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/warningText"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="15dp"
+        android:gravity="left"
+        android:textColor="#FFFF0000"
+        tools:text="errorText" />
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp"
+        android:background="#7d010000"
+        android:onClick="onStartButtonClick"
+        android:text="@string/start_text"
+        android:textColor="#ffffff"
+        android:textSize="15dp"
+        tools:ignore="SpUsage" />
+
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:background="#00000000"
+        android:onClick="onCancelButtonClick"
+        android:src="@drawable/ic_close_24dp" />
+
+    <ImageButton
+        android:id="@+id/flashButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:background="#00000000"
+        android:onClick="onFlashButtonClick"
+        android:src="@drawable/ic_flash_on_24dp" />
+
+</RelativeLayout>

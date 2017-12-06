@@ -1,0 +1,32 @@
+{
+	"name": "cordova-plugin-abbyy-rtr-sdk",
+	"version": "1.0.0",
+	"description": "ABBYY Real-Time Recognition SDK Cordova Plugin",
+	"cordova": {
+		"id": "cordova-plugin-abbyy-rtr-sdk",
+		"platforms": [
+			"android",
+			"ios"
+		]
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/abbyysdk/RTR-SDK.Cordova.git"
+	},
+	"keywords": [
+		"rtr",
+		"real time",
+		"recognition",
+		"data capture",
+		"abbyy",
+		"mobile sdk",
+		"OCR",
+		"optical character recognition",
+		"ocr-engine",
+		"ecosystem:cordova",
+		"cordova-ios",
+		"cordova-android"
+	],
+	"author": "ABBYY Mobile SDK Team",
+	"license": "LICENSE.md"
+}

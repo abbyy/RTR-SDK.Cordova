@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+		id="cordova-plugin-abbyy-rtr-sdk" version="1.0.0">
+	<name>AbbyyRtrSdk</name>
+	<description>ABBYY Real-Time Recognition SDK Plugin for Cordova</description>
+
+	<js-module src="www/AbbyyRtrSdk.js" name="AbbyyRtrSdk">
+		<clobbers target="AbbyyRtrSdk" />
+	</js-module>
+
+	<!-- Android -->
+	<platform name="android">
+
+		<info>Thank you for choosing ABBYY Real-Time Recognition SDK.
+To get started:
+	* Visit https://rtrsdk.com/#RTR.Android.Online to download the Android package (`abbyy-rtr-sdk-1.0.X.Y.Android.zip`).
+	* Copy assets (patterns and dictionaries) and the license file (`AbbyyRtrSdk.license`) to `www/rtr_assets` in your project.
+	* Copy `abbyy-rtr-sdk-1.0.aar` to `libs/android` in your project.
+	* Add `libs/android` to linker search paths:
+	** In `platforms/android/build.gradle`, add `allprojects { repositories { flatDir { dirs '../../libs/android' } } }`.
+	* Build and run:
+	** `cordova build android`
+	** `cordova run android`
+	* Enjoy using ABBYY OCR SDK :) Thank you!</info>
+
+		<asset src="www/AbbyyRtrSdk.js" target="js/AbbyyRtrSdk.js"/>
+
+		<config-file target="config.xml" parent="/*">
+			<feature name="AbbyyRtrSdk">
+				<param name="android-package" value="com.abbyy.mobile.rtr.cordova.RtrPlugin"/>
+			</feature>
+		</config-file>
+
+		<!-- add permissions in AndroidManifest.xml file-->
+		<config-file target="AndroidManifest.xml" parent="/*">
+			<uses-permission  android:name="android.permission.CAMERA"/>
+		</config-file>
+
+		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+
+			<activity
+				android:name="com.abbyy.mobile.rtr.cordova.activities.TextCaptureActivity"
+				android:configChanges="keyboardHidden|screenSize"
+				android:screenOrientation="portrait"
+			/>
+
+			<activity
+				android:name="com.abbyy.mobile.rtr.cordova.activities.DataCaptureActivity"
+				android:configChanges="keyboardHidden|screenSize"
+				android:screenOrientation="portrait"
+			/>
+
+			<activity
+				android:name="com.abbyy.mobile.rtr.cordova.settings.LanguagesSettingActivity"
+			/>
+
+		</config-file>
+
+		<hook type="after_build" src="scripts/android_move_assets.js" />
+		<hook type="after_plugin_add" src="scripts/android_manifest_application_name.js" />
+
+		<!-- plugin source code -->
+
+		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/RtrPlugin.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
+		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/RtrManager.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
+		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/ResourcesUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
+		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/DataCaptureScenario.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
+
+		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/exceptions/InitializationException.java" target-dir="src/com/abbyy/mobile/rtr/cordova/exceptions"/>
+
+		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/DataCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities/"/>
+		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/TextCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities/"/>
+		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/BaseActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities/"/>
+
+		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/settings/LanguagesSettingActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/settings/"/>
+
+		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/surfaces/BaseSurfaceView.java" target-dir="src/com/abbyy/mobile/rtr/cordova/surfaces/"/>
+		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/surfaces/DataCaptureSurfaceView.java" target-dir="src/com/abbyy/mobile/rtr/cordova/surfaces/"/>
+		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/surfaces/TextCaptureSurfaceView.java" target-dir="src/com/abbyy/mobile/rtr/cordova/surfaces/"/>
+
+		<resource-file src="src/android/res/layout/activity_capture.xml" target="res/layout/activity_capture.xml"/>
+		<resource-file src="src/android/res/layout/scenarios_list_item.xml" target="res/layout/scenarios_list_item.xml"/>
+		<resource-file src="src/android/res/layout/languages_setting_activity.xml" target="res/layout/languages_setting_activity.xml"/>
+
+		<resource-file src="src/android/res/anim/from_left_to_right.xml" target="res/anim/from_left_to_right.xml"/>
+		<resource-file src="src/android/res/anim/from_right_to_left.xml" target="res/anim/from_right_to_left.xml"/>
+
+		<resource-file src="src/android/res/drawable/ic_close_24dp.xml" target="res/drawable/ic_close_24dp.xml"/>
+		<resource-file src="src/android/res/drawable/ic_flash_on_24dp.xml" target="res/drawable/ic_flash_on_24dp.xml"/>
+		<resource-file src="src/android/res/drawable/ic_flash_off_24dp.xml" target="res/drawable/ic_flash_off_24dp.xml"/>
+
+		<resource-file src="src/android/res/mipmap-hdpi/ic_launcher.png" target="res/mipmap-hdpi/ic_launcher.png"/>
+		<resource-file src="src/android/res/mipmap-mdpi/ic_launcher.png" target="res/mipmap-mdpi/ic_launcher.png"/>
+		<resource-file src="src/android/res/mipmap-xhdpi/ic_launcher.png" target="res/mipmap-xhdpi/ic_launcher.png"/>
+		<resource-file src="src/android/res/mipmap-xxhdpi/ic_launcher.png" target="res/mipmap-xxhdpi/ic_launcher.png"/>
+		<resource-file src="src/android/res/mipmap-xxxhdpi/ic_launcher.png" target="res/mipmap-xxxhdpi/ic_launcher.png"/>
+
+		<resource-file src="src/android/res/values/attrs.xml" target="res/values/attrs.xml"/>
+		<resource-file src="src/android/res/values/colors.xml" target="res/values/colors.xml"/>
+		<resource-file src="src/android/res/values/strings.xml" target="res/values/strings.xml"/>
+		<resource-file src="src/android/res/values/styles.xml" target="res/values/styles.xml"/>
+
+		<!-- Gradle extra settings: -->
+		<framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
+
+	</platform>
+
+	<!-- ios -->
+	<platform name="ios">
+				<info>Thank you for choosing ABBYY Real-Time Recognition SDK.
+To get started:
+	* Visit https://rtrsdk.com/#RTR.iOS.Online to download the iOS framework (`abbyy-rtr-sdk-1.0.X.Y.iOS.zip`).
+	* Copy assets (patterns and dictionaries) and the license file (`AbbyyRtrSdk.license`) to `www/rtr_assets` in your project.
+	* Copy `AbbyyRtrSDK.framework` to `libs/ios` in your project.
+	* Add `libs/ios` to linker search paths:
+	** In `platforms/ios/cordova/build.xcconfig`, add `FRAMEWORK_SEARCH_PATHS = "../../libs/ios"`.
+	* Build and run. Don't forget to specify your Development Team:
+	** `cordova build ios --buildFlag="DEVELOPMENT_TEAM=YOUR_TEAM"`
+	** `cordova run ios --buildFlag="DEVELOPMENT_TEAM=YOUR_TEAM"`
+	* Enjoy using ABBYY OCR SDK :) Thank you!</info>
+
+		<config-file target="config.xml" parent="/*">
+			<feature name="AbbyyRtrSdk">
+				<param name="ios-package" value="RTRPlugin"/>
+			</feature>
+		</config-file>
+
+		<header-file src="src/ios/RTRPlugin.h" />
+		<source-file src="src/ios/RTRPlugin.m" />
+
+		<header-file src="src/ios/RTRManager.h" />
+		<source-file src="src/ios/RTRManager.m" />
+
+		<header-file src="src/ios/RTRDataCaptureScenario.h" />
+		<source-file src="src/ios/RTRDataCaptureScenario.m" />
+
+		<header-file src="src/ios/CDVPluginResult+RTRPluginResult.h" />
+		<source-file src="src/ios/CDVPluginResult+RTRPluginResult.m" />
+
+		<header-file src="src/ios/RTRSelectedAreaView.h" />
+		<source-file src="src/ios/RTRSelectedAreaView.m" />
+
+		<header-file src="src/ios/RTRProgressView.h" />
+		<source-file src="src/ios/RTRProgressView.m" />
+		<resource-file src="src/ios/RTRProgressView.xib" />
+
+		<header-file src="src/ios/RTRTextCaptureViewController.h" />
+		<source-file src="src/ios/RTRTextCaptureViewController.m" />
+		<header-file src="src/ios/RTRDataCaptureViewController.h" />
+		<source-file src="src/ios/RTRDataCaptureViewController.m" />
+		<header-file src="src/ios/RTRViewController.h" />
+		<source-file src="src/ios/RTRViewController.m" />
+		<resource-file src="src/ios/RTRViewController.xib" />
+
+		<!-- Icons -->
+		<resource-file src="src/ios/Icons/ui_close_button/ui_close_button.png" target="Icons/ui_close_button.png" />
+		<resource-file src="src/ios/Icons/ui_close_button/ui_close_button@2x.png" target="Icons/ui_close_button@2x.png" />
+		<resource-file src="src/ios/Icons/ui_close_button/ui_close_button@3x.png" target="Icons/ui_close_button@3x.png" />
+
+		<resource-file src="src/ios/Icons/ui_flash_off_button/ui_flash_off_button.png" target="Icons/ui_flash_off_button.png" />
+		<resource-file src="src/ios/Icons/ui_flash_off_button/ui_flash_off_button@2x.png" target="Icons/ui_flash_off_button@2x.png" />
+		<resource-file src="src/ios/Icons/ui_flash_off_button/ui_flash_off_button@3x.png" target="Icons/ui_flash_off_button@3x.png" />
+
+		<resource-file src="src/ios/Icons/ui_flash_on_button/ui_flash_on_button.png" target="Icons/ui_flash_on_button.png" />
+		<resource-file src="src/ios/Icons/ui_flash_on_button/ui_flash_on_button@2x.png" target="Icons/ui_flash_on_button@2x.png" />
+		<resource-file src="src/ios/Icons/ui_flash_on_button/ui_flash_on_button@3x.png" target="Icons/ui_flash_on_button@3x.png" />
+
+		<framework src="CoreGraphics.framework" />
+		<framework src="CoreMedia.framework" />
+		<framework src="CoreVideo.framework" />
+		<framework src="UIKit.framework" />
+		<framework src="QuartzCore.framework" />
+		<framework src="Security.framework" />
+		<framework src="AVFoundation.framework" />
+		<framework src="libc++.tbd" />
+		<framework src="AbbyyRtrSDK.framework"/>
+
+		<preference name="CAMERA_USAGE_DESCRIPTION" default="NSCameraUsageDescription" />
+		<config-file target="*-Info.plist" parent="NSCameraUsageDescription">
+			<string>$CAMERA_USAGE_DESCRIPTION</string>
+		</config-file>
+
+	</platform>
+
+</plugin>

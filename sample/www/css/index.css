@@ -1,0 +1,120 @@
+/*
+ 	ABBYY® Real-Time Recognition SDK 1 © 2016 ABBYY Production LLC.
+ 	ABBYY is either a registered trademark or a trademark of ABBYY Software Ltd.
+ */
+* {
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	box-sizing: border-box;
+}
+
+html, body, .app {
+	height: 100%;
+}
+
+body {
+	-webkit-touch-callout: none;
+	-webkit-text-size-adjust: none;
+	-webkit-user-select: none;
+	user-select: none;
+	background-color:#E4E4E4;
+
+	background-attachment:fixed;
+	font-family: Calibri, sans-serif;
+	font-size:12px;
+	height:100%;
+	margin:0px;
+	padding:0px;
+
+	width:100%;
+}
+
+.app {
+	text-align:center;
+	padding: 20px;
+	padding: 10vh 10vw;
+}
+
+h1 {
+	font-size:24px;
+	font-weight:normal;
+	margin:0px;
+	overflow:visible;
+	padding:0px;
+	text-align:center;
+}
+
+.event {
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	color: #FFFFFF;
+	font-size: 12px;
+	margin: 5px 30px;
+	padding: 2px 10px;
+	display: inline-block;
+	min-width: 130px;
+}
+
+.event.listening {
+	background-color:#333333;
+}
+
+.event.received {
+	background-color:#4B946A;
+	display:none;
+}
+
+@keyframes fade {
+	from { opacity: 1.0; }
+	50% { opacity: 0.4; }
+	to { opacity: 1.0; }
+}
+ 
+@-webkit-keyframes fade {
+	from { opacity: 1.0; }
+	50% { opacity: 0.4; }
+	to { opacity: 1.0; }
+}
+ 
+.blink {
+	animation:fade 3000ms infinite;
+	-webkit-animation:fade 3000ms infinite;
+}
+
+.logo {
+	max-width: 80%;
+}
+
+.settings {
+	font-size: 16px;
+}
+
+.row {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: flex;
+	margin: 20px 0;
+
+	justify-content: space-between;
+}
+
+.scenario-button {
+	max-width: 100%;
+	padding: 5px 10px;
+	background-color: #CCC;
+	color: black;
+	text-align: center;
+	font-weight: bold;
+	text-transform:uppercase;
+	background: #eee;
+	border: none;
+	box-shadow: 0 1px 2px 0 gray;
+	border-radius: 10px;
+}
+
+.rtr-sdk-plugin-result {
+	overflow: auto;
+	text-transform: none;
+	text-align: left;
+}
