@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-		id="cordova-plugin-abbyy-rtr-sdk" version="1.0.0">
+		id="cordova-plugin-abbyy-rtr-sdk" version="1.0.3">
 	<name>AbbyyRtrSdk</name>
 	<description>ABBYY Real-Time Recognition SDK Plugin for Cordova</description>
 
@@ -13,7 +13,7 @@
 
 		<info>Thank you for choosing ABBYY Real-Time Recognition SDK.
 To get started:
-	* Visit https://rtrsdk.com/#RTR.Android.Online to download the Android package (`abbyy-rtr-sdk-1.0.X.Y.Android.zip`).
+	* Visit https://rtrsdk.com/ to download the Android package (`abbyy-rtr-sdk-1.0.X.Y.Android.zip`).
 	* Copy assets (patterns and dictionaries) and the license file (`AbbyyRtrSdk.license`) to `www/rtr_assets` in your project.
 	* Copy `abbyy-rtr-sdk-1.0.aar` to `libs/android` in your project.
 	* Add `libs/android` to linker search paths:
@@ -109,7 +109,7 @@ To get started:
 	<platform name="ios">
 				<info>Thank you for choosing ABBYY Real-Time Recognition SDK.
 To get started:
-	* Visit https://rtrsdk.com/#RTR.iOS.Online to download the iOS framework (`abbyy-rtr-sdk-1.0.X.Y.iOS.zip`).
+	* Visit https://rtrsdk.com/ to download the iOS framework (`abbyy-rtr-sdk-1.0.X.Y.iOS.zip`).
 	* Copy assets (patterns and dictionaries) and the license file (`AbbyyRtrSdk.license`) to `www/rtr_assets` in your project.
 	* Copy `AbbyyRtrSDK.framework` to `libs/ios` in your project.
 	* Add `libs/ios` to linker search paths:

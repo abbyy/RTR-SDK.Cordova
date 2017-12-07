@@ -7,7 +7,7 @@ This example app shows how to integrate the ABBYY Real-Time Recognition SDK Cord
 1. Install [Cordova](https://cordova.apache.org).
 2. Get the example project and navigate to the project directory.
     ```sh
-    cd <path>/sample
+    cd <path>/cordova-plugin-abbyy-rtr-sdk-sample
     ```
 3. Add platforms and plugins from the project `config.xml`.
     ```sh
