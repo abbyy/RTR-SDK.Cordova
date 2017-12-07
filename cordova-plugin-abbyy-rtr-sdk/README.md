@@ -2,7 +2,13 @@
 
 ABBYY Real-Time Recognition SDK Cordova Plugin allows to use the Text Capture and Data Capture features of ABBYY Real-Time Recognition SDK (RTR SDK) in apps based on the [Apache Cordova](https://cordova.apache.org) framework.
 
-This plugin requires the ABBYY RTR SDK native library which is available for Android and iOS. You can download its free version from the [ABBYY RTR SDK website](https://rtrsdk.com/). Extended versions of the native libraries are also available, with more recognition languages, more Data Capture features, and full Text Capture scenario support. If you are interested in the extended version, please contact [ABBYY sales](https://rtrsdk.com/contacts/).
+This plugin requires the ABBYY RTR SDK native library which is available for Android and iOS. You can download its free version from the [ABBYY RTR SDK website](https://rtrsdk.com/). Extended versions of the native libraries are also available, with more recognition languages, more Data Capture features, and full Text Capture scenario support. If you are interested in the extended version, please contact the [ABBYY Sales Team](https://rtrsdk.com/contacts/).
+
+The native libraries support the following systems:
+
+* Android: version 4.4 or later for ARMv7 processors
+* iOS: versions 8.x and later
+
 
 ## Getting started
 
@@ -11,7 +17,7 @@ This plugin requires the ABBYY RTR SDK native library which is available for And
     cd MyProject
     cordova plugin add cordova-plugin-abbyy-rtr-sdk
     ```
-2. Download ABBYY RTR SDK from https://rtrsdk.com/ and add it to your project:
+2. Download ABBYY RTR SDK from https://rtrsdk.com/ (or get the extended version from the [ABBYY Sales Team](https://rtrsdk.com/contacts/)) and add it to your project:
     * Create the `www/rtr_assets` subdirectory in the project.
     * Copy RTR SDK assets (patterns and dictionaries) and license file (`AbbyyRtrSdk.license`) to `www/rtr_assets`.
     * Copy the Android library (`abbyy-rtr-sdk-1.0.aar`) to `libs/android`.
@@ -46,6 +52,8 @@ This plugin requires the ABBYY RTR SDK native library which is available for And
 
 ## Documentation
 
-Developer documentation for this plugin (`RtrSdkCordovaDevelopersGuide.pdf`) is available as the part of [this](https://www.npmjs.com/package/cordova-plugin-abbyy-rtr-sdk) npm package.
+Developer documentation for this plugin is available from the [npm package](https://www.npmjs.com/package/cordova-plugin-abbyy-rtr-sdk) (see `RtrSdkCordovaDevelopersGuide.pdf`).
 
-ABBYY RTR SDK developer documentation is available at https://rtrsdk.com/documentation/.
+Developer documentation for the free version of ABBYY RTR SDK is available at https://rtrsdk.com/documentation/.
+
+Developer documentation for the extended version is available from the extended version packages for iOS and Android.

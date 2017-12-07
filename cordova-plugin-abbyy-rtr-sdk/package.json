@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-abbyy-rtr-sdk",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "ABBYY Real-Time Recognition SDK Cordova Plugin",
   "cordova": {
     "id": "cordova-plugin-abbyy-rtr-sdk",
