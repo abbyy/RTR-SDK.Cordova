@@ -20,7 +20,6 @@ The native libraries support the following systems:
 2. Download ABBYY RTR SDK from https://rtrsdk.com/ (or get the extended version from the [ABBYY Sales Team](https://rtrsdk.com/contacts/)) and add it to your project:
     * Create the `www/rtr_assets` subdirectory in the project.
     * Copy RTR SDK assets (patterns and dictionaries) and license file (`AbbyyRtrSdk.license`) to `www/rtr_assets`.
-    * For cordova-android >= 7.0 users additionally need to place assets mentioned above to `platforms/android/app/src/main/assets` manually or by specify resource-file in config.xml
     * Copy the Android library (`abbyy-rtr-sdk-1.0.aar`) to `libs/android`.
     * Copy the iOS framework (`AbbyyRtrSDK.framework`) to `libs/ios`.
 3. Add `libs/android` and `libs/ios` to the linker search paths.

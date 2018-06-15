@@ -5,7 +5,7 @@
 // Alseo we need to rename folders to lowercase.
 
 module.exports = function (ctx) {
-	if(ctx.opts.platforms.indexOf('android') < 0) {
+	if (ctx.opts.platforms.indexOf('android') < 0) {
 		return;
 	}
 
@@ -13,22 +13,30 @@ module.exports = function (ctx) {
 		rimraf = ctx.requireCordovaModule('rimraf'),
 		path = ctx.requireCordovaModule('path');
 
-	var src = path.join(ctx.opts.projectRoot, 'platforms/android/assets/www/rtr_assets/');
-	var dst = path.join(ctx.opts.projectRoot, 'platforms/android/assets/');
+	var assetsPath = 'platforms/android/app/src/main/assets/'; // cordova-android >= 7
 
-	var callback = function (message) {
-		if(message) {
-			console.log('assets error' + message);
+	return fs.stat(path.join(ctx.opts.projectRoot, assetsPath), function (error) {
+		if (error) {
+			assetsPath = 'platforms/android/assets/'; // cordova-android < 7
 		}
-	}
 
-	rimraf.sync(path.join(dst, '!(www)*'));
+		var src = path.join(ctx.opts.projectRoot, assetsPath, '/www/rtr_assets/');
+		var dst = path.join(ctx.opts.projectRoot, assetsPath);
 
-	fs.readdirSync(src).forEach(function (file, index) {
-		if(fs.lstatSync(path.join(src, file)).isDirectory()) {
-			fs.rename(path.join(src, file), path.join(dst, file.toLowerCase()), callback);
-		} else {
-			fs.rename(path.join(src, file), path.join(dst, file), callback);
-		}
-	})
+		var callback = function (message) {
+			if (message) {
+				console.log('assets error' + message);
+			}
+		};
+
+		rimraf.sync(path.join(dst, '!(www)*'));
+
+		fs.readdirSync(src).forEach(function (file, index) {
+			if (fs.lstatSync(path.join(src, file)).isDirectory()) {
+				fs.rename(path.join(src, file), path.join(dst, file.toLowerCase()), callback);
+			} else {
+				fs.rename(path.join(src, file), path.join(dst, file), callback);
+			}
+		});
+	});
 };
