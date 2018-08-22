@@ -21,12 +21,15 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class RtrPlugin extends CordovaPlugin {
 
 	public static final int RESULT_OK = 0;
 	public static final int RESULT_FAIL = 2;
+	public static final String RTR_CUSTOM_RECOGNITION_LANGUAGES = "CustomRecognitionLanguages";
 
 	private static final int REQUEST_CODE_TEXT_CAPTURE = 1;
 	private static final int REQUEST_CODE_DATA_CAPTURE = 2;
@@ -38,6 +41,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	//region constants for parsing
 	private static final String RTR_RECOGNITION_LANGUAGES_KEY = "recognitionLanguages";
+	private static final String RTR_EXTENDED_SETTINGS = "extendedSettings";
 	private static final String RTR_SELECTABLE_RECOGNITION_LANGUAGES_KEY = "selectableRecognitionLanguages";
 
 	private static final String RTR_LICENSE_FILE_NAME_KEY = "licenseFileName";
@@ -70,6 +74,9 @@ public class RtrPlugin extends CordovaPlugin {
 			PreferenceManager.getDefaultSharedPreferences( cordova.getActivity().getApplicationContext() ).edit().clear().apply();
 			if( init( callbackContext, args ) ) {
 				try {
+					if( inputParameters.has( RTR_EXTENDED_SETTINGS ) ) {
+						RtrManager.setExtendedSettings( parseExtendedSettings( inputParameters ) );
+					}
 					RtrManager.setLanguages( parseLanguages( inputParameters ) );
 					RtrManager.setSelectedLanguages( parseSelectedLanguage( inputParameters ) );
 					parseUiSettings( inputParameters );
@@ -286,8 +293,18 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private List<Language> parseLanguages( JSONObject arg ) throws JSONException
 	{
+		HashMap<String, String> extendedSettings = RtrManager.getExtendedSettings();
 		List<Language> languages = parseLanguagesInternal( arg, RTR_SELECTABLE_RECOGNITION_LANGUAGES_KEY );
-		RtrManager.setLanguageSelectionEnabled( languages.size() > 0 );
+
+		if( extendedSettings != null ) {
+			if( extendedSettings.containsKey( RTR_CUSTOM_RECOGNITION_LANGUAGES ) ) {
+				RtrManager.setLanguageSelectionEnabled( false );
+			} else {
+				RtrManager.setLanguageSelectionEnabled( languages.size() > 0 );
+			}
+		} else {
+			RtrManager.setLanguageSelectionEnabled( languages.size() > 0 );
+		}
 		return languages;
 	}
 
@@ -300,6 +317,19 @@ public class RtrPlugin extends CordovaPlugin {
 		}
 
 		return languages;
+	}
+
+	private HashMap<String, String> parseExtendedSettings( JSONObject arg ) throws JSONException
+	{
+		HashMap<String, String> map = new HashMap<String, String>();
+		JSONObject jsonObject = arg.getJSONObject( RTR_EXTENDED_SETTINGS );
+		Iterator<?> keys = jsonObject.keys();
+		while( keys.hasNext() ) {
+			String key = (String) keys.next();
+			String value = jsonObject.getString( key );
+			map.put( key, value );
+		}
+		return map;
 	}
 
 	private Language parseLanguageName( String name )
@@ -320,6 +350,8 @@ public class RtrPlugin extends CordovaPlugin {
 			for( int i = 0; i < array.length(); i++ ) {
 				languages.add( parseLanguageName( array.getString( i ) ) );
 			}
+		} else {
+			languages.add( Language.English );
 		}
 
 		return languages;

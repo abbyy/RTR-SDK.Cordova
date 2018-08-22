@@ -11,12 +11,12 @@
 + (instancetype)managerWithLicense:(NSString*)licenseName error:(NSError**)error;
 
 - (id<RTRTextCaptureService>)textCaptureServiceWithLanguages:(NSSet*)languages
-	delegate:(id<RTRTextCaptureServiceDelegate>)delegate;
+	delegate:(id<RTRTextCaptureServiceDelegate>)delegate extendedSettings:(RTRExtendedSettings*)extendedSettings;
 
 - (id<RTRDataCaptureService>)dataCaptureServiceWithProfile:(NSString*)profile
-	delegate:(id<RTRDataCaptureServiceDelegate>)delegate;
+	delegate:(id<RTRDataCaptureServiceDelegate>)delegate extendedSettings:(RTRExtendedSettings*)extendedSettings;
 
 - (id<RTRDataCaptureService>)customDataCaptureServiceWithScenario:(RTRDataCaptureScenario*)scenario
-	delegate:(id<RTRDataCaptureServiceDelegate>)delegate;
+	delegate:(id<RTRDataCaptureServiceDelegate>)delegate extendedSettings:(RTRExtendedSettings*)extendedSettings;
 
 @end

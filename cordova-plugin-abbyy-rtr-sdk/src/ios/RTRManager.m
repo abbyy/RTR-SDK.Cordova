@@ -48,30 +48,32 @@ static NSString* const RTRAssetsPath = @"www/rtr_assets";
 }
 
 - (id<RTRTextCaptureService>)textCaptureServiceWithLanguages:(NSSet*)languages
-	delegate:(id<RTRTextCaptureServiceDelegate>)delegate
+	delegate:(id<RTRTextCaptureServiceDelegate>)delegate extendedSettings:(RTRExtendedSettings*)extendedSettings
 {
-	id<RTRTextCaptureService> service = [self.engine createTextCaptureServiceWithDelegate:delegate];
-	[service setRecognitionLanguages:languages];
+	id<RTRTextCaptureService> service = [self.engine createTextCaptureServiceWithDelegate:delegate settings:extendedSettings];
+	if(languages.count != 0) {
+		[service setRecognitionLanguages:languages];
+	}
 	
 	return service;
 }
 
 - (id<RTRDataCaptureService>)dataCaptureServiceWithProfile:(NSString*)profile
-	delegate:(id<RTRDataCaptureServiceDelegate>)delegate
+	delegate:(id<RTRDataCaptureServiceDelegate>)delegate extendedSettings:(RTRExtendedSettings*)extendedSettings
 {
-	return [self.engine createDataCaptureServiceWithDelegate:delegate profile:profile];
+	return [self.engine createDataCaptureServiceWithDelegate:delegate profile:profile settings:extendedSettings];
 }
 
 - (id<RTRDataCaptureService>)customDataCaptureServiceWithScenario:(RTRDataCaptureScenario*)scenario
-	delegate:(id<RTRDataCaptureServiceDelegate>)delegate
+	delegate:(id<RTRDataCaptureServiceDelegate>)delegate extendedSettings:(RTRExtendedSettings*)extendedSettings
 {
-	return [self buildServiceUsingScenario:scenario delegate:delegate error:nil];
+	return [self buildServiceUsingScenario:scenario delegate:delegate extendedSettings:extendedSettings error:nil];
 }
 
 - (id<RTRDataCaptureService>)buildServiceUsingScenario:(RTRDataCaptureScenario*)scenario
-	delegate:(id<RTRDataCaptureServiceDelegate>)delegate error:(NSError**)error
+	delegate:(id<RTRDataCaptureServiceDelegate>)delegate extendedSettings:(RTRExtendedSettings*)extendedSettings error:(NSError**)error
 {
-	id<RTRDataCaptureService> service = [self.engine createDataCaptureServiceWithDelegate:delegate profile:nil];
+	id<RTRDataCaptureService> service = [self.engine createDataCaptureServiceWithDelegate:delegate profile:nil settings:extendedSettings];
 	id<RTRDataCaptureProfileBuilder> builder = [service configureDataCaptureProfile];
 	[builder setRecognitionLanguages:scenario.languages];
 	

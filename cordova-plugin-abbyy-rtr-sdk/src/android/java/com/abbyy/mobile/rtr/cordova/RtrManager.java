@@ -10,6 +10,8 @@ import com.abbyy.mobile.rtr.cordova.exceptions.InitializationException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class RtrManager extends Application {
@@ -27,6 +29,7 @@ public class RtrManager extends Application {
 	private static boolean languageSelectionEnabled;
 	private static float ratioHeight;
 	private static float ratioWidth;
+	private static HashMap<String, String> extendedSettings;
 
 	public static RtrManager getInstance()
 	{
@@ -47,7 +50,8 @@ public class RtrManager extends Application {
 		languages = new ArrayList<>();
 	}
 
-	public static void setDataCaptureProfile( String profile ) {
+	public static void setDataCaptureProfile( String profile )
+	{
 		RtrManager.dataCaptureProfile = profile;
 	}
 
@@ -64,6 +68,11 @@ public class RtrManager extends Application {
 	public static void setSelectedLanguages( List<Language> languages )
 	{
 		RtrManager.selectedLanguages = languages;
+	}
+
+	public static void setExtendedSettings( HashMap<String, String> extendedSettings )
+	{
+		RtrManager.extendedSettings = extendedSettings;
 	}
 
 	public static String getDataCaptureProfile()
@@ -100,6 +109,11 @@ public class RtrManager extends Application {
 	public static List<Language> getSelectedLanguages()
 	{
 		return selectedLanguages;
+	}
+
+	public static HashMap<String, String> getExtendedSettings()
+	{
+		return extendedSettings;
 	}
 
 	public static boolean stopWhenStable()

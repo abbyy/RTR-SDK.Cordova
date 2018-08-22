@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class TextCaptureActivity extends BaseActivity {
 	private TextCaptureSurfaceView surfaceViewWithOverlay;
@@ -112,7 +113,15 @@ public class TextCaptureActivity extends BaseActivity {
 				for( int i = 0; i < currentLanguages.length; i++ ) {
 					languageNames[i] = currentLanguages[i].name();
 				}
-				resultInfo.put( "recognitionLanguages", languageNames );
+
+				HashMap<String, String> map = RtrManager.getExtendedSettings();
+				if( map == null ) {
+					resultInfo.put( "recognitionLanguages", languageNames );
+				} else {
+					if( map.get( RtrPlugin.RTR_CUSTOM_RECOGNITION_LANGUAGES ) == null ) {
+						resultInfo.put( "recognitionLanguages", languageNames );
+					}
+				}
 
 				if( wasStoppedByUser ) {
 					resultInfo.put( "userAction", "Manually Stopped" );
@@ -158,6 +167,15 @@ public class TextCaptureActivity extends BaseActivity {
 		try {
 			captureService = RtrManager.getInstance().createTextCaptureService( captureCallback );
 			captureService.setRecognitionLanguage( currentLanguages );
+
+			if( RtrManager.getExtendedSettings() != null ) {
+				HashMap<String, String> map = RtrManager.getExtendedSettings();
+				for( Map.Entry<String, String> entry : map.entrySet() ) {
+					String key = entry.getKey();
+					String value = entry.getValue();
+					captureService.getExtendedSettings().setNamedProperty( key, value );
+				}
+			}
 			return true;
 		} catch( InitializationException e ) {
 			e.printStackTrace();

@@ -14,7 +14,10 @@
 	[super viewDidLoad];
 
 	[self.settingsButton setTitle:[self languagesButtonTitle] forState:UIControlStateNormal];
-	self.service = [self.rtrManager textCaptureServiceWithLanguages:self.selectedRecognitionLanguages delegate:self];
+
+	RTRExtendedSettings* extendedSettings = [[RTRExtendedSettings alloc] init];
+	[extendedSettings setValue:self.extendedSettings forKey:@"properties"];
+	self.service = [self.rtrManager textCaptureServiceWithLanguages:self.selectedRecognitionLanguages delegate:self extendedSettings:extendedSettings];
 }
 
 #pragma mark -

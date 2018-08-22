@@ -14,6 +14,7 @@ extern void performBlockOnMainThread(NSInteger delay, void(^block)());
 
 @property (nonatomic, weak) RTRManager* rtrManager;
 @property (nonatomic) id<RTRRecognitionService> service;
+@property (nonatomic, copy) NSDictionary* extendedSettings;
 
 /// Image size.
 @property (nonatomic, assign) CGSize imageBufferSize;

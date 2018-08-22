@@ -19,12 +19,14 @@
 
 	self.descriptionLabel.text = [self.selectedScenario description];
 
+	RTRExtendedSettings* extendedSettings = [[RTRExtendedSettings alloc] init];
+	[extendedSettings setValue:self.extendedSettings forKey:@"properties"];
 	if(self.profile.length != 0) {
 		[self.settingsButton setTitle:self.profile forState:UIControlStateNormal];
-		self.service = [self.rtrManager dataCaptureServiceWithProfile:self.profile delegate:self];
+		self.service = [self.rtrManager dataCaptureServiceWithProfile:self.profile delegate:self extendedSettings:extendedSettings];
 	} else {
 		[self.settingsButton setTitle:self.selectedScenario.name forState:UIControlStateNormal];
-		self.service = [self.rtrManager customDataCaptureServiceWithScenario:self.selectedScenario delegate:self];
+		self.service = [self.rtrManager customDataCaptureServiceWithScenario:self.selectedScenario delegate:self extendedSettings:extendedSettings];
 	}
 }
 

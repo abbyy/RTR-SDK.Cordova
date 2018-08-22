@@ -6,7 +6,7 @@ This plugin requires the ABBYY RTR SDK native library which is available for And
 
 The native libraries support the following systems:
 
-* Android: version 4.4 or later for ARMv7 processors
+* Android: version 4.4 or later for ARMv7 (armeabi-v7a) and ARMv8 (arm64-v8a) processors 
 * iOS: versions 8.x and later
 
 

@@ -26,6 +26,8 @@ static NSString* const RTRScenarioDescriptionKey = @"description";
 
 static NSString* const RTRDataCaptureProfileKey = @"profile";
 
+static NSString* const RTRExtendedSettingsKey = @"extendedSettings";
+
 static NSString* const RTRDefaultRecognitionLanguage = @"English";
 
 NSString* const RTRCallbackErrorKey = @"error";
@@ -52,10 +54,16 @@ NSString* const RTRCallbackUserActionKey = @"userAction";
 		}
 
 		NSDictionary* params = command.arguments.firstObject;
-		NSArray<NSString*>* languages = params[RTRSelectableRecognitionLanguagesKey];
-		NSArray<NSString*>* selectedLanguagesArray = params[RTRRecognitionLanguagesKey];
-		if(selectedLanguagesArray.count == 0) {
-			selectedLanguagesArray = @[RTRDefaultRecognitionLanguage];
+
+		NSDictionary* extendedSettings = params[RTRExtendedSettingsKey];
+		NSArray<NSString*>* languages;
+		NSArray<NSString*>* selectedLanguagesArray;
+		if(extendedSettings[@"CustomRecognitionLanguages"] == nil) {
+			languages = params[RTRSelectableRecognitionLanguagesKey];
+			selectedLanguagesArray = params[RTRRecognitionLanguagesKey];
+			if(selectedLanguagesArray.count == 0) {
+				selectedLanguagesArray = @[RTRDefaultRecognitionLanguage];
+			}
 		}
 
 		NSSet* selectedLanguages = [NSSet setWithArray:selectedLanguagesArray];
@@ -73,6 +81,7 @@ NSString* const RTRCallbackUserActionKey = @"userAction";
 				[weakSelf.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 			}];
 		};
+		rtrViewController.extendedSettings = extendedSettings;
 
 		[self presentCaptureViewController:rtrViewController command:command];
 	}];
@@ -131,6 +140,8 @@ NSString* const RTRCallbackUserActionKey = @"userAction";
 			}];
 		};
 
+		rtrViewController.extendedSettings = params[RTRExtendedSettingsKey];
+
 		[self presentCaptureViewController:rtrViewController command:command];
 	}];
 }
@@ -140,6 +151,7 @@ NSString* const RTRCallbackUserActionKey = @"userAction";
 - (void)presentCaptureViewController:(RTRViewController*)rtrViewController command:(CDVInvokedUrlCommand*)command
 {
 	NSDictionary* params = command.arguments.firstObject;
+
 	rtrViewController.rtrManager = self.rtrManager;
 	rtrViewController.stopWhenStable = YES;
 	if(params[RTRStopWhenStableKey] != nil) {
