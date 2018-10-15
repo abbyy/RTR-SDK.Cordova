@@ -41,13 +41,11 @@ To get started:
 			<activity
 				android:name="com.abbyy.mobile.rtr.cordova.activities.TextCaptureActivity"
 				android:configChanges="keyboardHidden|screenSize"
-				android:screenOrientation="portrait"
 			/>
 
 			<activity
 				android:name="com.abbyy.mobile.rtr.cordova.activities.DataCaptureActivity"
 				android:configChanges="keyboardHidden|screenSize"
-				android:screenOrientation="portrait"
 			/>
 
 			<activity

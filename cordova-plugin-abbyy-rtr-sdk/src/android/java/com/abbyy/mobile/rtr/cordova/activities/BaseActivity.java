@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.hardware.Camera;
+import android.hardware.display.DisplayManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -70,6 +71,7 @@ abstract class BaseActivity extends Activity {
 	protected boolean stableResultHasBeenReached; // Stable result has been reached
 	protected boolean startRecognitionWhenReady; // Start recognition next time when ready (and reset this flag)
 	protected Handler handler = new Handler(); // Posting some delayed actions;
+	protected DisplayManager.DisplayListener orientationEventListener;
 
 	// UI components
 	protected Button startButton; // The start button
@@ -197,16 +199,32 @@ abstract class BaseActivity extends Activity {
 
 	protected void configureSurfaceView( BaseSurfaceView surfaceViewWithOverlay )
 	{
+		// Width and height of the preview according to the current screen rotation
+		int width = 0;
+		int height = 0;
+		switch( orientation ) {
+			case 0:
+			case 180:
+				width = cameraPreviewSize.width;
+				height = cameraPreviewSize.height;
+				break;
+			case 90:
+			case 270:
+				width = cameraPreviewSize.height;
+				height = cameraPreviewSize.width;
+				break;
+		}
+
 		// Configure the view scale and area of interest (camera sees it as rotated 90 degrees, so
 		// there's some confusion with what is width and what is height)
-		surfaceViewWithOverlay.setScaleX( surfaceViewWithOverlay.getWidth(), cameraPreviewSize.height );
-		surfaceViewWithOverlay.setScaleY( surfaceViewWithOverlay.getHeight(), cameraPreviewSize.width );
+		surfaceViewWithOverlay.setScaleX( surfaceViewWithOverlay.getWidth(), width );
+		surfaceViewWithOverlay.setScaleY( surfaceViewWithOverlay.getHeight(), height );
 		// Area of interest
-		int marginWidth = ( areaOfInterestMargin_PercentOfWidth * cameraPreviewSize.height ) / 100;
-		int marginHeight = ( areaOfInterestMargin_PercentOfHeight * cameraPreviewSize.width ) / 100;
+		int marginWidth = ( areaOfInterestMargin_PercentOfWidth * width ) / 100;
+		int marginHeight = ( areaOfInterestMargin_PercentOfHeight * height ) / 100;
 		surfaceViewWithOverlay.setAreaOfInterest(
-			new Rect( marginWidth, marginHeight, cameraPreviewSize.height - marginWidth,
-				cameraPreviewSize.width - marginHeight ) );
+			new Rect( marginWidth, marginHeight, width - marginWidth,
+				height - marginHeight ) );
 	}
 
 	// Returns orientation of camera
@@ -636,11 +654,50 @@ abstract class BaseActivity extends Activity {
 		if( previewSurfaceHolder != null ) {
 			setCameraPreviewDisplayAndStartPreview();
 		}
+
+		orientationEventListener = new DisplayManager.DisplayListener() {
+			int oldRotation = -5;
+
+			void eventHandler()
+			{
+				int update = getWindowManager().getDefaultDisplay().getRotation();
+				if( update != oldRotation ) {
+					oldRotation = update;
+					configureCameraAndStartPreview( camera );
+				}
+			}
+
+			@Override
+			public void onDisplayAdded( int displayId )
+			{
+				eventHandler();
+			}
+
+			@Override
+			public void onDisplayChanged( int displayId )
+			{
+				eventHandler();
+			}
+
+			@Override
+			public void onDisplayRemoved( int displayId )
+			{
+				eventHandler();
+			}
+		};
+
+		DisplayManager displayManager = (DisplayManager) this.getSystemService( Context.DISPLAY_SERVICE );
+		displayManager.registerDisplayListener( orientationEventListener, new Handler( getMainLooper() ) );
 	}
 
 	@Override
 	public void onPause()
 	{
+		if( orientationEventListener != null ) {
+			DisplayManager displayManager = (DisplayManager) this.getSystemService( Context.DISPLAY_SERVICE );
+			displayManager.unregisterDisplayListener( orientationEventListener );
+			orientationEventListener = null;
+		}
 		// Clear all pending actions
 		handler.removeCallbacksAndMessages( null );
 		// Stop the data capture service
