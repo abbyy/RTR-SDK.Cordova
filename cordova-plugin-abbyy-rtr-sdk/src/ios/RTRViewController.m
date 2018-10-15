@@ -50,6 +50,9 @@ void performBlockOnMainThread(NSInteger delay, void(^block)())
 	// Recommended session preset.
 	_sessionPreset = AVCaptureSessionPreset1280x720;
 	_imageBufferSize = CGSizeMake(720.f, 1280.f);
+	if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+		_imageBufferSize = CGSizeMake(_imageBufferSize.height, _imageBufferSize.width);
+	}
 
 	[self.settingsTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:RTRTableCellID];
 	self.settingsTableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -113,11 +116,6 @@ void performBlockOnMainThread(NSInteger delay, void(^block)())
 			completion(NO);
 			break;
 	}
-}
-
-- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
-{
-	return UIInterfaceOrientationPortrait;
 }
 
 - (void)configureCompletionAccessGranted:(BOOL)accessGranted
@@ -340,6 +338,9 @@ void performBlockOnMainThread(NSInteger delay, void(^block)())
 	[_session addOutput:videoDataOutput];
 
 	[[videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
+	AVCaptureVideoOrientation videoOrientation = [self videoOrientationFromInterfaceOrientation:
+		[UIApplication sharedApplication].statusBarOrientation];
+	[[videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setVideoOrientation:videoOrientation];
 }
 
 - (void)configurePreviewLayer
