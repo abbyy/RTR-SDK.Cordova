@@ -2,7 +2,7 @@
 /// ABBYY is either a registered trademark or a trademark of ABBYY Software Ltd.
 
 #import <Foundation/Foundation.h>
-#import <AbbyyRtrSdk/AbbyyRtrSdk.h>
+#import <AbbyyRtrSDK/AbbyyRtrSDK.h>
 
 @class RTRDataCaptureScenario;
 
