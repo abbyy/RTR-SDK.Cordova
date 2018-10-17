@@ -43,10 +43,10 @@ The native libraries support the following systems:
         cordova build android
         cordova run android
         ```
-    * For iOS, specify your Development Team:
+    * For iOS, specify your Development Team (and Legacy Build System for Xcode 10):
         ```sh
-        cordova build ios --buildFlag="DEVELOPMENT_TEAM=<YOUR_TEAM>"
-        cordova run ios --buildFlag="DEVELOPMENT_TEAM=<YOUR_TEAM>"
+        cordova build ios --buildFlag="-UseModernBuildSystem=0" --buildFlag="DEVELOPMENT_TEAM=<YOUR_TEAM>"
+        cordova run ios --buildFlag="-UseModernBuildSystem=0" --buildFlag="DEVELOPMENT_TEAM=<YOUR_TEAM>"
         ```
 
 

@@ -112,9 +112,9 @@ To get started:
 	* Copy `AbbyyRtrSDK.framework` to `libs/ios` in your project.
 	* Add `libs/ios` to linker search paths:
 	** In `platforms/ios/cordova/build.xcconfig`, add `FRAMEWORK_SEARCH_PATHS = "../../libs/ios"`.
-	* Build and run. Don't forget to specify your Development Team:
-	** `cordova build ios --buildFlag="DEVELOPMENT_TEAM=YOUR_TEAM"`
-	** `cordova run ios --buildFlag="DEVELOPMENT_TEAM=YOUR_TEAM"`
+	* Build and run. Don't forget to specify your Development Team and Legacy Build System for Xcode 10:
+	** `cordova build ios --buildFlag="-UseModernBuildSystem=0" --buildFlag="DEVELOPMENT_TEAM=YOUR_TEAM"`
+	** `cordova run ios --buildFlag="-UseModernBuildSystem=0" --buildFlag="DEVELOPMENT_TEAM=YOUR_TEAM"`
 	* Enjoy using ABBYY OCR SDK :) Thank you!</info>
 
 		<config-file target="config.xml" parent="/*">
