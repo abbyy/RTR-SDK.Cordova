@@ -79,7 +79,7 @@ static NSDictionary* dictionaryFromDataField(RTRDataField* field)
 		@"name" : field.name ?: @"",
 		@"text" : field.text ?: @"",
 		@"quadrangle" : strinfFromQuadrangle(field.quadrangle),
-		@"components" : arrayFromTextLines(field.components),
+		@"components" : arrayFromDataFields(field.components),
 	};
 }
 
