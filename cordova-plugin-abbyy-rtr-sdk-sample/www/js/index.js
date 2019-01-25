@@ -45,6 +45,11 @@ function Button(buttonId, action) {
 	this.element.addEventListener('touchstart', this.onTouch.bind(this));
 }
 
+function Orientation() {
+	element = document.getElementById('orientation')
+	return element.options[element.selectedIndex].text
+}
+
 var isFlashlightVisible = document.getElementById('isFlashlightVisible');
 var isStopButtonVisible = document.getElementById('isStopButtonVisible');
 var stopWhenStable = document.getElementById('stopWhenStable');
@@ -68,6 +73,7 @@ var textCaptureButton = new Button('textCaptureButton', function() {
 		stopWhenStable : stopWhenStable.checked,
 		areaOfInterest : (areaOfInterestWidth.current() + " " + areaOfInterestHeight.current()),
 		isStopButtonVisible : isStopButtonVisible.checked,
+		orientation: Orientation(),
 	});
 });
 
@@ -87,6 +93,7 @@ var customDataCaptureButton = new Button('customDataCaptureButton', function() {
 		stopWhenStable : stopWhenStable.checked,
 		areaOfInterest : areaOfInterestWidth.current() + " " + areaOfInterestHeight.current(),
 		isStopButtonVisible : isStopButtonVisible.checked,
+		orientation: Orientation(),
 	});
 });
 
@@ -94,11 +101,13 @@ var dataCaptureButton = new Button('dataCaptureButton', function() {
 	AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
 		profile : "MRZ",
 
+		orientation: "default",
 		licenseFileName : "AbbyyRtrSdk.license",
 		isFlashlightVisible : isFlashlightVisible.checked,
 		stopWhenStable : stopWhenStable.checked,
 		areaOfInterest : areaOfInterestWidth.current() + " " + areaOfInterestHeight.current(),
 		isStopButtonVisible : isStopButtonVisible.checked,
+		orientation: Orientation(),
 	});
 });
 
