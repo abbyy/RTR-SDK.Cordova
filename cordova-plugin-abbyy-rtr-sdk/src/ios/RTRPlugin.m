@@ -30,6 +30,8 @@ static NSString* const RTRExtendedSettingsKey = @"extendedSettings";
 
 static NSString* const RTRDefaultRecognitionLanguage = @"English";
 
+static NSString* const RTROrientationPolicy = @"orientation";
+
 NSString* const RTRCallbackErrorKey = @"error";
 NSString* const RTRCallbackErrorDescriptionKey = @"description";
 NSString* const RTRCallbackResultInfoKey = @"resultInfo";
@@ -69,6 +71,7 @@ NSString* const RTRCallbackUserActionKey = @"userAction";
 		NSSet* selectedLanguages = [NSSet setWithArray:selectedLanguagesArray];
 
 		RTRTextCaptureViewController* rtrViewController = [RTRTextCaptureViewController new];
+		rtrViewController.supportedInterfaceOrientations = [self orientationMaskFromString:params[RTROrientationPolicy]];
 		rtrViewController.settingsTableContent = languages;
 		rtrViewController.selectedRecognitionLanguages = [selectedLanguages mutableCopy];
 		rtrViewController.languageSelectionEnabled = languages.count != 0;
@@ -94,10 +97,11 @@ NSString* const RTRCallbackUserActionKey = @"userAction";
 			return;
 		}
 
-		RTRDataCaptureViewController* rtrViewController = [RTRDataCaptureViewController new];
-
 		NSDictionary* params = command.arguments.firstObject;
 		NSDictionary* scenarioParams = params[RTRCustomDataCaptureScenarioKey];
+
+		RTRDataCaptureViewController* rtrViewController = [RTRDataCaptureViewController new];
+		rtrViewController.supportedInterfaceOrientations = [self orientationMaskFromString:params[RTROrientationPolicy]];
 
 		NSString* errorDescription = nil;
 
@@ -218,6 +222,21 @@ NSString* const RTRCallbackUserActionKey = @"userAction";
 	}
 
 	return YES;
+}
+
+- (UIInterfaceOrientationMask)orientationMaskFromString:(NSString*)string
+{
+	if([string isEqualToString:@"portrait"]) {
+		return UIInterfaceOrientationMaskPortrait;
+	}
+	if([string isEqualToString:@"landscape"]) {
+		return UIInterfaceOrientationMaskLandscape;
+	}
+	if([string isEqualToString:@"default"]) {
+		return UIInterfaceOrientationMaskAll;
+	}
+	// default like cordova config behaviour
+	return UIInterfaceOrientationMaskPortrait;
 }
 
 @end

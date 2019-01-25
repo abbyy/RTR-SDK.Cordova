@@ -50,9 +50,6 @@ void performBlockOnMainThread(NSInteger delay, void(^block)())
 	// Recommended session preset.
 	_sessionPreset = AVCaptureSessionPreset1280x720;
 	_imageBufferSize = CGSizeMake(720.f, 1280.f);
-	if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
-		_imageBufferSize = CGSizeMake(_imageBufferSize.height, _imageBufferSize.width);
-	}
 
 	[self.settingsTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:RTRTableCellID];
 	self.settingsTableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -68,7 +65,12 @@ void performBlockOnMainThread(NSInteger delay, void(^block)())
 	}
 
 	self.settingsTableView.hidden = YES;
+}
 
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	[super viewWillAppear:animated];
 	__weak RTRViewController* weakSelf = self;
 	[self authorizeCameraDeviceWithCompletion:^(BOOL isGranted) {
 		performBlockOnMainThread(0, ^{
@@ -147,8 +149,20 @@ void performBlockOnMainThread(NSInteger delay, void(^block)())
 		name: UIApplicationWillEnterForegroundNotification object:nil];
 }
 
+- (void)updateImageBufferSize
+{
+	CGFloat smallerSide = MIN(_imageBufferSize.width, _imageBufferSize.height);
+	CGFloat biggerSide = MAX(_imageBufferSize.width, _imageBufferSize.height);
+	if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+		_imageBufferSize = CGSizeMake(biggerSide, smallerSide);
+	} else {
+		_imageBufferSize = CGSizeMake(smallerSide, biggerSide);
+	}
+}
+
 - (void)updateAreaOfInterest
 {
+	[self updateImageBufferSize];
 	// Scale area of interest from view coordinate system to image coordinates.
 	CGRect selectedRect = CGRectApplyAffineTransform(_selectedArea,
 		CGAffineTransformMakeScale(_imageBufferSize.width * 1.f / CGRectGetWidth(_overlayView.frame),
@@ -373,10 +387,17 @@ void performBlockOnMainThread(NSInteger delay, void(^block)())
 		return;
 	}
 
-	AVCaptureVideoOrientation videoOrientation = [self videoOrientationFromInterfaceOrientation:
-		[UIApplication sharedApplication].statusBarOrientation];
-	if(connection.videoOrientation != videoOrientation) {
-		[connection setVideoOrientation:videoOrientation];
+	__block BOOL invalidFrameOrientation = NO;
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		AVCaptureVideoOrientation videoOrientation = [self videoOrientationFromInterfaceOrientation:
+			[UIApplication sharedApplication].statusBarOrientation];
+		if(connection.videoOrientation != videoOrientation) {
+			[connection setVideoOrientation:videoOrientation];
+			invalidFrameOrientation = YES;
+		}
+	});
+
+	if(invalidFrameOrientation) {
 		return;
 	}
 

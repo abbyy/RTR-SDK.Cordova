@@ -60,6 +60,8 @@ extern void performBlockOnMainThread(NSInteger delay, void(^block)());
 /// Progress indicator view.
 @property (nonatomic, weak) IBOutlet RTRProgressView* progressIndicatorView;
 
+@property (nonatomic, assign) UIInterfaceOrientationMask supportedInterfaceOrientations;
+
 - (IBAction)capturePressed;
 - (IBAction)toggleSettingsTableVisibility;
 - (IBAction)toggleFlashMode;
