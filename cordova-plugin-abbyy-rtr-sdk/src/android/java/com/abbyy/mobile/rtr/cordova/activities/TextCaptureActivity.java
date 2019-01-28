@@ -165,7 +165,7 @@ public class TextCaptureActivity extends BaseActivity {
 	protected boolean createCaptureService()
 	{
 		try {
-			captureService = RtrManager.getInstance().createTextCaptureService( captureCallback );
+			captureService = RtrManager.createTextCaptureService( captureCallback );
 			captureService.setRecognitionLanguage( currentLanguages );
 
 			if( RtrManager.getExtendedSettings() != null ) {

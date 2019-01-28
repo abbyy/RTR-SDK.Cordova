@@ -204,7 +204,7 @@ public class DataCaptureActivity extends BaseActivity {
 		String profile = RtrManager.getDataCaptureProfile();
 		if( profile != null ) {
 			try {
-				captureService = RtrManager.getInstance().createDataCaptureService( profile, captureCallback );
+				captureService = RtrManager.createDataCaptureService( profile, captureCallback );
 			} catch( InitializationException e ) {
 				onStartupError( e );
 			} catch( IllegalArgumentException e ) {
@@ -215,7 +215,7 @@ public class DataCaptureActivity extends BaseActivity {
 			// Custom data capture scenarios
 			captureService = null;
 			try {
-				captureService = RtrManager.getInstance().createDataCaptureService( null, captureCallback );
+				captureService = RtrManager.createDataCaptureService( null, captureCallback );
 				IDataCaptureProfileBuilder profileBuilder = captureService.configureDataCaptureProfile();
 				IDataCaptureProfileBuilder.IFieldBuilder field = profileBuilder.addScheme( currentScenario.name ).addField( currentScenario.name );
 

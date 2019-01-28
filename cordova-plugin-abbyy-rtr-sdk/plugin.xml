@@ -17,7 +17,7 @@ To get started:
 	* Copy assets (patterns and dictionaries) and the license file (`AbbyyRtrSdk.license`) to `www/rtr_assets` in your project.
 	* Copy `abbyy-rtr-sdk-1.0.aar` to `libs/android` in your project.
 	* Add `libs/android` to linker search paths:
-	** In `platforms/android/build.gradle`, add `allprojects { repositories { flatDir { dirs '../../libs/android' } } }`.
+	** In `platforms/android/build.gradle`, add `allprojects { repositories { flatDir { dirs '../../libs/android' // or '../../../libs/android' for cordova-android >= 7 } } }`.
 	* Build and run:
 	** `cordova build android`
 	** `cordova run android`

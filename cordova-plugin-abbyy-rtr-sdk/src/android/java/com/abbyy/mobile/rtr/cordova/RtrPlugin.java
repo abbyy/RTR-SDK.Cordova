@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
+import android.content.Context;
 
 import com.abbyy.mobile.rtr.Engine;
 import com.abbyy.mobile.rtr.Language;
@@ -125,7 +126,8 @@ public class RtrPlugin extends CordovaPlugin {
 		try {
 			inputParameters = args.getJSONObject( 0 );
 			parseLicenseName( inputParameters );
-			RtrManager.getInstance().initWithLicense();
+			Context applicationContext = this.cordova.getActivity().getApplicationContext();
+			RtrManager.initWithLicense( applicationContext );
 		} catch( IOException e ) {
 			Log.e( cordova.getActivity().getString( ResourcesUtils.getResId( "string", "app_name", cordova.getActivity() ) ), "Error loading ABBYY RTR SDK:", e );
 			onError( "Could not load some required resource files. Make sure to configure " +

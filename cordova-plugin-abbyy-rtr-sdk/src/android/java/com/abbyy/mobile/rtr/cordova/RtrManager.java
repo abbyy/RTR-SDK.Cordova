@@ -1,6 +1,7 @@
 package com.abbyy.mobile.rtr.cordova;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.abbyy.mobile.rtr.Engine;
 import com.abbyy.mobile.rtr.IDataCaptureService;
@@ -14,14 +15,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class RtrManager extends Application {
+public class RtrManager {
 
-	private static RtrManager instance;
 	private static Engine engine;
 	private static String licenseFileName;
 	private static String dataCaptureProfile;
 	private static DataCaptureScenario customDataCaptureScenario;
-	private static List<Language> languages;
+	private static List<Language> languages = new ArrayList<>();
 	private static List<Language> selectedLanguages;
 	private static boolean stopWhenStable;
 	private static boolean stopButtonVisible;
@@ -31,24 +31,12 @@ public class RtrManager extends Application {
 	private static float ratioWidth;
 	private static HashMap<String, String> extendedSettings;
 
-	public static RtrManager getInstance()
+
+	public static void initWithLicense( Context context ) throws IOException, Engine.LicenseException
 	{
-		return instance;
+		engine = Engine.load( context, licenseFileName );
 	}
 
-	public void initWithLicense() throws IOException, Engine.LicenseException
-	{
-		engine = Engine.load( getApplicationContext(), licenseFileName );
-	}
-
-	@Override
-	public void onCreate()
-	{
-		super.onCreate();
-		instance = this;
-		engine = null;
-		languages = new ArrayList<>();
-	}
 
 	public static void setDataCaptureProfile( String profile )
 	{
@@ -85,7 +73,7 @@ public class RtrManager extends Application {
 		return customDataCaptureScenario;
 	}
 
-	public ITextCaptureService createTextCaptureService( ITextCaptureService.Callback captureCallback ) throws InitializationException
+	public static ITextCaptureService createTextCaptureService( ITextCaptureService.Callback captureCallback ) throws InitializationException
 	{
 		if( engine == null ) {
 			throw new InitializationException( "Initialize Engine first" );
@@ -93,7 +81,7 @@ public class RtrManager extends Application {
 		return engine.createTextCaptureService( captureCallback );
 	}
 
-	public IDataCaptureService createDataCaptureService( String name, IDataCaptureService.Callback captureCallback ) throws InitializationException
+	public static IDataCaptureService createDataCaptureService( String name, IDataCaptureService.Callback captureCallback ) throws InitializationException
 	{
 		if( engine == null ) {
 			throw new InitializationException( "Initialize Engine first" );
@@ -168,13 +156,13 @@ public class RtrManager extends Application {
 		RtrManager.languageSelectionEnabled = value;
 	}
 
-	public static void setRatioHeight( float ratioHeight )
+	public static void setRatioHeight( float height )
 	{
-		RtrManager.ratioHeight = ratioHeight;
+		ratioHeight = height;
 	}
 
-	public static void setRatioWidth( float ratioWidth )
+	public static void setRatioWidth( float width )
 	{
-		RtrManager.ratioWidth = ratioWidth;
+		ratioWidth = width;
 	}
 }

@@ -21,6 +21,7 @@ This example app shows how to integrate the ABBYY Real-Time Recognition SDK Cord
     You should see `android` and `ios` in platforms and `cordova-plugin-abbyy-rtr-sdk` in plugins.
 5. Download ABBYY Real-Time Recognition SDK (RTR SDK) from https://rtrsdk.com/ and add it to the example:
     * Copy RTR SDK assets (patterns and dictionaries) and your license file (`AbbyyRtrSdk.license`) to `www/rtr_assets`.
+    * For cordova-android >= 7.0 users additionally need to place assets mentioned above to `platforms/android/app/src/main/assets` manually or by specify resource-file in config.xml
     * Copy the Android library (`abbyy-rtr-sdk-1.0.aar`) to `libs/android`.
     * Copy the iOS framework (`AbbyyRtrSDK.framework`) to `libs/ios`.
     These paths already exist in the example project.
@@ -30,7 +31,8 @@ This example app shows how to integrate the ABBYY Real-Time Recognition SDK Cord
         allprojects {
           repositories {
             flatDir {
-              dirs '../../libs/android'
+              dirs '../../../libs/android' // cordova-android >= 7
+              dirs '../../libs/android' // cordova-android <= 6
             }
           }
         }

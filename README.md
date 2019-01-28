@@ -28,7 +28,8 @@ The native libraries support the following systems:
         allprojects {
           repositories {
             flatDir {
-              dirs '../../libs/android'
+              dirs '../../../libs/android' // cordova-android >= 7
+              dirs '../../libs/android' // cordova-android <= 6
             }
           }
         }
