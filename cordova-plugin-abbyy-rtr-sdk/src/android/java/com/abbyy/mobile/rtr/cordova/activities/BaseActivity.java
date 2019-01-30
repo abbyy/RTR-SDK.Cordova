@@ -3,6 +3,7 @@ package com.abbyy.mobile.rtr.cordova.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
@@ -599,6 +600,10 @@ abstract class BaseActivity extends Activity {
 	protected void onCreate( @Nullable Bundle savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
+		
+		if( RtrManager.getOrientation() != ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED ) {
+			setRequestedOrientation( RtrManager.getOrientation() );
+		}
 
 		requestWindowFeature( Window.FEATURE_NO_TITLE );
 		getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -663,6 +668,10 @@ abstract class BaseActivity extends Activity {
 				int update = getWindowManager().getDefaultDisplay().getRotation();
 				if( update != oldRotation ) {
 					oldRotation = update;
+					if( getCaptureService() != null ) {
+						getCaptureService().stop();
+					}
+					startRecognitionWhenReady = startRecognitionOnAppStart;
 					configureCameraAndStartPreview( camera );
 				}
 			}

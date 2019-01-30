@@ -30,6 +30,7 @@ public class RtrManager {
 	private static float ratioHeight;
 	private static float ratioWidth;
 	private static HashMap<String, String> extendedSettings;
+	private static int orientation;
 
 
 	public static void initWithLicense( Context context ) throws IOException, Engine.LicenseException
@@ -133,6 +134,11 @@ public class RtrManager {
 	{
 		return ratioWidth;
 	}
+	
+	public static int getOrientation() 
+	{ 
+		return orientation; 
+	}
 
 	public static void setLicenseFileName( String licenseFileName )
 	{
@@ -164,5 +170,10 @@ public class RtrManager {
 	public static void setRatioWidth( float width )
 	{
 		ratioWidth = width;
+	}
+	
+	public static void setOrientation( int orientation )
+	{ 
+		RtrManager.orientation = orientation;
 	}
 }

@@ -2,6 +2,7 @@ package com.abbyy.mobile.rtr.cordova;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -50,6 +51,7 @@ public class RtrPlugin extends CordovaPlugin {
 	private static final String RTR_AREA_OF_INTEREST_KEY = "areaOfInterest";
 	private static final String RTR_IS_FLASHLIGHT_VISIBLE_KEY = "isFlashlightVisible";
 	private static final String RTR_IS_STOP_BUTTON_VISIBLE_KEY = "isStopButtonVisible";
+	private static final String RTR_ORIENTATION_KEY = "orientation";
 
 	private static final String RTR_CUSTOM_DATA_CAPTURE_SCENARIO_KEY = "customDataCaptureScenario";
 	private static final String RTR_CUSTOM_DATA_CAPTURE_SCENARIO_NAME_KEY = "name";
@@ -246,6 +248,21 @@ public class RtrPlugin extends CordovaPlugin {
 		}
 		RtrManager.setStopWhenStable( stopWhenStable );
 	}
+	
+	private void parseOrientation( JSONObject arg ) throws JSONException
+	{
+		int orientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+		if( arg.has( RTR_ORIENTATION_KEY ) ) {
+			String value = arg.getString( RTR_ORIENTATION_KEY );
+			if( value.equals( "portrait" ) ) {
+				orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+			}
+			else if( value.equals( "landscape" ) ) {
+				orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+			}
+		}
+		RtrManager.setOrientation( orientation );
+	}
 
 	private void parseStopButtonVisibility( JSONObject arg ) throws JSONException
 	{
@@ -365,6 +382,7 @@ public class RtrPlugin extends CordovaPlugin {
 		parseStopButtonVisibility( arg );
 		parseToggleFlash( arg );
 		parseAreaOfInterest( arg );
+		parseOrientation( arg );
 	}
 
 	private DataCaptureScenario parseCustomScenario( JSONObject arg ) throws JSONException
