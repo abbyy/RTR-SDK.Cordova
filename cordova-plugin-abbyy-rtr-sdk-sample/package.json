@@ -1,7 +1,7 @@
 {
   "name": "cordova-plugin-abbyy-rtr-sdk-sample",
   "description": "ABBYY Real-Time Recognition SDK Cordova Plugin Example",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "RTRCordovaSample",
   "cordova": {
     "id": "cordova-plugin-abbyy-rtr-sdk-sample",
@@ -22,7 +22,7 @@
   "dependencies": {
     "cordova-android": "~6.2.3",
     "cordova-ios": "~4.4.0",
-    "cordova-plugin-abbyy-rtr-sdk": "^1.0.0"
+    "cordova-plugin-abbyy-rtr-sdk": "^1.0.9"
   },
   "keywords": [
     "rtr",

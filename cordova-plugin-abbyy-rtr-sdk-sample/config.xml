@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.abbyy.rtrcordovasample" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.abbyy.rtrcordovasample" version="1.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>RTRCordovaSample</name>
     <description>A sample Apache Cordova application with ABBYY Real-Time Recognition SDK Plugin.</description>
     <author email="sdk@abbyy.com" href="https://rtrsdk.com">ABBYY Mobile SDK Team</author>
@@ -17,7 +17,7 @@
     <preference name="BackupWebStorage" value="none" />
     <engine name="android" spec="~6.2.3" />
     <engine name="ios" spec="~4.4.0" />
-    <plugin name="cordova-plugin-abbyy-rtr-sdk" spec="^1.0.0">
+    <plugin name="cordova-plugin-abbyy-rtr-sdk" spec="^1.0.9">
         <variable name="CAMERA_USAGE_DESCRIPTION" value="NSCameraUsageDescription" />
     </plugin>
 </widget>
