@@ -46,8 +46,8 @@ The native libraries support the following systems:
         ```
     * For iOS, specify your Development Team:
         ```sh
-        cordova build ios --buildFlag="DEVELOPMENT_TEAM=<YOUR_TEAM>"
-        cordova run ios --buildFlag="DEVELOPMENT_TEAM=<YOUR_TEAM>"
+        cordova build ios --buildFlag="-UseModernBuildSystem=0" --buildFlag="DEVELOPMENT_TEAM=<YOUR_TEAM>"
+        cordova run ios --buildFlag="-UseModernBuildSystem=0" --buildFlag="DEVELOPMENT_TEAM=<YOUR_TEAM>"
         ```
 
 
