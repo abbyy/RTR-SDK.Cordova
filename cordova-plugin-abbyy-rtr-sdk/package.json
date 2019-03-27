@@ -28,5 +28,8 @@
     "cordova-android"
   ],
   "author": "ABBYY Mobile SDK Team",
-  "license": "LICENSE.md"
+  "license": "LICENSE.md",
+  "dependencies": {
+    "rimraf": "^2.6.3"
+  }
 }

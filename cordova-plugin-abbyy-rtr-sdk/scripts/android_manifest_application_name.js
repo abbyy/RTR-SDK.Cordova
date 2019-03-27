@@ -1,9 +1,9 @@
-// ABBYY® Real-Time Recognition SDK 1 © 2016 ABBYY Production LLC.
+﻿// ABBYY® Real-Time Recognition SDK 1 © 2016 ABBYY Production LLC.
 // ABBYY is either a registered trademark or a trademark of ABBYY Software Ltd.
 
 module.exports = function (context) {
-	var fs = context.requireCordovaModule('fs'),
-		path = context.requireCordovaModule('path');
+	var fs = require('fs'),
+		path = require('path');
 
 	var platformRoot = path.join(context.opts.projectRoot, 'platforms/android');
 	var manifestFile = path.join(platformRoot, 'AndroidManifest.xml');
