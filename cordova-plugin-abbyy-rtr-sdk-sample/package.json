@@ -20,8 +20,8 @@
     "url": "https://github.com/abbyysdk/RTR-SDK.Cordova.git"
   },
   "dependencies": {
-    "cordova-android": "~6.2.3",
-    "cordova-ios": "~4.4.0",
+    "cordova-android": "~8.0.0",
+    "cordova-ios": "~5.0.0",
     "cordova-plugin-abbyy-rtr-sdk": "^1.0.9"
   },
   "keywords": [

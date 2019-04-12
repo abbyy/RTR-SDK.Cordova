@@ -15,8 +15,8 @@
         <allow-intent href="itms-apps:*" />
     </platform>
     <preference name="BackupWebStorage" value="none" />
-    <engine name="android" spec="~6.2.3" />
-    <engine name="ios" spec="~4.4.0" />
+    <engine name="android" spec="~8.0.0" />
+    <engine name="ios" spec="~5.0.0" />
     <plugin name="cordova-plugin-abbyy-rtr-sdk" spec="^1.0.9">
         <variable name="CAMERA_USAGE_DESCRIPTION" value="NSCameraUsageDescription" />
     </plugin>
