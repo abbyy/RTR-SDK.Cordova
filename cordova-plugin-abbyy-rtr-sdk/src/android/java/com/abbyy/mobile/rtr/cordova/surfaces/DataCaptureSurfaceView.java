@@ -43,7 +43,7 @@ public class DataCaptureSurfaceView extends BaseSurfaceView {
 			this.fieldValues = new String[count];
 			int index = 0;
 			for( IDataCaptureService.DataField field : fields ) {
-				for( IDataCaptureService.TextLine component : field.Components ) {
+				for( IDataCaptureService.DataField component : field.Components ) {
 					Point[] srcQuad = component.Quadrangle;
 					for( int j = 0; j < 4; j++ ) {
 						this.quads[4 * index + j] = ( srcQuad != null ? transformPoint( srcQuad[j] ) : null );

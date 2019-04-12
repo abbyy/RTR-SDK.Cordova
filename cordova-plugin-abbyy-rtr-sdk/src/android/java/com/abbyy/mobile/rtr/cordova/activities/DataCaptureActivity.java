@@ -134,7 +134,7 @@ public class DataCaptureActivity extends BaseActivity {
 						}
 
 						ArrayList<HashMap<String, String>> lineList = new ArrayList<>();
-						for( IDataCaptureService.TextLine line : field.Components ) {
+						for( IDataCaptureService.DataField line : field.Components ) {
 							HashMap<String, String> lineInfo = new HashMap<>();
 							lineInfo.put( "text", line.Text );
 							if( line.Quadrangle != null ) {
