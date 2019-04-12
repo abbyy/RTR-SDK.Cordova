@@ -1,5 +1,5 @@
-﻿// ABBYY® Real-Time Recognition SDK 1 © 2016 ABBYY Production LLC.
-// ABBYY is either a registered trademark or a trademark of ABBYY Software Ltd.
+// ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
 
 // Due to folder hierarchy in android project it is necessary to move assets from 'platforms/android/assets/www/rtr_assets/' to 'platforms/android/assets/'.
 // Also we need to rename folders to lowercase.
