@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.abbyy.rtrcordovasample" version="1.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>RTRCordovaSample</name>
-    <description>A sample Apache Cordova application with ABBYY Real-Time Recognition SDK Plugin.</description>
+    <description>A sample Apache Cordova application with ABBYY Mobile Capture SDK Plugin.</description>
     <author email="sdk@abbyy.com" href="https://rtrsdk.com">ABBYY Mobile SDK Team</author>
     <content src="index.html" />
     <access origin="*" />

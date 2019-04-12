@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-abbyy-rtr-sdk-sample",
-  "description": "ABBYY Real-Time Recognition SDK Cordova Plugin Example",
+  "description": "ABBYY Mobile Capture SDK Cordova Plugin Example",
   "version": "1.0.1",
   "displayName": "RTRCordovaSample",
   "cordova": {
