@@ -1,21 +1,19 @@
 # LICENSE
 
-You are free to modify the Plugin and include it into your application according to the Terms of use of the ABBYY RTR SDK Cordova plugin specified below:
+## License Agreement for the ABBYY Mobile Capture Cordova plugin (Plugin)
 
-## Terms of use of the ABBYY RTR SDK Cordova plugin (Plugin)
+1.	Subject to the terms and conditions hereof and in accordance with the ABBYY Mobile Capture License Agreement ABBYY grants You a limited, worldwide, non-exclusive, royalty-free license to study, reproduce, use, modify the ABBYY Mobile Capture Cordova plugin and integrate Plugin into your Application. For the purposes hereof, “Application” means the software program, or a complex of software programs for mobile device, which is to be developed by You and which is to include parts of the ABBYY Mobile Capture Cordova plugin or otherwise interact with the Plugin.
 
-1. The code of the Plugin is the property of ABBYY. ABBYY reserves the exclusive rights to the ABBYY RTR SDK Cordova plugin.
+2.	ABBYY Mobile Capture Cordova plugin is licensed, not sold, to You. ABBYY reserves all copyright and other intellectual property rights to the ABBYY Mobile Capture Cordova plugin.
 
-2. You may copy, install, use Plugin and include the Plugin into the Application and modify it.
+3.	You may include the Plugin into the Application and modify the Plugin provided that You have a valid License to use ABBYY Mobile Capture.
 
-3. You may provide the Plugin to end users of your Application both in binary code and object code as part of the Application or provide in-house access to the Plugin, provided that the Application uses the Plugin solely for processing the results obtained with the ABBYY RTR SDK.
+4.	You may redistribute the Plugin to end-users in binary code form or object code form only as the part of Your Application provided that the Your Application uses the Plugin solely for the purpose of processing the results obtained with the ABBYY Mobile Capture.
 
-4. Any modifications made to the Plugin shall be the property of You.
+5.	You may transfer to ABBYY the copyright and other intellectual property rights to the modifications made by You to the Plugin. ABBYY may consider including such modifications into subsequent releases of the Plugin. If You transfer to ABBYY the copyright and other intellectual property rights to Your modifications to the Plugin, You may use these modifications as a part of the Plugin under the terms hereof.
 
-5. You may transfer to ABBYY the exclusive right to the modifications made by You to the Plugin. ABBYY may consider including such modifications into subsequent releases of the Plugin. If You transfer to ABBYY the exclusive right to the modifications made by You to the Plugin, You may use the said modifications as part of the Plugin for its own needs under a simple non-exclusive license and under the same terms that govern the use of the Plugin.
+6.	If You disclose to ABBYY modifications made by You to the Plugin by any means, the copyright and other intellectual property rights to such modifications shall be deemed to have been transferred to ABBYY. If You do not wish to transfer to ABBYY the copyright and other intellectual property rights to the modifications made by You to the Plugin, You shall not disclose to ABBYY the source code of such modifications.
 
-6. If You discloses modifications made to the Plugin to ABBYY by any means, the exclusive right to such modifications shall be deemed to have been transferred to ABBYY. If the You do not wish to transfer to ABBYY the exclusive right to the modifications to the Plugin, You shall not disclose to ABBYY the source code of such modifications.
+7.	You must retain, in the source code form of Your Application, all copyright, trademark, and attribution notices present in the ABBYY Mobile Capture Cordova plugin.
 
-“Application” means the computer program, or set of computer programs, which is to be developed by You and which is to include parts of the ABBYY RTR SDK Cordova plugin or otherwise interact with the ABBYY SDK Cordova plugin.
-
-ABBYY RTR SDK CORDOVA PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
+8.	THE ABBYY MOBILE CAPTURE CORDOVA PLUGIN IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL ABBYY BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE PLUGIN OR THE USE OR OTHER DEALINGS IN THE PLUGIN. In particular, ABBYY cannot warrant the performance of any Application created by or for You by means of the ABBYY Mobile Capture Samples, nor does ABBYY make any representations or warranties with respect to the performance of the ABBYY Mobile Capture Samples integrated into the Application. ABBYY will not be liable for any direct or indirect damages resulting from errors or misprints in the ABBYY Mobile Capture Samples.
