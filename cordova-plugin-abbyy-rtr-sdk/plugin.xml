@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-		id="cordova-plugin-abbyy-rtr-sdk" version="1.0.9">
+		id="cordova-plugin-abbyy-rtr-sdk" version="1.0.10">
 	<name>AbbyyRtrSdk</name>
 	<description>ABBYY Mobile Capture SDK Plugin for Cordova</description>
 
