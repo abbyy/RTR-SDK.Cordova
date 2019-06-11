@@ -148,6 +148,9 @@ To get started:
 		<header-file src="src/ios/RTRPlugin.h" />
 		<source-file src="src/ios/RTRPlugin.m" />
 
+		<header-file src="src/ios/RTRPluginConstants.h" />
+		<source-file src="src/ios/RTRPluginConstants.m" />
+
 		<header-file src="src/ios/RTRManager.h" />
 		<source-file src="src/ios/RTRManager.m" />
 
@@ -156,6 +159,9 @@ To get started:
 
 		<header-file src="src/ios/CDVPluginResult+RTRPluginResult.h" />
 		<source-file src="src/ios/CDVPluginResult+RTRPluginResult.m" />
+
+		<header-file src="src/ios/NSString+RTRPluginLocalization.h" />
+		<source-file src="src/ios/NSString+RTRPluginLocalization.m" />
 
 		<header-file src="src/ios/RTRSelectedAreaView.h" />
 		<source-file src="src/ios/RTRSelectedAreaView.m" />
@@ -170,8 +176,42 @@ To get started:
 		<source-file src="src/ios/RTRDataCaptureViewController.m" />
 		<header-file src="src/ios/RTRViewController.h" />
 		<source-file src="src/ios/RTRViewController.m" />
+
+		<header-file src="src/ios/RTRDocumentManager.h" />
+		<source-file src="src/ios/RTRDocumentManager.m" />
+		<header-file src="src/ios/RTRThumbnailButton.h" />
+		<source-file src="src/ios/RTRThumbnailButton.m" />
+		<header-file src="src/ios/RTRImageCaptureViewController.h" />
+		<source-file src="src/ios/RTRImageCaptureViewController.m" />
+
+		<header-file src="src/ios/RTRMultiImagePreviewController.h" />
+		<source-file src="src/ios/RTRMultiImagePreviewController.m" />
+
+		<header-file src="src/ios/RTRSingleImageViewController.h" />
+		<source-file src="src/ios/RTRSingleImageViewController.m" />
+
+		<header-file src="src/ios/NSDictionary+RTRSettings.h" />
+		<source-file src="src/ios/NSDictionary+RTRSettings.m" />
+
+		<header-file src="src/ios/RTRMultipageScenarioConfiguration.h" />
+		<source-file src="src/ios/RTRMultipageScenarioConfiguration.m" />
+
+		<header-file src="src/ios/RTRZoomImageView.h" />
+		<source-file src="src/ios/RTRZoomImageView.m" />
+		<resource-file src="src/ios/RTRZoomImageView.xib" />
+
+		<header-file src="src/ios/RTRZoomImageViewBase.h" />
+		<source-file src="src/ios/RTRZoomImageViewBase.m" />
+
+		<header-file src="src/ios/RTRMultipageScenarioStorage.h" />
+		<source-file src="src/ios/RTRMultipageScenarioStorage.m" />
+
 		<resource-file src="src/ios/RTRViewController.xib" />
 
+		<resource-file src="src/ios/Main.storyboard" />
+
+		<!-- Localization -->
+		<resource-file src="src/ios/strings/rtr_localizable_en.json" target="rtr_localizable_en.json"/>
 		<!-- Icons -->
 		<resource-file src="src/ios/Icons/ui_close_button/ui_close_button.png" target="Icons/ui_close_button.png" />
 		<resource-file src="src/ios/Icons/ui_close_button/ui_close_button@2x.png" target="Icons/ui_close_button@2x.png" />
@@ -196,6 +236,7 @@ To get started:
 		<framework src="AVFoundation.framework" />
 
 		<framework src="AbbyyRtrSDK.framework"/>
+		<framework src="AbbyyUI.framework"/>
 
 		<preference name="CAMERA_USAGE_DESCRIPTION" default="NSCameraUsageDescription" />
 		<config-file target="*-Info.plist" parent="NSCameraUsageDescription">
