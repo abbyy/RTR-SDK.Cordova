@@ -30,7 +30,7 @@ function Slider(elementId, labelId) {
 		return Number(this.element.value);
 	};
 	this.update = function() {
-		this.label.innerText = this.current().toFixed(1);
+		this.label.innerText = this.current().toFixed(2);
 	};
 
 	this.element.addEventListener('input', this.update.bind(this));
@@ -50,19 +50,107 @@ function Orientation() {
 	return element.options[element.selectedIndex].text
 }
 
+function maxImagesCount() {
+	element = document.getElementById('maxImagesCount')
+	return element.value
+}
+
+function orientationIC() {
+	element = document.getElementById('orientationIC')
+	return element.options[element.selectedIndex].text
+}
+
+function cameraResolution() {
+	element = document.getElementById('cameraResolution')
+	return element.options[element.selectedIndex].text
+}
+
+function exportType() {
+	element = document.getElementById('exportType')
+	return element.options[element.selectedIndex].text
+}
+
+function compressionLevel() {
+	element = document.getElementById('compressionLevel')
+	return element.options[element.selectedIndex].text
+}
+
+function pdfCompressionType() {
+	element = document.getElementById('pdfCompressionType')
+	return element.options[element.selectedIndex].text
+}
+
+function documentSize() {
+	element = document.getElementById('documentSize')
+	return element.options[element.selectedIndex].text
+}
+
+function destination() {
+	element = document.getElementById('destination')
+	return element.options[element.selectedIndex].text
+}
+
+var isFlashlightButtonVisibleIC = document.getElementById('isFlashlightButtonVisibleIC');
+var showPreviewIC = document.getElementById('showPreviewIC');
+var isCaptureButtonVisible = document.getElementById('isCaptureButtonVisible');
+var cropEnabled = document.getElementById('cropEnabled');
+var minimumDocumentToViewRatio = new Slider('minimumDocumentToViewRatio', 'minimumDocumentToViewRatioValue');
+
 var isFlashlightVisible = document.getElementById('isFlashlightVisible');
 var isStopButtonVisible = document.getElementById('isStopButtonVisible');
 var stopWhenStable = document.getElementById('stopWhenStable');
 
+var imageCaptureTab = document.getElementById('tab_settings_ic');
+var textCaptureTab = document.getElementById('tab_settings_tc');
+var customDataCaptureTab = document.getElementById('tab_settings_regex');
+var dataCaptureTab = document.getElementById('tab_settings_mrz');
+
 var areaOfInterestWidth = new Slider('areaOfInterestWidth', 'widthValue');
 var areaOfInterestHeight = new Slider('areaOfInterestHeight', 'heightValue');
+
+var abbyyRtrSdkPluginImageCaptureCallback = function(result) {
+	console.log(result);
+	document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(result, null, 2);
+	var imageView = document.getElementById('AbbyyRtrSdkPluginCapturedImage')
+	if(result.images && result.images[0] && result.images[0].base64) {
+		imageView.style.display = "block";
+		imageView.src = "data:image/jpeg;base64," + result.images[0].base64;
+	} else {
+		imageView.style.display = "none";
+		imageView.src = null;
+	}
+}
 
 var abbyyRtrSdkPluginCallback = function(result) {
 	console.log(result);
 	document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(result, null, 2);
 }
 
-var textCaptureButton = new Button('textCaptureButton', function() {
+function imageCapture() {
+	AbbyyRtrSdk.startImageCapture(abbyyRtrSdkPluginImageCaptureCallback, {
+		licenseFileName : "AbbyyRtrSdk.license", // optional, default=AbbyyRtrSdk.license
+
+		cameraResolution : cameraResolution(), // optional, default=FullHD (HD, FullHD, 4K)
+		isFlashlightButtonVisible : isFlashlightButtonVisibleIC.checked, // optional, default=true
+		isCaptureButtonVisible : isCaptureButtonVisible.checked, // optional, default=false
+		orientation: orientationIC(), // optional, default=default
+		showPreview: showPreviewIC.checked, // optional, default=false
+		maxImagesCount: maxImagesCount(), // optional, default=0
+
+		destination : destination(), // optional, captured image will be saved to corresponding file ("file") or returned as encode base64 image string ("base64"). default=file
+		exportType : exportType(), // optional, default=jpg (jpg, png, pdf).
+		pdfCompressionType : pdfCompressionType(), // optional, default=jpg (jpg)
+		compressionLevel : compressionLevel(), // optional, default=Normal (Low, Normal, High, ExtraHigh)
+
+		defaultImageSettings : {
+			minimumDocumentToViewRatio : minimumDocumentToViewRatio.current(), // optional, minimum document area relative to frame area - 0...1. Default 0.15.
+			documentSize : documentSize(), // optional, document size in millimeters. default=Any.
+			cropEnabled : cropEnabled.checked, // optional, default=true
+		},
+	});
+}
+
+function textCapture() {
 	AbbyyRtrSdk.startTextCapture(abbyyRtrSdkPluginCallback, {
 		selectableRecognitionLanguages : ["English", "French", "German", "Italian", "Polish", "PortugueseBrazilian",
 			"Russian", "ChineseSimplified", "ChineseTraditional", "Japanese", "Korean", "Spanish"],
@@ -75,9 +163,9 @@ var textCaptureButton = new Button('textCaptureButton', function() {
 		isStopButtonVisible : isStopButtonVisible.checked,
 		orientation: Orientation(),
 	});
-});
+}
 
-var customDataCaptureButton = new Button('customDataCaptureButton', function() {
+function customDataCapture() {
 	AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
 		customDataCaptureScenario : {
 			name : "Code",
@@ -95,13 +183,12 @@ var customDataCaptureButton = new Button('customDataCaptureButton', function() {
 		isStopButtonVisible : isStopButtonVisible.checked,
 		orientation: Orientation(),
 	});
-});
+}
 
-var dataCaptureButton = new Button('dataCaptureButton', function() {
+function dataCapture() {
 	AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
 		profile : "MRZ",
 
-		orientation: "default",
 		licenseFileName : "AbbyyRtrSdk.license",
 		isFlashlightVisible : isFlashlightVisible.checked,
 		stopWhenStable : stopWhenStable.checked,
@@ -109,6 +196,18 @@ var dataCaptureButton = new Button('dataCaptureButton', function() {
 		isStopButtonVisible : isStopButtonVisible.checked,
 		orientation: Orientation(),
 	});
+}
+
+var startCaptureButton = new Button('startCaptureButton', function() {
+	if(imageCaptureTab.checked) {
+		imageCapture();
+	} else if(textCaptureTab.checked) {
+		textCapture();
+	} else if(customDataCaptureTab.checked) {
+		customDataCapture();
+	} else if(dataCaptureTab.checked) {
+		dataCapture();
+	}
 });
 
 app.initialize();

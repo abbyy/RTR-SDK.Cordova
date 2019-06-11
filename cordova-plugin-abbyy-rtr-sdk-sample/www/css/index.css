@@ -84,8 +84,34 @@ h1 {
 	max-width: 80%;
 }
 
+.settings_container>input { display:none; }
+.settings_container>div {
+    display: none;
+}
+.settings_container>label {
+    display: inline-block;
+    padding: 7px;
+    margin: 0 -5px -1px 0;
+    text-align: center;
+    color: #666666;
+    border: 1px solid #C0C0C0;
+    background: #E0E0E0;
+    cursor: pointer;
+}
+.settings_container>input:checked + label {
+    color: #000000;
+    border: 1px solid #C0C0C0;
+    border-bottom: 1px solid #FFFFFF;
+    background: #FFFFFF;
+}
+#tab_settings_ic:checked ~ #settings_ic,
+#tab_settings_tc:checked ~ #settings { display: block; }
+#tab_settings_regex:checked ~ #settings { display: block; }
+#tab_settings_mrz:checked ~ #settings { display: block; }
+
 .settings {
 	font-size: 16px;
+	display: none;
 }
 
 .row {
@@ -117,4 +143,10 @@ h1 {
 	overflow: auto;
 	text-transform: none;
 	text-align: left;
+}
+
+img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
 }

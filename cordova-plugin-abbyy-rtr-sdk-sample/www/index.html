@@ -18,19 +18,122 @@
 	<div class="app">
 		<h1>
 			<img class="logo" src="./img/logo.png" alt="ABBYY">
-			<br>
-			RTRCordovaSample
 		</h1>
 		<div id="deviceready" class="blink">
 			<p class="event listening">Connecting to Device</p>
 			<p class="event received">Device is Ready</p>
 		</div>
-		<div>
-			<div class="settings">
+		<div class="settings_container">
+            <input type="radio" name="inset" value="" id="tab_settings_ic" checked>
+            <label for="tab_settings_ic">Image Capture</label>
+            <input type="radio" name="inset" value="" id="tab_settings_tc">
+            <label for="tab_settings_tc">Text Capture</label>
+            <input type="radio" name="inset" value="" id="tab_settings_regex">
+            <label for="tab_settings_regex">Reg Ex</label>
+            <input type="radio" name="inset" value="" id="tab_settings_mrz">
+            <label for="tab_settings_mrz">MRZ</label>
+
+            <div class="settings" id="settings_ic">
 				<div class="row">
-					<label for="orientation">
-						orientation
-					</label>
+					<label for="orientationIC">orientation</label>
+					<select id="orientationIC">
+						<option value="default" selected="selected">default</option>
+						<option value="portrait">portrait</option>
+						<option value="landscape">landscape</option>
+					</select>
+				</div>
+				<div class="row">
+					<label for="isFlashlightButtonVisibleIC">isFlashlightButtonVisible</label>
+					<div>
+						<input id="isFlashlightButtonVisibleIC" type="checkbox" checked>
+					</div>
+				</div>
+				<div class="row">
+					<label for="showPreviewIC">showPreview</label>
+					<div>
+						<input id="showPreviewIC" type="checkbox">
+					</div>
+				</div>
+				<div class="row">
+					<label for="isCaptureButtonVisible">isCaptureButtonVisible</label>
+					<div>
+						<input id="isCaptureButtonVisible" type="checkbox">
+					</div>
+				</div>
+				<div class="row">
+					<label for="maxImagesCount">maxImagesCount</label>
+					<input type="number" id="maxImagesCount" name="maxImagesCount" min="0" max="100" value="0">
+				</div>
+				<div class="row">
+					<label for="cameraResolution">cameraResolution</label>
+					<select id="cameraResolution">
+						<option value="HD">HD</option>
+						<option value="FullHD" selected="selected">FullHD</option>
+						<option value="4K">4K</option>
+					</select>
+				</div>
+				<div class="row">
+					<label for="destination">destination</label>
+					<select id="destination">
+						<option value="file" selected="selected">file</option>
+						<option value="base64">base64</option>
+					</select>
+				</div>
+				<div class="row">
+					<label for="exportType">exportType</label>
+					<select id="exportType">
+						<option value="jpg" selected="selected">jpg</option>
+						<option value="jpeg2000">jpeg2000</option>
+						<option value="png">png</option>
+						<option value="pdf">pdf</option>
+					</select>
+				</div>
+				<div class="row">
+					<label for="pdfCompressionType">pdfCompressionType</label>
+					<select id="pdfCompressionType">
+						<option value="jpg" selected="selected">jpg</option>
+						<option value="jpeg2000">jpeg2000</option>
+					</select>
+				</div>
+				<div class="row">
+					<label for="compressionLevel">compressionLevel</label>
+					<select id="compressionLevel">
+						<option value="Low">Low</option>
+						<option value="Normal" selected="selected">Normal</option>
+						<option value="High">High</option>
+						<option value="ExtraHigh">ExtraHigh</option>
+					</select>
+				</div>
+				<fieldset>
+					<legend>Default Image Settings</legend>
+					<div class="row">
+						<label for="documentSize">documentSize</label>
+						<select id="documentSize">
+							<option value="Any" selected="selected">Any</option>
+							<option value="A4">A4</option>
+							<option value="BusinessCard">BusinessCard</option>
+							<option value="Letter">Letter</option>
+							<option value="100 100">100 100</option>
+						</select>
+					</div>
+					<div class="row">
+						<label for="cropEnabled">cropEnabled</label>
+						<div>
+							<input id="cropEnabled" type="checkbox" checked>
+						</div>
+					</div>
+					<div class="row">
+						<label for="minimumDocumentToViewRatio">minDocToViewRatio</label>
+						<div id="minimumDocumentToViewRatioValue"></div>
+						<div>
+							<input id="minimumDocumentToViewRatio" max="1.0" min="0.0" step="0.01" value="0.15" type="range" />
+						</div>
+					</div>
+				</fieldset>
+			</div>
+			<div class="settings" id="settings">
+				<div class="row">
+					<label for="orientation">orientation</label>
 					<select id="orientation">
 						<option value="default" selected="selected">default</option>
 						<option value="portrait">portrait</option>
@@ -38,25 +141,19 @@
 					</select>
 				</div>
 				<div class="row">
-					<label for="isFlashlightVisible">
-						isFlashlightVisible
-					</label>
+					<label for="isFlashlightVisible">isFlashlightVisible</label>
 					<div>
 						<input id="isFlashlightVisible" type="checkbox" checked>
 					</div>
 				</div>
 				<div class="row">
-					<label for="isStopButtonVisible">
-						isStopButtonVisible
-					</label>
+					<label for="isStopButtonVisible">isStopButtonVisible</label>
 					<div>
 						<input id="isStopButtonVisible" type="checkbox" checked>
 					</div>
 				</div>
 				<div class="row">
-					<label for="stopWhenStable">
-						stopWhenStable
-					</label>
+					<label for="stopWhenStable">stopWhenStable</label>
 					<div>
 						<input id="stopWhenStable" type="checkbox" checked>
 					</div>
@@ -64,18 +161,14 @@
 				<fieldset>
 					<legend>Area of interest</legend>
 					<div class="row">
-						<label for="areaOfInterestHeight">
-							Height
-						</label>
+						<label for="areaOfInterestHeight">Height</label>
 						<div id="heightValue"></div>
 						<div>
 							<input id="areaOfInterestHeight" max="1.0" min="0.0" step="0.1" value="0.3" type="range" />
 						</div>
 					</div>
 					<div class="row">
-						<label for="areaOfInterestWidth">
-							Width
-						</label>
+						<label for="areaOfInterestWidth">Width</label>
 						<div id="widthValue"></div>
 						<div>
 							<input id="areaOfInterestWidth" max="1.0" min="0.0" step="0.1" value="0.8" type="range" />
@@ -84,19 +177,14 @@
 				</fieldset>
 			</div>
 		</div>
-		<div class="row">
-			<div>
-				<button type="button" id="textCaptureButton" class="scenario-button">Text Capture</button>
-			</div>
-			<div>
-				<button type="button" id="customDataCaptureButton" class="scenario-button">Reg Ex</button>
-			</div>
-			<div>
-				<button type="button" id="dataCaptureButton" class="scenario-button">MRZ</button>
-			</div>
-		</div>
+        <div class="row">
+            <div>
+                <button type="button" id="startCaptureButton" class="scenario-button">Start Capture</button>
+            </div>
+        </div>
 		<div class="rtr-sdk-plugin-result">
 			<pre id="AbbyyRtrSdkPluginResult"></pre>
+			<img id="AbbyyRtrSdkPluginCapturedImage"/>
 		</div>
 	</div>
 	<script type="text/javascript" src="cordova.js"></script>
