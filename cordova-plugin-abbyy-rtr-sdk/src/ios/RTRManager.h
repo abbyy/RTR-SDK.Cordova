@@ -8,6 +8,8 @@
 
 @interface RTRManager : NSObject
 
+@property (nonatomic, strong) RTREngine* engine;
+
 + (instancetype)managerWithLicense:(NSString*)licenseName error:(NSError**)error;
 
 - (id<RTRTextCaptureService>)textCaptureServiceWithLanguages:(NSSet*)languages

@@ -8,8 +8,6 @@ static NSString* const RTRAssetsPath = @"www/rtr_assets";
 
 @interface RTRManager ()
 
-@property (nonatomic) RTREngine* engine;
-
 @end
 
 @implementation RTRManager

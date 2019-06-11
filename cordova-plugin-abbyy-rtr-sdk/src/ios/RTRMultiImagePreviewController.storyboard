@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="APY-UU-6of">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Multi Image Preview Controller-->
+        <scene sceneID="PcE-vS-4lf">
+            <objects>
+                <viewController id="APY-UU-6of" customClass="RTRMultiImagePreviewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Fog-OD-ZvH">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aVL-1v-zxw">
+                                <rect key="frame" x="20" y="124" width="374" height="658"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="aVL-1v-zxw" firstAttribute="top" secondItem="UCr-30-31c" secondAttribute="top" constant="80" id="3Z8-lZ-CoE"/>
+                            <constraint firstItem="aVL-1v-zxw" firstAttribute="leading" secondItem="UCr-30-31c" secondAttribute="leading" constant="20" id="hSi-SY-4u1"/>
+                            <constraint firstItem="UCr-30-31c" firstAttribute="bottom" secondItem="aVL-1v-zxw" secondAttribute="bottom" constant="80" id="pEc-ZL-AUR"/>
+                            <constraint firstItem="UCr-30-31c" firstAttribute="trailing" secondItem="aVL-1v-zxw" secondAttribute="trailing" constant="20" id="pa8-ma-tKJ"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="UCr-30-31c"/>
+                    </view>
+                    <connections>
+                        <outlet property="pagesContainer" destination="aVL-1v-zxw" id="qdl-aQ-xwU"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="9Od-ms-5gR" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>

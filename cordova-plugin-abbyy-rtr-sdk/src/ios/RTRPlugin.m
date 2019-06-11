@@ -6,41 +6,37 @@
 #import "RTRTextCaptureViewController.h"
 #import "RTRDataCaptureViewController.h"
 #import "RTRDataCaptureScenario.h"
+#import "NSDictionary+RTRSettings.h"
 
-static NSString* const RTRCordovaPluginErrorDomain = @"com.abbyy.rtr-cordova-plugin";
+#import <AbbyyRtrSDK/AbbyyRtrSDK.h>
+#import <AbbyyUI/AbbyyUI.h>
 
-static NSString* const RTRRecognitionLanguagesKey = @"recognitionLanguages";
-static NSString* const RTRSelectableRecognitionLanguagesKey = @"selectableRecognitionLanguages";
+#import "RTRImageCaptureViewController.h"
+#import "RTRPluginConstants.h"
 
-static NSString* const RTRLicenseFileNameKey = @"licenseFileName";
-static NSString* const RTRStopWhenStableKey = @"stopWhenStable";
-static NSString* const RTRIsStopButtonVisibleKey = @"isStopButtonVisible";
-static NSString* const RTRAreaOfInterestKey = @"areaOfInterest";
-static NSString* const RTRIsFlashlightVisibleKey = @"isFlashlightVisible";
+@interface RTRImageCaptureOptions : NSObject
 
-static NSString* const RTRCustomDataCaptureScenarioKey = @"customDataCaptureScenario";
-static NSString* const RTRCustomDataCaptureScenarioNameKey = @"name";
-static NSString* const RTRCustomDataCaptureFieldsKey = @"fields";
-static NSString* const RTRCustomDataCaptureRegExKey = @"regEx";
-static NSString* const RTRScenarioDescriptionKey = @"description";
+@property (nonatomic, assign) CGSize documentSize;
+@property (nonatomic, assign) BOOL cropEnabled;
+@property (nonatomic, assign) CGFloat minimumDocumentToViewRatio;
 
-static NSString* const RTRDataCaptureProfileKey = @"profile";
+@property (nonatomic, assign) RTRImageCaptureDestintationType destination;
+@property (nonatomic, assign) RTRImageCaptureEncodingType encodingType;
+@property (nonatomic, assign) RTRCoreAPIExportCompressionLevel compression;
 
-static NSString* const RTRExtendedSettingsKey = @"extendedSettings";
+@end
 
-static NSString* const RTRDefaultRecognitionLanguage = @"English";
+@implementation RTRImageCaptureOptions
+@end
 
-static NSString* const RTROrientationPolicy = @"orientation";
-
-NSString* const RTRCallbackErrorKey = @"error";
-NSString* const RTRCallbackErrorDescriptionKey = @"description";
-NSString* const RTRCallbackResultInfoKey = @"resultInfo";
-NSString* const RTRCallbackUserActionKey = @"userAction";
-
-@interface RTRPlugin ()
+@interface RTRPlugin () <AUIImageCaptureScenarioDelegate>
 
 @property (nonatomic) RTRViewController* rtrViewController;
 @property (nonatomic) RTRManager* rtrManager;
+
+@property (nonatomic) CDVInvokedUrlCommand* currentCommand;
+
+@property (nonatomic, strong) RTRImageCaptureViewController* imageCaptureHolder;
 
 @end
 
@@ -71,7 +67,7 @@ NSString* const RTRCallbackUserActionKey = @"userAction";
 		NSSet* selectedLanguages = [NSSet setWithArray:selectedLanguagesArray];
 
 		RTRTextCaptureViewController* rtrViewController = [RTRTextCaptureViewController new];
-		rtrViewController.supportedInterfaceOrientations = [self orientationMaskFromString:params[RTROrientationPolicy]];
+		rtrViewController.supportedInterfaceOrientations = [params rtr_orientationMaskForKey:RTROrientationPolicy];
 		rtrViewController.settingsTableContent = languages;
 		rtrViewController.selectedRecognitionLanguages = [selectedLanguages mutableCopy];
 		rtrViewController.languageSelectionEnabled = languages.count != 0;
@@ -101,7 +97,7 @@ NSString* const RTRCallbackUserActionKey = @"userAction";
 		NSDictionary* scenarioParams = params[RTRCustomDataCaptureScenarioKey];
 
 		RTRDataCaptureViewController* rtrViewController = [RTRDataCaptureViewController new];
-		rtrViewController.supportedInterfaceOrientations = [self orientationMaskFromString:params[RTROrientationPolicy]];
+		rtrViewController.supportedInterfaceOrientations = [params rtr_orientationMaskForKey:RTROrientationPolicy];
 
 		NSString* errorDescription = nil;
 
@@ -147,6 +143,62 @@ NSString* const RTRCallbackUserActionKey = @"userAction";
 		rtrViewController.extendedSettings = params[RTRExtendedSettingsKey];
 
 		[self presentCaptureViewController:rtrViewController command:command];
+	}];
+}
+
+- (void)startImageCapture:(CDVInvokedUrlCommand*)command
+{
+	[self.commandDelegate runInBackground:^{
+		self.currentCommand = command;
+
+		if(![self initializeRtrManager:command]) {
+			return;
+		}
+
+		dispatch_async(dispatch_get_main_queue(), ^{
+			UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+			self.imageCaptureHolder = [storyboard instantiateInitialViewController];
+
+			__weak RTRPlugin* weakSelf = self;
+			__weak RTRImageCaptureViewController* weakController = self.imageCaptureHolder;
+
+			self.imageCaptureHolder.config = [[RTRMultipageScenarioConfiguration alloc] initWithManager:self.rtrManager args:command.arguments.firstObject];
+			self.imageCaptureHolder.onSuccess = ^(NSArray<NSDictionary*>* resultArray) {
+				NSMutableDictionary* resultDict = [@{
+					RTRCallbackResultInfoKey : @{
+						RTRCallbackUserActionKey : @"Succeeded"
+					},
+					@"imagesBase64" : resultArray,
+					} mutableCopy
+				];
+
+				CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+				[weakSelf.viewController dismissViewControllerAnimated:YES completion:^{
+					[weakSelf.commandDelegate sendPluginResult:pluginResult callbackId:weakSelf.currentCommand.callbackId];
+				}];
+			};
+			self.imageCaptureHolder.onCancel = ^{
+				NSMutableDictionary* result = [@{
+					RTRCallbackResultInfoKey : @{
+						RTRCallbackUserActionKey : @"Canceled"
+					}
+				} mutableCopy];
+
+				if(weakController.errorOccurred != nil) {
+					NSDictionary* errorDictionary = @{
+						RTRCallbackErrorDescriptionKey : weakController.errorOccurred ?: @""
+					};
+					result[RTRCallbackErrorKey] = errorDictionary;
+				}
+
+				CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+				[weakSelf.viewController dismissViewControllerAnimated:YES completion:^{
+					[weakSelf.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+				}];
+			};
+			[self.viewController presentViewController:self.imageCaptureHolder animated:YES completion:nil];
+		});
+
 	}];
 }
 
@@ -224,15 +276,46 @@ NSString* const RTRCallbackUserActionKey = @"userAction";
 	return YES;
 }
 
-- (UIInterfaceOrientationMask)orientationMaskFromString:(NSString*)string
+#pragma mark - AUIImageCaptureScenarioDelegate
+
+- (void)captureScenario:(AUICaptureScenario*)scenario didFailWithError:(NSError*)error
 {
-	if([string isEqualToString:@"portrait"]) {
-		return UIInterfaceOrientationMaskPortrait;
-	}
-	if([string isEqualToString:@"landscape"]) {
-		return UIInterfaceOrientationMaskLandscape;
-	}
-	return UIInterfaceOrientationMaskAll;
+	CDVPluginResult* result = [CDVPluginResult rtrResultWithError:error];
+	[self.viewController dismissViewControllerAnimated:YES completion:^{
+		[self.commandDelegate sendPluginResult:result callbackId:self.currentCommand.callbackId];
+	}];
+}
+
+- (void)captureScenarioDidCancel:(AUICaptureScenario*)scenario
+{
+	NSMutableDictionary* result = [@{
+		RTRCallbackResultInfoKey : @{
+			RTRCallbackUserActionKey : @"Canceled"
+		}
+	} mutableCopy];
+
+	CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+	[self.viewController dismissViewControllerAnimated:YES completion:^{
+		[self.commandDelegate sendPluginResult:pluginResult callbackId:self.currentCommand.callbackId];
+	}];
+}
+
+- (void)captureScenario:(AUIImageCaptureScenario*)captureScenario didCaptureImageWithResult:(AUIImageCaptureResult*)result
+{
+	UIImage* image = result.image;
+	NSData* jpegData = UIImageJPEGRepresentation(image, 0.7);
+	NSString* base64Str = [jpegData base64EncodedStringWithOptions:0];
+	NSMutableDictionary* resultDict = [@{
+		RTRCallbackResultInfoKey : @{
+			RTRCallbackUserActionKey : @"Succeeded"
+		},
+		@"imageBase64" : base64Str,
+	} mutableCopy];
+
+	CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+	[self.viewController dismissViewControllerAnimated:YES completion:^{
+		[self.commandDelegate sendPluginResult:pluginResult callbackId:self.currentCommand.callbackId];
+	}];
 }
 
 @end

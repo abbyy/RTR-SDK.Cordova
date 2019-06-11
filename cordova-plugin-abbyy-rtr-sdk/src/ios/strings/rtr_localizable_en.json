@@ -1,0 +1,20 @@
+{
+	"DectructiveActionWarning" : "Are you sure?",
+	"AllPagesOnCurrentSessionWillBeDeletedWarning" : "All the pages captured in the current session will be deleted.",
+	"Confirm" : "Confirm",
+	"Cancel" : "Cancel",
+	"ExportInProgress" : "Exporting...",
+	"SharePDFButtonTitle" : "Share PDF",
+	"AddPagesButtonTitle" : "Add Pages",
+	"AddPageButtonTitle" : "Add Page",
+	"DoneButtonTitle" : "Done",
+	"ScanNewDocButtonTitle" : "Scan New Doc",
+	"Delete" : "Delete",
+	"SinglePagePreviewTitle" : "Preview",
+	"Page of" : "Page %d of %d",
+	"SomethingWentWrong" : "Oops!",
+	"InvalidLicenseMessage" : "The license is invalid. Please check the license file and the license file path.",
+	"Ok" : "Ok",
+	"PdfExportWithError" : "Failed to export to PDF. Error: %@.",
+	"SavePageWithError" : "Failed to save page. Error: %@."
+}
