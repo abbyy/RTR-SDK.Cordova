@@ -54,8 +54,8 @@ To get started:
 
 		</config-file>
 
+		<hook type="before_build" src="scripts/android_move_assets.js" />
 		<hook type="after_plugin_add" src="scripts/android_gradle_libs_patch.js" />
-		<hook type="after_build" src="scripts/android_move_assets.js" />
 
 		<!-- plugin source code -->
 
