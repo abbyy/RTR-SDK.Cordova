@@ -232,11 +232,7 @@ NSString* const RTRCallbackUserActionKey = @"userAction";
 	if([string isEqualToString:@"landscape"]) {
 		return UIInterfaceOrientationMaskLandscape;
 	}
-	if([string isEqualToString:@"default"]) {
-		return UIInterfaceOrientationMaskAll;
-	}
-	// default like cordova config behaviour
-	return UIInterfaceOrientationMaskPortrait;
+	return UIInterfaceOrientationMaskAll;
 }
 
 @end
