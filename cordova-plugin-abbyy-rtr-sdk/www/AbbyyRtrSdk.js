@@ -12,5 +12,10 @@ module.exports = {
 	/// Open modal dialog for Data Capture Scenario.
 	startDataCapture: function (callback, options) {
 		exec(callback, callback, "AbbyyRtrSdk", "startDataCapture", [options]);
-	}
+	},
+
+	/// Open modal dialog for Image Capture Scenario.
+	startImageCapture: function (callback, options) {
+		exec(callback, callback, "AbbyyRtrSdk", "startImageCapture", [options]);
+	},
 }
