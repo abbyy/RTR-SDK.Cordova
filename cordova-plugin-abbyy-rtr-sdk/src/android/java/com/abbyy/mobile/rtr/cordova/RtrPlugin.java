@@ -1,17 +1,18 @@
 package com.abbyy.mobile.rtr.cordova;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
-import android.content.Context;
 
 import com.abbyy.mobile.rtr.Engine;
 import com.abbyy.mobile.rtr.Language;
 import com.abbyy.mobile.rtr.cordova.activities.DataCaptureActivity;
+import com.abbyy.mobile.rtr.cordova.activities.ImageCaptureActivity;
 import com.abbyy.mobile.rtr.cordova.activities.TextCaptureActivity;
 
 import org.apache.cordova.CallbackContext;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class RtrPlugin extends CordovaPlugin {
 
@@ -35,9 +35,11 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private static final int REQUEST_CODE_TEXT_CAPTURE = 1;
 	private static final int REQUEST_CODE_DATA_CAPTURE = 2;
+	private static final int REQUEST_CODE_IMAGE_CAPTURE = 3;
 
 	private static final int REQUEST_CODE_PERMISSIONS_TEXT_CAPTURE = 401;
 	private static final int REQUEST_CODE_PERMISSIONS_DATA_CAPTURE = 402;
+	private static final int REQUEST_CODE_PERMISSIONS_IMAGE_CAPTURE = 403;
 
 	private static final String REQUIRED_PERMISSION = Manifest.permission.CAMERA;
 
@@ -73,6 +75,25 @@ public class RtrPlugin extends CordovaPlugin {
 	@Override
 	public boolean execute( String action, JSONArray args, final CallbackContext callbackContext ) throws JSONException
 	{
+		if( "startImageCapture".equals( action ) ) {
+			PreferenceManager.getDefaultSharedPreferences( cordova.getActivity().getApplicationContext() ).edit().clear().apply();
+			if( init( callbackContext, args ) ) {
+				try {
+					if( inputParameters.has( RTR_EXTENDED_SETTINGS ) ) {
+						RtrManager.setExtendedSettings( parseExtendedSettings( inputParameters ) );
+					}
+					parseUiSettings( inputParameters );
+				} catch( IllegalArgumentException e ) {
+					onError( e.getMessage() );
+					return false;
+				} catch( JSONException e ) {
+					onError( e.getMessage() );
+					return false;
+				}
+				checkPermissionAndStartImageCapture();
+				return true;
+			}
+		}
 		if( "startTextCapture".equals( action ) ) {
 			PreferenceManager.getDefaultSharedPreferences( cordova.getActivity().getApplicationContext() ).edit().clear().apply();
 			if( init( callbackContext, args ) ) {
@@ -148,6 +169,19 @@ public class RtrPlugin extends CordovaPlugin {
 		return true;
 	}
 
+	private void checkPermissionAndStartImageCapture()
+	{
+		if( !this.cordova.hasPermission( REQUIRED_PERMISSION ) ) {
+			this.cordova.requestPermission( this, REQUEST_CODE_PERMISSIONS_IMAGE_CAPTURE, REQUIRED_PERMISSION );
+			return;
+		}
+		if( !this.cordova.hasPermission( Manifest.permission.WRITE_EXTERNAL_STORAGE ) ) {
+			this.cordova.requestPermission( this, REQUEST_CODE_PERMISSIONS_IMAGE_CAPTURE, Manifest.permission.WRITE_EXTERNAL_STORAGE );
+			return;
+		}
+		startImageCapture();
+	}
+
 	private void checkPermissionAndStartTextCapture()
 	{
 		if( !this.cordova.hasPermission( REQUIRED_PERMISSION ) ) {
@@ -164,6 +198,13 @@ public class RtrPlugin extends CordovaPlugin {
 			return;
 		}
 		startDataCapture();
+	}
+
+	private void startImageCapture()
+	{
+		Intent intent = ImageCaptureActivity.newImageCaptureIntent( cordova.getActivity() );
+		this.cordova.setActivityResultCallback( this );
+		this.cordova.startActivityForResult( this, intent, REQUEST_CODE_IMAGE_CAPTURE );
 	}
 
 	private void startTextCapture()
@@ -193,6 +234,9 @@ public class RtrPlugin extends CordovaPlugin {
 		}
 
 		switch( requestCode ) {
+			case REQUEST_CODE_PERMISSIONS_IMAGE_CAPTURE:
+				startImageCapture();
+				break;
 			case REQUEST_CODE_PERMISSIONS_TEXT_CAPTURE:
 				startTextCapture();
 				break;
@@ -248,7 +292,7 @@ public class RtrPlugin extends CordovaPlugin {
 		}
 		RtrManager.setStopWhenStable( stopWhenStable );
 	}
-	
+
 	private void parseOrientation( JSONObject arg ) throws JSONException
 	{
 		int orientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
@@ -256,8 +300,7 @@ public class RtrPlugin extends CordovaPlugin {
 			String value = arg.getString( RTR_ORIENTATION_KEY );
 			if( value.equals( "portrait" ) ) {
 				orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-			}
-			else if( value.equals( "landscape" ) ) {
+			} else if( value.equals( "landscape" ) ) {
 				orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
 			}
 		}

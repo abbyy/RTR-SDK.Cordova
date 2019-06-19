@@ -1,6 +1,5 @@
 package com.abbyy.mobile.rtr.cordova;
 
-import android.app.Application;
 import android.content.Context;
 
 import com.abbyy.mobile.rtr.Engine;
@@ -8,11 +7,11 @@ import com.abbyy.mobile.rtr.IDataCaptureService;
 import com.abbyy.mobile.rtr.ITextCaptureService;
 import com.abbyy.mobile.rtr.Language;
 import com.abbyy.mobile.rtr.cordova.exceptions.InitializationException;
+import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 public class RtrManager {
@@ -37,7 +36,6 @@ public class RtrManager {
 	{
 		engine = Engine.load( context, licenseFileName );
 	}
-
 
 	public static void setDataCaptureProfile( String profile )
 	{
@@ -175,5 +173,10 @@ public class RtrManager {
 	public static void setOrientation( int orientation )
 	{ 
 		RtrManager.orientation = orientation;
+	}
+
+	public static ImageCaptureScenario getImageCaptureScenario()
+	{
+		return new ImageCaptureScenario( engine );
 	}
 }
