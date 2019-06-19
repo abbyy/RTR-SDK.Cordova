@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.abbyy.mobile.uicomponents.CaptureView
+        android:id="@+id/captureView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ImageCaptureActivity" />
+
+    <com.abbyy.mobile.rtr.cordova.fragments.MultiPageCounter
+        android:id="@+id/finishCapture"
+        style="@style/FinishCaptureButtonStyle"
+        android:layout_width="@dimen/miniature_size"
+        android:layout_height="@dimen/miniature_size"
+        android:visibility="gone"/>
+
+    <ImageButton
+        android:id="@+id/cancelCapture"
+        android:layout_width="@dimen/miniature_size"
+        android:layout_height="@dimen/miniature_size"
+        android:background="@drawable/rounded_corner_background"
+        style="@style/CancelCaptureButtonStyle"
+        android:src="@drawable/icon_close"/>
+
+</FrameLayout>

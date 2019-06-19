@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/lastPage"
+        android:layout_width="@dimen/miniature_size"
+        android:layout_height="@dimen/miniature_size"
+        />
+    <TextView
+        android:id="@+id/pageCounter"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="start|bottom"
+        android:background="@drawable/rounded_corner_half_tile"
+        android:textColor="#ffffff"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp"
+        android:gravity="center"/>
+</FrameLayout>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">RTRCordovaSample</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name" tools:override="true">RTRCordovaSample</string>
     <string name="activity_name">@string/app_name</string>
     <string name="launcher_name">@string/app_name</string>
     <string name="text_capture">Text capture</string>
@@ -10,4 +10,14 @@
     <string name="languages_text">Languages</string>
     <string name="ok_text">OK</string>
     <string name="start_text">Start</string>
+    <string name="captured_pages_delete_warning">You will lose captured pages</string>
+    <string name="discard_pages">Discard pages</string>
+    <string name="cancel">Cancel</string>
+    <string name="discard">Discard</string>
+    <string name="add_page">Add New Page</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="add_pages">Add Pages</string>
+    <string name="done">Done</string>
+    <string name="page">Page %1$d of %2$d</string>
+    <string name="build_number">Build: %1$s</string>
 </resources>
