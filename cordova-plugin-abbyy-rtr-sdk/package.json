@@ -10,7 +10,8 @@
     ]
   },
   "dependencies": {
-    "xcode": "~2.0.0"
+    "xcode": "~2.0.0",
+    "rimraf": "^2.6.3"
   },
   "repository": {
     "type": "git",
@@ -32,8 +33,5 @@
     "cordova-android"
   ],
   "author": "ABBYY Mobile SDK Team",
-  "license": "LICENSE.md",
-  "dependencies": {
-    "rimraf": "^2.6.3"
-  }
+  "license": "LICENSE.md"
 }

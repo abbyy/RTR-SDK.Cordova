@@ -34,9 +34,16 @@ To get started:
 		<!-- add permissions in AndroidManifest.xml file-->
 		<config-file target="AndroidManifest.xml" parent="/*">
 			<uses-permission  android:name="android.permission.CAMERA"/>
+			<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 		</config-file>
 
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+
+			<activity
+				android:theme="@style/Theme.AppCompat.NoActionBar"
+				android:name="com.abbyy.mobile.rtr.cordova.activities.ImageCaptureActivity"
+				android:configChanges="keyboardHidden|screenSize"
+			/>
 
 			<activity
 				android:name="com.abbyy.mobile.rtr.cordova.activities.TextCaptureActivity"
@@ -59,24 +66,35 @@ To get started:
 
 		<!-- plugin source code -->
 
-		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/RtrPlugin.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
-		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/RtrManager.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
-		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/ResourcesUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
-		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/DataCaptureScenario.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/RtrPlugin.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/RtrManager.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/ResourcesUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/DataCaptureScenario.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
 
-		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/exceptions/InitializationException.java" target-dir="src/com/abbyy/mobile/rtr/cordova/exceptions"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/exceptions/InitializationException.java" target-dir="src/com/abbyy/mobile/rtr/cordova/exceptions"/>
 
-		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/DataCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities/"/>
-		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/TextCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities/"/>
-		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/BaseActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities/"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/fragments/CaptureResultDialogFragment.java" target-dir="src/com/abbyy/mobile/rtr/cordova/fragments"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/fragments/MultiPageCounter.java" target-dir="src/com/abbyy/mobile/rtr/cordova/fragments"/>
+		
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/ImageUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/ImageSaver.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/ImageLoader.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
 
-		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/settings/LanguagesSettingActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/settings/"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/ImageCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/DataCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/TextCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/BaseActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities"/>
 
-		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/surfaces/BaseSurfaceView.java" target-dir="src/com/abbyy/mobile/rtr/cordova/surfaces/"/>
-		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/surfaces/DataCaptureSurfaceView.java" target-dir="src/com/abbyy/mobile/rtr/cordova/surfaces/"/>
-		<source-file  src="src/android/java/com/abbyy/mobile/rtr/cordova/surfaces/TextCaptureSurfaceView.java" target-dir="src/com/abbyy/mobile/rtr/cordova/surfaces/"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/settings/LanguagesSettingActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/settings"/>
+
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/surfaces/BaseSurfaceView.java" target-dir="src/com/abbyy/mobile/rtr/cordova/surfaces"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/surfaces/DataCaptureSurfaceView.java" target-dir="src/com/abbyy/mobile/rtr/cordova/surfaces"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/surfaces/TextCaptureSurfaceView.java" target-dir="src/com/abbyy/mobile/rtr/cordova/surfaces"/>
 
 		<resource-file src="src/android/res/layout/activity_capture.xml" target="res/layout/activity_capture.xml"/>
+		<resource-file src="src/android/res/layout/activity_image_capture.xml" target="res/layout/activity_image_capture.xml"/>
+		<resource-file src="src/android/res/layout/fragment_result.xml" target="res/layout/fragment_result.xml"/>
+		<resource-file src="src/android/res/layout/page_counter.xml" target="res/layout/page_counter.xml"/>
 		<resource-file src="src/android/res/layout/scenarios_list_item.xml" target="res/layout/scenarios_list_item.xml"/>
 		<resource-file src="src/android/res/layout/languages_setting_activity.xml" target="res/layout/languages_setting_activity.xml"/>
 
@@ -86,6 +104,9 @@ To get started:
 		<resource-file src="src/android/res/drawable/ic_close_24dp.xml" target="res/drawable/ic_close_24dp.xml"/>
 		<resource-file src="src/android/res/drawable/ic_flash_on_24dp.xml" target="res/drawable/ic_flash_on_24dp.xml"/>
 		<resource-file src="src/android/res/drawable/ic_flash_off_24dp.xml" target="res/drawable/ic_flash_off_24dp.xml"/>
+		<resource-file src="src/android/res/drawable/icon_close.xml" target="res/drawable/icon_close.xml"/>
+		<resource-file src="src/android/res/drawable/icon_trash.xml" target="res/drawable/icon_trash.xml"/>
+		<resource-file src="src/android/res/drawable/rounded_corner_half_tile.xml" target="res/drawable/rounded_corner_half_tile.xml"/>
 
 		<resource-file src="src/android/res/mipmap-hdpi/ic_launcher.png" target="res/mipmap-hdpi/ic_launcher.png"/>
 		<resource-file src="src/android/res/mipmap-mdpi/ic_launcher.png" target="res/mipmap-mdpi/ic_launcher.png"/>
@@ -95,6 +116,7 @@ To get started:
 
 		<resource-file src="src/android/res/values/attrs.xml" target="res/values/attrs.xml"/>
 		<resource-file src="src/android/res/values/colors.xml" target="res/values/colors.xml"/>
+		<resource-file src="src/android/res/values/dimens.xml" target="res/values/dimens.xml"/>
 		<resource-file src="src/android/res/values/strings.xml" target="res/values/strings.xml"/>
 		<resource-file src="src/android/res/values/styles.xml" target="res/values/styles.xml"/>
 
