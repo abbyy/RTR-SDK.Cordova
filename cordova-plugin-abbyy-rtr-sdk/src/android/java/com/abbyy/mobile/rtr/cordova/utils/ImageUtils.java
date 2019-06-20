@@ -33,6 +33,16 @@ public class ImageUtils {
 		}
 	}
 
+	// Synchronously load bitmap from file
+	public static Bitmap loadBitmap( File file ) throws IOException
+	{
+		Bitmap image;
+		try( FileInputStream fis = new FileInputStream( file ) ) {
+			image = BitmapFactory.decodeStream( fis, null, null );
+		}
+		return image;
+	}
+
 	// Load bitmap and scale it to fit required size
 	public static Bitmap loadThumbnail( File file, int requiredDimension ) throws IOException
 	{
@@ -90,8 +100,7 @@ public class ImageUtils {
 
 	private static File getCaptureSessionDir( Context context )
 	{
-		File root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-		return new File( root, "session_pages" );
+		return new File( context.getFilesDir(), "session_pages" );
 	}
 
 	public static int getCaptureSessionPageCount( Context context )

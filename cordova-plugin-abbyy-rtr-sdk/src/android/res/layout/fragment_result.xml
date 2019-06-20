@@ -2,39 +2,37 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#cccccc">
 
-    <ImageView
-        android:id="@+id/pagePreview"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/pagesPreview"
+        style="@style/PagePreviewStyle"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_height="match_parent"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/done"
+        style="@style/TextResultButtonStyle"
         android:background="@android:color/transparent"
         android:text="@string/done"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pagePreview" />
+        app:layout_constraintTop_toBottomOf="@id/pagesPreview" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/addPage"
+        style="@style/TextResultButtonStyle"
         android:background="@android:color/transparent"
         android:text="@string/add_page"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/done"
-        app:layout_constraintTop_toBottomOf="@id/pagePreview" />
+        app:layout_constraintTop_toBottomOf="@id/pagesPreview" />
 
     <ImageButton
         android:id="@+id/closeResult"
+        style="@style/CloseResultButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
@@ -45,6 +43,7 @@
 
     <TextView
         android:id="@+id/pageText"
+        style="@style/PreviewTextViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/page"

@@ -109,7 +109,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 			@Override
 			public void onClick( View v )
 			{
-				finishCapture();
+				showResultFragment(null);
 			}
 		} );
 
@@ -197,10 +197,17 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 	@Override
 	public void onImageCaptured( @NonNull ImageCaptureScenario.Result documentCaptureResult )
 	{
-		// New page number is equal to the capture session page count
-		int newPageNumber = ImageUtils.getCaptureSessionPageCount( this );
+		showResultFragment( documentCaptureResult.getBitmap() );
+	}
+
+	private void showResultFragment( Bitmap capturedImage )
+	{
+		if (resultDialogShown) {
+			return;
+		}
+		int sessionPageCount = ImageUtils.getCaptureSessionPageCount( this );
 		CaptureResultDialogFragment resultFragment = CaptureResultDialogFragment.newInstance(
-			newPageNumber, 0, documentCaptureResult.getBitmap()
+			sessionPageCount, capturedImage
 		);
 		resultFragment.show( getSupportFragmentManager(), "result" );
 
@@ -228,13 +235,15 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 	{
 		resultDialogShown = false;
 		if( confirmed ) {
-			// Create last page miniature
-			lastPageMiniature = ImageUtils.getMiniature(
-				capturedPage,
-				getResources().getDimensionPixelSize( R.dimen.miniature_size )
-			);
-			int captureSessionPageCount = ImageUtils.getCaptureSessionPageCount( this );
-			multiPageCounter.updatePageCount( captureSessionPageCount, lastPageMiniature );
+			if (capturedPage != null) {
+				// Create last page miniature
+				lastPageMiniature = ImageUtils.getMiniature(
+					capturedPage,
+					getResources().getDimensionPixelSize( R.dimen.miniature_size )
+				);
+				int captureSessionPageCount = ImageUtils.getCaptureSessionPageCount( this );
+				multiPageCounter.updatePageCount( captureSessionPageCount, lastPageMiniature );
+			}
 
 			if( shouldFinishCapture ) { // Finish capture session & return to the main activity
 				finishCapture();

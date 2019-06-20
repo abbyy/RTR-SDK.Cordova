@@ -11,14 +11,16 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PagerSnapHelper;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,21 +35,24 @@ import com.abbyy.rtrcordovasample.R;
 public class CaptureResultDialogFragment extends DialogFragment implements ImageSaver.Callback,
 	View.OnClickListener {
 
-	private int alreadySavedPageCount;
+	private TextView pageNumberText;
+	private int pageCount;
 
-	public static CaptureResultDialogFragment newInstance( int addPageNumber, int alreadySavedPageCount, Bitmap pageImage )
+	public static CaptureResultDialogFragment newInstance( int pageCount, Bitmap pageImage )
 	{
 		CaptureResultDialogFragment dialog = new CaptureResultDialogFragment();
-		dialog.setPageNumbers( addPageNumber, alreadySavedPageCount );
 		dialog.setPageImage( pageImage );
+		if (pageImage != null) {
+			dialog.setPageCount( pageCount + 1 );
+		} else {
+			dialog.setPageCount( pageCount );
+		}
 		return dialog;
 	}
 
 	public interface ResultListener {
 		void onCaptureResultConfirmed( Bitmap result, boolean confirmed, boolean finishCapture );
 	}
-
-	private int addPageNumber;
 
 	// Dialog's result callback
 	private ResultListener resultListener;
@@ -81,9 +86,7 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		super.onCreateView( inflater, container, savedInstanceState );
 
 		View view = inflater.inflate( R.layout.fragment_result, container, false );
-
-		ImageView pagePreview = view.findViewById( R.id.pagePreview );
-		pagePreview.setImageBitmap( pageImage );
+		initPagesPreview( view );
 
 		Button done = view.findViewById( R.id.done );
 		done.setOnClickListener( this );
@@ -92,10 +95,9 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		ImageButton closeBtn = view.findViewById( R.id.closeResult );
 		closeBtn.setOnClickListener( this );
 
-		TextView pageText = view.findViewById( R.id.pageText );
-		// Page number is a sum of saved and additional pages 
-		int pageNumber = alreadySavedPageCount + addPageNumber + 1;
-		pageText.setText( getString( R.string.page, pageNumber, pageNumber ) );
+		pageNumberText = view.findViewById( R.id.pageText );
+		// Page number is a sum of saved and additional pages
+		pageNumberText.setText( getString( R.string.page, pageCount, pageCount ) );
 
 		return view;
 	}
@@ -133,10 +135,31 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		}
 	}
 
-	private void setPageNumbers( int addPageNumber, int alreadySavedPageCount )
+	private void initPagesPreview( View view )
 	{
-		this.alreadySavedPageCount = alreadySavedPageCount;
-		this.addPageNumber = addPageNumber;
+		RecyclerView pagesPreview = view.findViewById( R.id.pagesPreview );
+		pagesPreview.setHasFixedSize( true );
+
+		LinearLayoutManager layoutManager = new LinearLayoutManager( getContext() );
+		layoutManager.setOrientation( LinearLayoutManager.HORIZONTAL );
+		pagesPreview.setLayoutManager( layoutManager );
+		PagesPreviewAdapter pagesAdapter = new PagesPreviewAdapter( pageCount, pageImage );
+		pagesPreview.setAdapter( pagesAdapter );
+		SnapHelper snapHelper = new PagerSnapHelper();
+		snapHelper.attachToRecyclerView(pagesPreview);
+		pagesPreview.addOnScrollListener( new PagesPreviewAdapter.SnapOnScrollListener( snapHelper, new PagesPreviewAdapter.OnSnapPositionChangeListener() {
+			@Override public void onPositionChanged( int position )
+			{
+				int pageNumber = position + 1;
+				pageNumberText.setText( getString( R.string.page, pageNumber, pageCount ) );
+			}
+		} ) );
+		pagesPreview.scrollToPosition( pageCount - 1 );
+	}
+
+	private void setPageCount( int pageCount )
+	{
+		this.pageCount = pageCount;
 	}
 
 	private void setPageImage( Bitmap page )
@@ -147,9 +170,14 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 	private void saveTempImageAndFinish( boolean finishCapture )
 	{
 		this.finishCapture = finishCapture;
-		String pageFilePath = ImageUtils.getCaptureSessionPageFile( addPageNumber, getContext() ).getPath();
-		ImageSaver tempImageSaver = new ImageSaver( pageImage, pageFilePath, this );
-		tempImageSaver.execute();
+		if (pageImage != null) {
+			String pageFilePath = ImageUtils.getCaptureSessionPageFile( pageCount, getContext() ).getPath();
+			ImageSaver tempImageSaver = new ImageSaver( pageImage, pageFilePath, this );
+			tempImageSaver.execute();
+		} else {
+			confirmed = true;
+			dismiss();
+		}
 	}
 
 	@Override
