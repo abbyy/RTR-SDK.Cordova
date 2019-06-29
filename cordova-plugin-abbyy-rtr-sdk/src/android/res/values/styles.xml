@@ -17,7 +17,7 @@
         <item name="android:layout_marginBottom">16dp</item>
     </style>
 
-    <style name="CloseResultButtonStyle">
+    <style name="DeleteButtonStyle">
         <item name="android:layout_marginEnd">12dp</item>
         <item name="android:layout_marginTop">16dp</item>
     </style>
