@@ -14,6 +14,8 @@ import com.abbyy.mobile.rtr.Language;
 import com.abbyy.mobile.rtr.cordova.activities.DataCaptureActivity;
 import com.abbyy.mobile.rtr.cordova.activities.ImageCaptureActivity;
 import com.abbyy.mobile.rtr.cordova.activities.TextCaptureActivity;
+import com.abbyy.mobile.uicomponents.CaptureView;
+import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -50,8 +52,19 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private static final String RTR_LICENSE_FILE_NAME_KEY = "licenseFileName";
 
+	private static final String RTR_CAMERA_RESOLUTION_KEY = "cameraResolution";
+	private static final String RTR_DESTINATION_KEY = "destination";
+	private static final String RTR_EXPORT_TYPE_KEY = "exportType";
+	private static final String RTR_COMPRESSION_TYPE_KEY = "compressionType";
+	private static final String RTR_COMPRESSION_LEVEL_KEY = "compressionLevel";
+	private static final String RTR_DEFAULT_IMAGE_SETTINGS_KEY = "defaultImageSettings";
+	private static final String RTR_IS_CROP_ENABLED_KEY = "cropEnabled";
+	private static final String RTR_DOCUMENT_TO_VIEW_RATIO_KEY = "minimumDocumentToViewRatio";
+	private static final String RTR_DOCUMENT_SIZE_KEY = "documentSize";
+
 	private static final String RTR_AREA_OF_INTEREST_KEY = "areaOfInterest";
 	private static final String RTR_IS_FLASHLIGHT_VISIBLE_KEY = "isFlashlightVisible";
+	private static final String RTR_IS_MANUAL_CAPTURE_VISIBLE_KEY = "isShootButtonVisible";
 	private static final String RTR_IS_STOP_BUTTON_VISIBLE_KEY = "isStopButtonVisible";
 	private static final String RTR_ORIENTATION_KEY = "orientation";
 
@@ -82,7 +95,7 @@ public class RtrPlugin extends CordovaPlugin {
 					if( inputParameters.has( RTR_EXTENDED_SETTINGS ) ) {
 						RtrManager.setExtendedSettings( parseExtendedSettings( inputParameters ) );
 					}
-					parseUiSettings( inputParameters );
+					parseImageCaptureSettings( inputParameters );
 				} catch( IllegalArgumentException e ) {
 					onError( e.getMessage() );
 					return false;
@@ -284,6 +297,16 @@ public class RtrPlugin extends CordovaPlugin {
 		RtrManager.setLicenseFileName( licenseFileName );
 	}
 
+	private void parseCameraResolution( JSONObject arg ) throws JSONException
+	{
+		CaptureView.CameraSettings.Resolution resolution = CaptureView.CameraSettings.Resolution.HD;
+		if( arg.has( RTR_CAMERA_RESOLUTION_KEY ) ) {
+			String resolutionName = arg.getString( RTR_CAMERA_RESOLUTION_KEY );
+			resolution = CaptureView.CameraSettings.Resolution.valueOf( resolutionName );
+		}
+		RtrManager.setCameraResolution( resolution );
+	}
+
 	private void parseAutoStop( JSONObject arg ) throws JSONException
 	{
 		boolean stopWhenStable = true;
@@ -307,6 +330,144 @@ public class RtrPlugin extends CordovaPlugin {
 		RtrManager.setOrientation( orientation );
 	}
 
+	private void parseDestination( JSONObject arg ) throws JSONException
+	{
+		ImageCaptureSettings.Destination destination = ImageCaptureSettings.Destination.FILE;
+		if( arg.has( RTR_DESTINATION_KEY ) ) {
+			String value = arg.getString( RTR_DESTINATION_KEY );
+			if( value.equals( "data" ) ) {
+				destination = ImageCaptureSettings.Destination.BASE64;
+			} else if( value.equals( "file" ) ) {
+				destination = ImageCaptureSettings.Destination.FILE;
+			}
+		}
+		RtrManager.setDestination( destination );
+	}
+
+	private void parseExportType( JSONObject arg ) throws JSONException
+	{
+		ImageCaptureSettings.ExportType exportType = ImageCaptureSettings.ExportType.JPG;
+		if( arg.has( RTR_EXPORT_TYPE_KEY ) ) {
+			String value = arg.getString( RTR_EXPORT_TYPE_KEY );
+			switch( value ) {
+				case "jpg":
+					exportType = ImageCaptureSettings.ExportType.JPG;
+					break;
+				case "png":
+					exportType = ImageCaptureSettings.ExportType.PNG;
+					break;
+				case "pdf":
+					exportType = ImageCaptureSettings.ExportType.PDF;
+					break;
+			}
+		}
+		RtrManager.setExportType( exportType );
+	}
+
+	private void parseCompressionType( JSONObject arg ) throws JSONException
+	{
+		ImageCaptureSettings.CompressionType compressionType = ImageCaptureSettings.CompressionType.JPG;
+		if( arg.has( RTR_COMPRESSION_TYPE_KEY ) ) {
+			String value = arg.getString( RTR_COMPRESSION_TYPE_KEY );
+			switch( value ) {
+				case "jpg":
+					compressionType = ImageCaptureSettings.CompressionType.JPG;
+					break;
+			}
+		}
+		RtrManager.setCompressionType( compressionType );
+	}
+
+	private void parseCompressionLevel( JSONObject arg ) throws JSONException
+	{
+		ImageCaptureSettings.CompressionLevel compressionLevel = ImageCaptureSettings.CompressionLevel.Low;
+		if( arg.has( RTR_COMPRESSION_LEVEL_KEY ) ) {
+			String value = arg.getString( RTR_COMPRESSION_LEVEL_KEY );
+			switch( value ) {
+				case "Low":
+					compressionLevel = ImageCaptureSettings.CompressionLevel.Low;
+					break;
+				case "Medium":
+					compressionLevel = ImageCaptureSettings.CompressionLevel.Medium;
+					break;
+				case "High":
+					compressionLevel = ImageCaptureSettings.CompressionLevel.High;
+					break;
+				case "ExtraHigh":
+					compressionLevel = ImageCaptureSettings.CompressionLevel.ExtraHigh;
+					break;
+			}
+		}
+		RtrManager.setCompressionLevel( compressionLevel );
+	}
+
+	private void parseDefaultImageSettings( JSONObject arg ) throws JSONException
+	{
+		if( arg.has( RTR_DEFAULT_IMAGE_SETTINGS_KEY ) ) {
+			JSONObject settings = arg.getJSONObject( RTR_DEFAULT_IMAGE_SETTINGS_KEY );
+			parseMinimumDocumentToViewRatio( settings );
+			parseDocumentSize( settings );
+			parseCropEnabled( settings );
+		}
+	}
+
+	private void parseCropEnabled( JSONObject settings ) throws JSONException
+	{
+		boolean cropEnabled = true;
+		if( settings.has( RTR_IS_CROP_ENABLED_KEY ) ) {
+			cropEnabled = settings.getBoolean( RTR_IS_CROP_ENABLED_KEY );
+		}
+		RtrManager.setCropEnabled( cropEnabled );
+	}
+
+	private void parseMinimumDocumentToViewRatio( JSONObject settings ) throws JSONException
+	{
+		float documentRatio;
+
+		if( settings.has( RTR_DOCUMENT_TO_VIEW_RATIO_KEY ) ) {
+			documentRatio = Float.parseFloat( settings.getString( RTR_DOCUMENT_TO_VIEW_RATIO_KEY ) );
+		} else {
+			documentRatio = 0.15f;
+		}
+
+		RtrManager.setDocumentToViewRatio( documentRatio );
+	}
+
+	private void parseDocumentSize( JSONObject arg ) throws JSONException
+	{
+		ImageCaptureScenario.DocumentSize size;
+
+		if( arg.has( RTR_DOCUMENT_SIZE_KEY ) ) {
+			String[] parts = arg.getString( RTR_DOCUMENT_SIZE_KEY ).split( " " );
+			if( parts.length == 1 ) {
+				switch( parts[0] ) {
+					case "Any":
+						size = ImageCaptureScenario.DocumentSize.ANY;
+						break;
+					case "A4":
+						size = ImageCaptureScenario.DocumentSize.A4;
+						break;
+					case "BusinessCard":
+						size = ImageCaptureScenario.DocumentSize.BUSINESS_CARD;
+						break;
+					case "Letter":
+						size = ImageCaptureScenario.DocumentSize.LETTER;
+						break;
+					default:
+						size = ImageCaptureScenario.DocumentSize.ANY;
+				}
+			} else {
+				float width = Float.parseFloat( parts[0] );
+				float height = Float.parseFloat( parts[1] );
+				size = new ImageCaptureScenario.DocumentSize( width, height );
+			}
+		} else {
+			size = ImageCaptureScenario.DocumentSize.ANY;
+		}
+
+		RtrManager.setDocumentSize( size );
+	}
+
 	private void parseStopButtonVisibility( JSONObject arg ) throws JSONException
 	{
 		boolean stopButtonVisible = true;
@@ -323,6 +484,15 @@ public class RtrPlugin extends CordovaPlugin {
 			isFlashlightVisible = arg.getBoolean( RTR_IS_FLASHLIGHT_VISIBLE_KEY );
 		}
 		RtrManager.setFlashlightVisible( isFlashlightVisible );
+	}
+
+	private void parseToggleManualCapture( JSONObject arg ) throws JSONException
+	{
+		boolean isManualCaptureVisible = true;
+		if( arg.has( RTR_IS_MANUAL_CAPTURE_VISIBLE_KEY ) ) {
+			isManualCaptureVisible = arg.getBoolean( RTR_IS_MANUAL_CAPTURE_VISIBLE_KEY );
+		}
+		RtrManager.setManualCaptureVisible( isManualCaptureVisible );
 	}
 
 	private static void checkValidAreaOfInterest( float value )
@@ -392,6 +562,19 @@ public class RtrPlugin extends CordovaPlugin {
 			map.put( key, value );
 		}
 		return map;
+	}
+
+	private void parseImageCaptureSettings( JSONObject arg ) throws JSONException
+	{
+		parseCameraResolution( arg );
+		parseToggleFlash( arg );
+		parseToggleManualCapture( arg );
+		parseOrientation( arg );
+		parseDestination( arg );
+		parseExportType( arg );
+		parseCompressionType( arg );
+		parseCompressionLevel( arg );
+		parseDefaultImageSettings( arg );
 	}
 
 	private Language parseLanguageName( String name )

@@ -16,22 +16,20 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.abbyy.mobile.rtr.cordova.ImageCaptureSettings;
 import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.RtrPlugin;
-import com.abbyy.mobile.rtr.cordova.fragments.CaptureMode;
-import com.abbyy.mobile.rtr.cordova.fragments.CaptureResult;
-import com.abbyy.mobile.rtr.cordova.fragments.CaptureResultDialogFragment;
-import com.abbyy.mobile.rtr.cordova.fragments.CaptureTask;
-import com.abbyy.mobile.rtr.cordova.fragments.MultiPageCounter;
-import com.abbyy.mobile.rtr.cordova.fragments.PageHolder;
-import com.abbyy.mobile.rtr.cordova.utils.ImageLoader;
+import com.abbyy.mobile.rtr.cordova.multipage.CaptureMode;
+import com.abbyy.mobile.rtr.cordova.multipage.CaptureResult;
+import com.abbyy.mobile.rtr.cordova.multipage.CaptureResultDialogFragment;
+import com.abbyy.mobile.rtr.cordova.multipage.CaptureTask;
+import com.abbyy.mobile.rtr.cordova.multipage.MultiPageCounter;
+import com.abbyy.mobile.rtr.cordova.multipage.PageHolder;
 import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
 import com.abbyy.mobile.uicomponents.CaptureView;
 import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario;
 import com.abbyy.rtrcordovasample.R;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -119,6 +117,10 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 	private void initCaptureView()
 	{
 		captureView = (CaptureView) findViewById( R.id.captureView );
+		captureView.getUISettings().setCaptureButtonVisible( ImageCaptureSettings.manualCaptureVisible );
+		captureView.getUISettings().setFlashlightButtonVisible( ImageCaptureSettings.flashlightVisible );
+		captureView.getCameraSettings().setResolution( ImageCaptureSettings.cameraResolution );
+
 		imageCaptureScenario = RtrManager.getImageCaptureScenario();
 		imageCaptureScenario.setCallback( this );
 

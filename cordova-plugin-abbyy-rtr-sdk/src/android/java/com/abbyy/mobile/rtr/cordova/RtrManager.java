@@ -7,6 +7,7 @@ import com.abbyy.mobile.rtr.IDataCaptureService;
 import com.abbyy.mobile.rtr.ITextCaptureService;
 import com.abbyy.mobile.rtr.Language;
 import com.abbyy.mobile.rtr.cordova.exceptions.InitializationException;
+import com.abbyy.mobile.uicomponents.CaptureView;
 import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario;
 
 import java.io.IOException;
@@ -30,7 +31,6 @@ public class RtrManager {
 	private static float ratioWidth;
 	private static HashMap<String, String> extendedSettings;
 	private static int orientation;
-
 
 	public static void initWithLicense( Context context ) throws IOException, Engine.LicenseException
 	{
@@ -153,6 +153,12 @@ public class RtrManager {
 	public static void setFlashlightVisible( boolean value )
 	{
 		RtrManager.flashlightVisible = value;
+		ImageCaptureSettings.flashlightVisible = value;
+	}
+
+	public static void setManualCaptureVisible( boolean value )
+	{
+		ImageCaptureSettings.manualCaptureVisible = value;
 	}
 
 	public static void setLanguageSelectionEnabled( boolean value )
@@ -171,12 +177,57 @@ public class RtrManager {
 	}
 	
 	public static void setOrientation( int orientation )
-	{ 
+	{
 		RtrManager.orientation = orientation;
+		ImageCaptureSettings.orientation = orientation;
 	}
 
 	public static ImageCaptureScenario getImageCaptureScenario()
 	{
-		return new ImageCaptureScenario( engine );
+		ImageCaptureScenario scenario = new ImageCaptureScenario( engine );
+		scenario.setCropEnabled( ImageCaptureSettings.cropEnabled );
+		scenario.setDocumentSize( ImageCaptureSettings.documentSize );
+		scenario.setMinimumDocumentToViewRatio( ImageCaptureSettings.documentToViewRatio );
+		return scenario;
+	}
+
+	public static void setCameraResolution( CaptureView.CameraSettings.Resolution resolution )
+	{
+		ImageCaptureSettings.cameraResolution = resolution;
+	}
+
+	public static void setDestination( ImageCaptureSettings.Destination destination )
+	{
+		ImageCaptureSettings.destination = destination;
+	}
+
+	public static void setExportType( ImageCaptureSettings.ExportType exportType )
+	{
+		ImageCaptureSettings.exportType = exportType;
+	}
+
+	public static void setCompressionType( ImageCaptureSettings.CompressionType compressionType )
+	{
+		ImageCaptureSettings.compressionType = compressionType;
+	}
+
+	public static void setCompressionLevel( ImageCaptureSettings.CompressionLevel compressionLevel )
+	{
+		ImageCaptureSettings.compressionLevel = compressionLevel;
+	}
+
+	public static void setCropEnabled( boolean cropEnabled )
+	{
+		ImageCaptureSettings.cropEnabled = cropEnabled;
+	}
+
+	public static void setDocumentToViewRatio( float documentToViewRatio )
+	{
+		ImageCaptureSettings.documentToViewRatio = documentToViewRatio;
+	}
+
+	public static void setDocumentSize( ImageCaptureScenario.DocumentSize documentSize )
+	{
+		ImageCaptureSettings.documentSize = documentSize;
 	}
 }
