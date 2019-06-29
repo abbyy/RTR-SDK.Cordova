@@ -1,4 +1,4 @@
-package com.abbyy.mobile.rtr.cordova.fragments;
+package com.abbyy.mobile.rtr.cordova.multipage;
 
 import android.content.Context;
 import android.graphics.Bitmap;

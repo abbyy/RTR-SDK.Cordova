@@ -11,14 +11,19 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.RtrPlugin;
+import com.abbyy.mobile.rtr.cordova.fragments.CaptureMode;
+import com.abbyy.mobile.rtr.cordova.fragments.CaptureResult;
 import com.abbyy.mobile.rtr.cordova.fragments.CaptureResultDialogFragment;
+import com.abbyy.mobile.rtr.cordova.fragments.CaptureTask;
 import com.abbyy.mobile.rtr.cordova.fragments.MultiPageCounter;
+import com.abbyy.mobile.rtr.cordova.fragments.PageHolder;
 import com.abbyy.mobile.rtr.cordova.utils.ImageLoader;
 import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
 import com.abbyy.mobile.uicomponents.CaptureView;
@@ -53,7 +58,10 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 	private boolean resultDialogShown = false;
 
 	private Bitmap lastPageMiniature = null;
-	private ImageLoader lastPageMiniatureLoader;
+
+	private int capturePageNumber = 0;
+	private CaptureMode captureMode = CaptureMode.Add;
+	private SparseArray<PageHolder> pages = new SparseArray<>();
 
 	public static Intent newImageCaptureIntent( Context context )
 	{
@@ -86,14 +94,6 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 		} );
 	}
 
-	@Override protected void onDestroy()
-	{
-		if( lastPageMiniatureLoader != null ) {
-			lastPageMiniatureLoader.cancel( true );
-		}
-		super.onDestroy();
-	}
-
 	// Supporting correct behavior on activity re-creation
 	@Override
 	protected void onSaveInstanceState( Bundle outState )
@@ -109,16 +109,11 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 			@Override
 			public void onClick( View v )
 			{
-				showResultFragment(null);
+				showResultFragment( null, CaptureMode.View );
 			}
 		} );
 
-		final int captureSessionPageCount = ImageUtils.getCaptureSessionPageCount( this );
-		if( captureSessionPageCount > 0 && lastPageMiniature == null ) {
-			loadLastPageMiniature( captureSessionPageCount );
-		} else {
-			multiPageCounter.updatePageCount( captureSessionPageCount, lastPageMiniature );
-		}
+		multiPageCounter.updatePageCount( 0, lastPageMiniature );
 	}
 
 	private void initCaptureView()
@@ -146,36 +141,6 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 		}
 	}
 
-	private void loadLastPageMiniature( final int captureSessionPageCount )
-	{
-		String lastPagePath = ImageUtils.getCaptureSessionPageFile( captureSessionPageCount - 1, this ).getPath();
-		lastPageMiniatureLoader = new ImageLoader( lastPagePath, new ImageLoader.Callback() {
-			@Override
-			public Bitmap loadBitmap( @NonNull File file ) throws IOException
-			{
-				return ImageUtils.loadThumbnail(
-					file,
-					getResources().getDimensionPixelSize( R.dimen.miniature_size )
-				);
-			}
-
-			@Override
-			public void onImageReady( @NonNull Bitmap image )
-			{
-				lastPageMiniature = image;
-				multiPageCounter.updatePageCount( captureSessionPageCount, lastPageMiniature );
-			}
-
-			@Override
-			public void onError( @NonNull Exception error )
-			{
-				lastPageMiniature = null;
-				multiPageCounter.updatePageCount( captureSessionPageCount, null );
-			}
-		} );
-		lastPageMiniatureLoader.execute();
-	}
-
 	@Override
 	protected void onResume()
 	{
@@ -197,18 +162,15 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 	@Override
 	public void onImageCaptured( @NonNull ImageCaptureScenario.Result documentCaptureResult )
 	{
-		showResultFragment( documentCaptureResult.getBitmap() );
+		showResultFragment( documentCaptureResult.getBitmap(), captureMode );
 	}
 
-	private void showResultFragment( Bitmap capturedImage )
+	private void showResultFragment( Bitmap capturedImage, CaptureMode captureMode )
 	{
-		if (resultDialogShown) {
+		if( resultDialogShown ) {
 			return;
 		}
-		int sessionPageCount = ImageUtils.getCaptureSessionPageCount( this );
-		CaptureResultDialogFragment resultFragment = CaptureResultDialogFragment.newInstance(
-			sessionPageCount, capturedImage
-		);
+		CaptureResultDialogFragment resultFragment = CaptureResultDialogFragment.newInstance( captureMode, capturedImage, capturePageNumber, pages );
 		resultFragment.show( getSupportFragmentManager(), "result" );
 
 		resultDialogShown = true;
@@ -231,21 +193,28 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 	// Callback methods for CaptureResultDialogFragment
 
 	@Override
-	public void onCaptureResultConfirmed( Bitmap capturedPage, boolean confirmed, boolean shouldFinishCapture )
+	public void onCaptureResult( CaptureResult result, CaptureTask task )
 	{
 		resultDialogShown = false;
-		if( confirmed ) {
-			if (capturedPage != null) {
+		if( task != null && task.getCaptureMode() != CaptureMode.View ) {
+			this.capturePageNumber = task.getPageNumber();
+			captureMode = task.getCaptureMode();
+		}
+		if (result != null) {
+			pages = result.getPages();
+			PageHolder pageHolder = result.getPages().get( result.getCapturedPageNumber() );
+			Bitmap capturedPage = pageHolder != null ? pageHolder.getPageImage() : null;
+			if( result.getCaptureMode() == CaptureMode.Add && capturedPage != null ) {
 				// Create last page miniature
 				lastPageMiniature = ImageUtils.getMiniature(
 					capturedPage,
 					getResources().getDimensionPixelSize( R.dimen.miniature_size )
 				);
-				int captureSessionPageCount = ImageUtils.getCaptureSessionPageCount( this );
+				int captureSessionPageCount = pages.size();
 				multiPageCounter.updatePageCount( captureSessionPageCount, lastPageMiniature );
 			}
 
-			if( shouldFinishCapture ) { // Finish capture session & return to the main activity
+			if( result.isFinishCapture() ) { // Finish capture session and return to the main activity
 				finishCapture();
 				return;
 			}
@@ -255,8 +224,8 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 
 	private void finishWithWarning()
 	{
-		int addPageCount = ImageUtils.getCaptureSessionPageCount( this );
-		if( addPageCount > 0 ) {
+		int pageCount = pages.size();
+		if( pageCount > 0 ) {
 			// There are pages that would be discarded, needs confirmation
 			showDiscardPagesDialog();
 		} else {
@@ -311,9 +280,10 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 
 		HashMap<String, Object> json = new HashMap<>();
 		ArrayList<String> pagesPaths = new ArrayList<>();
-		File[] pages = ImageUtils.getCaptureSessionPages( this );
-		for (File page : pages) {
-			pagesPaths.add( page.getPath() );
+		int pageCount = pages.size();
+		for( int i = 0; i < pageCount; ++i ) {
+			PageHolder pageHolder = pages.valueAt( i );
+			pagesPaths.add( pageHolder.getPageFile().getPath() );
 		}
 		json.put( "pages", pagesPaths );
 
