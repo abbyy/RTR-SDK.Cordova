@@ -11,6 +11,7 @@ typedef NS_ENUM(NSUInteger, RTRImageCaptureDestintationType) {
 };
 
 typedef NS_ENUM(NSUInteger, RTRImageCaptureEncodingType) {
+	RTRImageCaptureEncodingTypeJpeg2000,
 	RTRImageCaptureEncodingTypeJpg,
 	RTRImageCaptureEncodingTypePng,
 	RTRImageCaptureEncodingTypePdf,

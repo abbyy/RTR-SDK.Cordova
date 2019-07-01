@@ -134,6 +134,7 @@
 			return;
 		}
 		case RTRImageCaptureEncodingTypeJpg:
+		case RTRImageCaptureEncodingTypeJpeg2000:
 		case RTRImageCaptureEncodingTypePng: {
 			completion(@{
 				@"imagePaths": self.storage.manager.imagePaths
@@ -165,8 +166,22 @@
 {
 	switch(self.exportType) {
 		case RTRImageCaptureEncodingTypePng:
-		case RTRImageCaptureEncodingTypeJpg:
-			return [self containerForJpg];
+		case RTRImageCaptureEncodingTypeJpg: {
+			RTRImageContainer* container = [[RTRJpgImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
+			container.operationCustomization = ^(id<RTRCoreAPIExportToJpgOperation> _Nonnull op) {
+				NSAssert([op conformsToProtocol:@protocol(RTRCoreAPIExportToJpgOperation)], @"unexpected");
+				op.compression = self.compressionLevel;
+			};
+			return container;
+		}
+		case RTRImageCaptureEncodingTypeJpeg2000: {
+			RTRImageContainer* container = [[RTRJpeg2000ImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
+			container.operationCustomization = ^(id<RTRCoreAPIExportToJpeg2000Operation> _Nonnull op) {
+				NSAssert([op conformsToProtocol:@protocol(RTRCoreAPIExportToJpeg2000Operation)], @"unexpected");
+				op.compression = self.compressionLevel;
+			};
+			return container;
+		}
 		case RTRImageCaptureEncodingTypePdf:
 			return [[RTRPngImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
 		default:
@@ -183,28 +198,6 @@
 		op.compression = self.compressionLevel;
 	};
 	return container;
-}
-
-- (RTRImageContainer*)containerForJpg
-{
-	if(self.compressionType == RTRCoreAPIPdfExportJpeg2000Compression) {
-		RTRImageContainer* container = [[RTRJpeg2000ImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
-		container.operationCustomization = ^(id<RTRCoreAPIExportToJpeg2000Operation> _Nonnull op) {
-			NSAssert([op conformsToProtocol:@protocol(RTRCoreAPIExportToJpeg2000Operation)], @"unexpected");
-			op.compression = self.compressionLevel;
-		};
-		return container;
-	} else if(self.compressionType == RTRCoreAPIPdfExportJpgCompression) {
-		RTRImageContainer* container = [[RTRJpgImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
-		container.operationCustomization = ^(id<RTRCoreAPIExportToJpgOperation> _Nonnull op) {
-			NSAssert([op conformsToProtocol:@protocol(RTRCoreAPIExportToJpgOperation)], @"unexpected");
-			op.compression = self.compressionLevel;
-		};
-		return container;
-	} else {
-		NSAssert(NO, @"Unknown compression type");
-		return nil;
-	}
 }
 
 #pragma mark - image scenario

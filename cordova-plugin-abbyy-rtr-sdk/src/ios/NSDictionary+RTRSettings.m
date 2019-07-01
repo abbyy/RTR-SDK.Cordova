@@ -70,6 +70,7 @@
 	static NSDictionary* predefined = nil;
 	if(predefined == nil) {
 		predefined = @{
+			@"jpeg2000": @(RTRImageCaptureEncodingTypeJpeg2000),
 			@"jpg": @(RTRImageCaptureEncodingTypeJpg),
 			@"png": @(RTRImageCaptureEncodingTypePng),
 			@"pdf": @(RTRImageCaptureEncodingTypePdf)
