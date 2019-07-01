@@ -1,7 +1,5 @@
 package com.abbyy.mobile.rtr.cordova.multipage;
 
-import android.util.SparseArray;
-
 public class CaptureResult {
 	private int capturedPageNumber;
 	private boolean finishCapture;

@@ -212,7 +212,6 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		int pageCount = getPages().size();
 		if (pageCount == 0) {
 			dismiss();
-			return;
 		} else {
 			if( selectedPageIndex >= pageCount ) {
 				selectedPageIndex = pageCount - 1;

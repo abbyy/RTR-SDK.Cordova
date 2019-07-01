@@ -58,6 +58,7 @@ public class PageHolder {
 			pageImage,
 			context.getResources().getDimensionPixelSize( R.dimen.miniature_size )
 		);
+
 		ImageSaver tempImageSaver = new ImageSaver( pageImage, pageFilePath, callback );
 		pageImage = null;
 		tempImageSaver.execute();

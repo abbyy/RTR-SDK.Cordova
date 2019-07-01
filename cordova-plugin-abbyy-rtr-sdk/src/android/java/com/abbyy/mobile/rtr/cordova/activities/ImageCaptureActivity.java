@@ -24,12 +24,14 @@ import com.abbyy.mobile.rtr.cordova.multipage.CaptureResultDialogFragment;
 import com.abbyy.mobile.rtr.cordova.multipage.MultiCaptureResult;
 import com.abbyy.mobile.rtr.cordova.multipage.MultiPageCounter;
 import com.abbyy.mobile.rtr.cordova.multipage.PageHolder;
+import com.abbyy.mobile.rtr.cordova.utils.ImagePdfSaver;
 import com.abbyy.mobile.rtr.cordova.utils.ImageSaver;
 import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
 import com.abbyy.mobile.uicomponents.CaptureView;
 import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario;
 import com.abbyy.rtrcordovasample.R;
 
+import java.io.File;
 import java.util.HashMap;
 
 /**
@@ -55,8 +57,6 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 	private boolean resultDialogShown = false;
 
 	private int capturePageNumber = 0;
-
-	private MultiCaptureResult multiCaptureResult = new MultiCaptureResult();
 
 	public static Intent newImageCaptureIntent( Context context )
 	{
@@ -160,7 +160,8 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 		super.onPause();
 	}
 
-	private SparseArray<PageHolder> getPages() {
+	private SparseArray<PageHolder> getPages()
+	{
 		return RtrManager.getImageCaptureResult();
 	}
 
@@ -194,7 +195,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 					startCapture(); // Resume capture
 				}
 			} );
-			updatePages( pageHolder, pageMiniature );
+			updatePages( pageMiniature );
 		}
 	}
 
@@ -233,25 +234,22 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 	public void onCaptureResult( CaptureResult result, int nextPageNumber, Bitmap lastPageMiniature )
 	{
 		resultDialogShown = false;
-		if( result != null ) {
-			PageHolder pageHolder = getPages().get( capturePageNumber );
-			updatePages( pageHolder, lastPageMiniature );
+		if (nextPageNumber > 0) {
+			updatePages( lastPageMiniature );
+		}
 
-			if( result.isFinishCapture() ) { // Finish capture session and return to the main activity
-				finishCapture();
-				return;
-			}
+		if( result.isFinishCapture() ) { // Finish capture session and return to the main activity
+			finishCapture();
+			return;
 		}
 		this.capturePageNumber = nextPageNumber;
 		startCapture(); // Resume capture
 	}
 
-	private void updatePages( PageHolder pageHolder, Bitmap lastPageMiniature )
+	private void updatePages( Bitmap lastPageMiniature )
 	{
 		int pageCount = getPages().size();
 		multiPageCounter.updatePageCount( pageCount, lastPageMiniature );
-
-		multiCaptureResult.addPage( pageHolder );
 	}
 
 	private void finishWithWarning()
@@ -309,9 +307,29 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 
 	private void finishCapture()
 	{
+		if( ImageCaptureSettings.exportType == ImageCaptureSettings.ExportType.PDF ) {
+			finishCapturePdf();
+		} else {
+			finishCaptureResult();
+		}
+	}
+
+	private void finishCapturePdf()
+	{
+		File pdfFile = ImageUtils.getCaptureSessionPdfFile( this );
+		new ImagePdfSaver( getPages(), pdfFile, new ImagePdfSaver.Callback() {
+			@Override public void onSaved( File pdfFile )
+			{
+				finishCaptureResult();
+			}
+		} ).execute();
+	}
+
+	private void finishCaptureResult()
+	{
 		Intent intent = new Intent();
 
-		HashMap<String, Object> json = multiCaptureResult.getJsonResult(getPages());
+		HashMap<String, Object> json = MultiCaptureResult.getJsonResult( getPages(), this );
 		RtrManager.setImageCaptureResult( null );
 
 		intent.putExtra( "result", json );

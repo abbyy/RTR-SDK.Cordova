@@ -11,6 +11,7 @@ import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.abbyy.mobile.rtr.Engine;
+import com.abbyy.mobile.rtr.IImagingCoreAPI;
 import com.abbyy.mobile.rtr.Language;
 import com.abbyy.mobile.rtr.cordova.activities.DataCaptureActivity;
 import com.abbyy.mobile.rtr.cordova.activities.ImageCaptureActivity;
@@ -307,7 +308,16 @@ public class RtrPlugin extends CordovaPlugin {
 		CaptureView.CameraSettings.Resolution resolution = CaptureView.CameraSettings.Resolution.HD;
 		if( arg.has( RTR_CAMERA_RESOLUTION_KEY ) ) {
 			String resolutionName = arg.getString( RTR_CAMERA_RESOLUTION_KEY );
-			resolution = CaptureView.CameraSettings.Resolution.valueOf( resolutionName );
+			switch( resolutionName ) {
+				case "HD":
+					resolution = CaptureView.CameraSettings.Resolution.HD;
+					break;
+				case "FullHD":
+					resolution = CaptureView.CameraSettings.Resolution.FULL_HD;
+					break;
+				case "4K":
+					break;
+			}
 		}
 		RtrManager.setCameraResolution( resolution );
 	}
@@ -371,12 +381,12 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseCompressionType( JSONObject arg ) throws JSONException
 	{
-		ImageCaptureSettings.CompressionType compressionType = ImageCaptureSettings.CompressionType.JPG;
+		IImagingCoreAPI.ExportOperation.CompressionType compressionType = IImagingCoreAPI.ExportOperation.CompressionType.Jpg;
 		if( arg.has( RTR_COMPRESSION_TYPE_KEY ) ) {
 			String value = arg.getString( RTR_COMPRESSION_TYPE_KEY );
 			switch( value ) {
 				case "jpg":
-					compressionType = ImageCaptureSettings.CompressionType.JPG;
+					compressionType = IImagingCoreAPI.ExportOperation.CompressionType.Jpg;
 					break;
 			}
 		}
@@ -385,21 +395,21 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseCompressionLevel( JSONObject arg ) throws JSONException
 	{
-		ImageCaptureSettings.CompressionLevel compressionLevel = ImageCaptureSettings.CompressionLevel.Low;
+		IImagingCoreAPI.ExportOperation.Compression compressionLevel = IImagingCoreAPI.ExportOperation.Compression.Low;
 		if( arg.has( RTR_COMPRESSION_LEVEL_KEY ) ) {
 			String value = arg.getString( RTR_COMPRESSION_LEVEL_KEY );
 			switch( value ) {
 				case "Low":
-					compressionLevel = ImageCaptureSettings.CompressionLevel.Low;
+					compressionLevel = IImagingCoreAPI.ExportOperation.Compression.Low;
 					break;
-				case "Medium":
-					compressionLevel = ImageCaptureSettings.CompressionLevel.Medium;
+				case "Normal":
+					compressionLevel = IImagingCoreAPI.ExportOperation.Compression.Normal;
 					break;
 				case "High":
-					compressionLevel = ImageCaptureSettings.CompressionLevel.High;
+					compressionLevel = IImagingCoreAPI.ExportOperation.Compression.High;
 					break;
 				case "ExtraHigh":
-					compressionLevel = ImageCaptureSettings.CompressionLevel.ExtraHigh;
+					compressionLevel = IImagingCoreAPI.ExportOperation.Compression.ExtraHigh;
 					break;
 			}
 		}

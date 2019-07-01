@@ -13,6 +13,8 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.SparseArray;
 
+import com.abbyy.mobile.rtr.cordova.ImageCaptureSettings;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -29,7 +31,26 @@ public class ImageUtils {
 	public static void saveBitmap( Bitmap image, File file ) throws IOException
 	{
 		try( FileOutputStream fos = new FileOutputStream( file ) ) {
-			image.compress( Bitmap.CompressFormat.PNG, 100, fos );
+			if ( ImageCaptureSettings.exportType == ImageCaptureSettings.ExportType.PNG ) {
+				image.compress( Bitmap.CompressFormat.PNG, 0, fos );
+			} else {
+				int quality = 0;
+				switch( ImageCaptureSettings.compressionLevel ) {
+					case Low:
+						quality = 100;
+						break;
+					case Normal:
+						quality = 66;
+						break;
+					case High:
+						quality = 33;
+						break;
+					case ExtraHigh:
+						quality = 0;
+						break;
+				}
+				image.compress( Bitmap.CompressFormat.JPEG, quality, fos );
+			}
 			fos.flush();
 		}
 	}
@@ -53,6 +74,15 @@ public class ImageUtils {
 		return new File( captureSessionDir, "page_" + ( pageIndex + 1 ) + ".png" );
 	}
 
+	public static File getCaptureSessionPdfFile( Context context )
+	{
+		File captureSessionDir = getCaptureSessionDir( context );
+		if( !captureSessionDir.exists() ) {
+			captureSessionDir.mkdir();
+		}
+		return new File( captureSessionDir, "pages.pdf" );
+	}
+
 	public static File[] getCaptureSessionPages( Context context )
 	{
 		File captureSessionDir = getCaptureSessionDir( context );
@@ -63,30 +93,10 @@ public class ImageUtils {
 		return files != null ? files : new File[] {};
 	}
 
-	public static int getCaptureSessionPagesArray( Context context, SparseArray<File> pagesArray )
-	{
-		int maxPageNumber = 0;
-		File[] pages = getCaptureSessionPages( context );
-		for( File page : pages ) {
-			String name = page.getName();
-			String number = name.substring( 5, name.length() - 4 );
-			int num = Integer.valueOf( number );
-			if (num > maxPageNumber) {
-				maxPageNumber = num;
-			}
-			pagesArray.append( num, page );
-		}
-		return maxPageNumber;
-	}
-
 	private static File getCaptureSessionDir( Context context )
 	{
-		return new File( context.getFilesDir(), "session_pages" );
-	}
-
-	public static int getCaptureSessionPageCount( Context context )
-	{
-		return getCaptureSessionPages( context ).length;
+		File root = Environment.getExternalStoragePublicDirectory( Environment.DIRECTORY_PICTURES );
+		return new File( root/*context.getFilesDir()*/, "session_pages" );
 	}
 
 	public static void clearCaptureSessionPages( Context context )

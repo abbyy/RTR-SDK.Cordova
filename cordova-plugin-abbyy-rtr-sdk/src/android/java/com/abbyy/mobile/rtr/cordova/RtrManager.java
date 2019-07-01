@@ -6,6 +6,7 @@ import android.util.SparseArray;
 
 import com.abbyy.mobile.rtr.Engine;
 import com.abbyy.mobile.rtr.IDataCaptureService;
+import com.abbyy.mobile.rtr.IImagingCoreAPI;
 import com.abbyy.mobile.rtr.ITextCaptureService;
 import com.abbyy.mobile.rtr.Language;
 import com.abbyy.mobile.rtr.cordova.exceptions.InitializationException;
@@ -211,12 +212,12 @@ public class RtrManager {
 		ImageCaptureSettings.exportType = exportType;
 	}
 
-	public static void setCompressionType( ImageCaptureSettings.CompressionType compressionType )
+	public static void setCompressionType( IImagingCoreAPI.ExportOperation.CompressionType compressionType )
 	{
 		ImageCaptureSettings.compressionType = compressionType;
 	}
 
-	public static void setCompressionLevel( ImageCaptureSettings.CompressionLevel compressionLevel )
+	public static void setCompressionLevel( IImagingCoreAPI.ExportOperation.Compression compressionLevel )
 	{
 		ImageCaptureSettings.compressionLevel = compressionLevel;
 	}
@@ -264,5 +265,9 @@ public class RtrManager {
 	public static void setImageCaptureMiniature( Bitmap imageCaptureMiniature )
 	{
 		RtrManager.imageCaptureMiniature = imageCaptureMiniature;
+	}
+
+	public static IImagingCoreAPI getImagingCoreAPI() {
+		return engine.createImagingCoreAPI();
 	}
 }
