@@ -22,6 +22,16 @@
 #pragma mark - ViewController
 
 @interface RTRImageCaptureViewController () <AUIImageCaptureScenarioDelegate, PreviewViewControllerDelegate>
+
+@property (nonatomic, assign) BOOL forceCaptured;
+
+@end
+
+@interface RTRFixedOrientationMaskNavigationController: UINavigationController
+@property (nonatomic, assign) UIInterfaceOrientationMask supportedInterfaceOrientations;
+@end
+
+@implementation RTRFixedOrientationMaskNavigationController
 @end
 
 @implementation RTRImageCaptureViewController
@@ -34,6 +44,7 @@
 	self.overlay.hidden = YES;
 	self.flashButton.hidden = !self.config.isFlashlightButtonVisible;
 	self.captureButton.hidden = !self.config.isCaptureButtonVisible;
+	[self.captureButton addTarget:self action:@selector(forceCaptured:) forControlEvents:UIControlEventTouchUpInside];
 
 	self.captureScenario = self.config.scenario;
 	self.captureScenario.delegate = self;
@@ -60,10 +71,12 @@
 
 - (void)didPressPreview:(id)sender
 {
-	[self.config.storage sessionClosedSuccessfully];
-	[self.config exportResult:^(NSDictionary* dict) {
-		self.onSuccess(@[dict]);
-	}];
+	[self showPreviewController];
+}
+
+- (void)forceCaptured:(id)sender
+{
+	self.forceCaptured = YES;
 }
 
 #pragma mark - Abbyy Mobile UI
@@ -77,12 +90,8 @@
 			[self setPaused:NO animated:YES];
 		}];
 		UIAlertAction* ok = [UIAlertAction actionWithTitle:@"Confirm".rtr_localized style:UIAlertActionStyleDestructive handler:^(UIAlertAction* action) {
-			[self dismissViewControllerAnimated:YES completion:^{
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[self.config.storage sessionCancelled];
-					self.onCancel();
-				});
-			}];
+			[self.config.storage sessionCancelled];
+			self.onCancel();
 		}];
 		[confirmation addAction:ok];
 		[confirmation addAction:cancel];
@@ -111,26 +120,35 @@
 - (void)captureScenario:(AUIImageCaptureScenario*)captureScenario didCaptureImageWithResult:(AUIImageCaptureResult*)result
 {
 	NSLog(@"did capture result %@", result);
-	[self.config.storage imageCaptured:result.image];
+	[self.config.storage imageCaptured:result forceCaptured:self.forceCaptured];
+	self.forceCaptured = NO;
 
 	if(self.config.shouldShowPreview) {
-		RTRMultiImagePreviewController* viewController = [RTRMultiImagePreviewController new];
-		viewController.pageIndex = self.config.storage.currentImageIndex;
-		viewController.imagesCount = self.config.storage.imagesCount;
-		viewController.delegate = self;
-		UINavigationController* navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-		[self presentViewController:navigationController animated:YES completion:nil];
+		[self showPreviewController];
 	} else {
 		[self.config.storage confirmChanges];
 		[self updateOverlay];
 		if(!self.config.shouldShowPreview && self.config.maxImagesCount == self.config.storage.imagesCount) {
 			[self.config exportResult:^(NSDictionary* dict) {
-				self.onSuccess(@[dict]);
+				self.onSuccess(dict);
 			}];
 		} else {
 			captureScenario.active = YES;
 		}
 	}
+}
+
+#pragma mark - routines
+
+- (void)showPreviewController
+{
+	RTRMultiImagePreviewController* viewController = [RTRMultiImagePreviewController new];
+	viewController.pageIndex = self.config.storage.currentImageIndex;
+	viewController.imagesCount = self.config.storage.imagesCount;
+	viewController.delegate = self;
+	RTRFixedOrientationMaskNavigationController* navigationController = [[RTRFixedOrientationMaskNavigationController alloc] initWithRootViewController:viewController];
+	navigationController.supportedInterfaceOrientations = self.supportedInterfaceOrientations;
+	[self presentViewController:navigationController animated:YES completion:nil];
 }
 
 #pragma mark - Preview Controller
@@ -151,7 +169,7 @@
 {
 	[self.config.storage sessionClosedSuccessfully];
 	[self.config exportResult:^(NSDictionary* dict) {
-		self.onSuccess(@[dict]);
+		self.onSuccess(dict);
 	}];
 }
 

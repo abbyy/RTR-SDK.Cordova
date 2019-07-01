@@ -7,19 +7,21 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class RTRDocumentManager;
+@class AUIImageCaptureResult;
 
 @interface RTRMultipageScenarioStorage : NSObject
 
 @property (nonatomic, readonly) NSInteger imagesCount;
 @property (nonatomic, readonly) NSInteger currentImageIndex;
 @property (nonatomic, readonly) RTREngine* engine;
-@property (nonatomic, readonly) RTRDocumentManager* manager;
+@property (nonatomic, strong) NSMutableArray<NSDictionary*>* shouldShow;
 
 - (instancetype)initWithEngine:(RTREngine*)engine manager:(RTRDocumentManager*)manager;
 - (instancetype)init __unavailable;
 
 - (UIImage*)imageForIndex:(NSInteger)index;
-- (void)imageCaptured:(UIImage*)image;
+- (void)generatePdfWithCompletion:(void(^)(NSString*))completion;
+- (void)imageCaptured:(AUIImageCaptureResult*)result forceCaptured:(BOOL)force;
 - (void)deleteImageAt:(NSInteger)index;
 - (void)retakeImageAt:(NSInteger)index;
 - (void)sessionClosedSuccessfully;

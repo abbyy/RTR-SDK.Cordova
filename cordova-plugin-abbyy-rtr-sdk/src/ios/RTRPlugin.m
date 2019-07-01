@@ -163,16 +163,15 @@
 			__weak RTRImageCaptureViewController* weakController = self.imageCaptureHolder;
 
 			self.imageCaptureHolder.config = [[RTRMultipageScenarioConfiguration alloc] initWithManager:self.rtrManager args:command.arguments.firstObject];
-			self.imageCaptureHolder.onSuccess = ^(NSArray<NSDictionary*>* resultArray) {
-				NSMutableDictionary* resultDict = [@{
-					RTRCallbackResultInfoKey : @{
-						RTRCallbackUserActionKey : @"Succeeded"
-					},
-					@"imagesBase64" : resultArray,
-					} mutableCopy
-				];
+			self.imageCaptureHolder.onSuccess = ^(NSDictionary* response) {
+				NSMutableDictionary* mutableResponce = response.mutableCopy;
+				mutableResponce[RTRCallbackResultInfoKey] =
+				@{
+					  RTRCallbackUserActionKey : @"Succeeded",
+					  @"frameSize": [NSDictionary rtr_auiCameraResolutionToString][@(weakSelf.imageCaptureHolder.config.cameraResolution)]
+				};
 
-				CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+				CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:mutableResponce];
 				[weakSelf.viewController dismissViewControllerAnimated:YES completion:^{
 					[weakSelf.commandDelegate sendPluginResult:pluginResult callbackId:weakSelf.currentCommand.callbackId];
 				}];

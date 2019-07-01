@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RTRImageCaptureViewController : AUICaptureController
 
 @property (nonatomic, copy) void (^onCancel)(void);
-@property (nonatomic, copy) void (^onSuccess)(NSArray<NSDictionary*>* capturedData);
+@property (nonatomic, copy) void (^onSuccess)(NSDictionary* capturedData);
 
 @property (nonatomic, strong) NSString* errorOccurred;
 @property (nonatomic, strong) RTRMultipageScenarioConfiguration* config;

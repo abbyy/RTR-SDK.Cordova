@@ -122,28 +122,37 @@
 
 - (void)exportResult:(void(^)(NSDictionary*))completion
 {
-	switch(_exportType) {
-		case RTRImageCaptureEncodingTypePdf: {
-			[self.storage.manager generatePdfWithCompletion:^(NSString * _Nonnull path) {
-				if(completion != nil) {
-					completion(@{
-						@"pdfPath": path
-					});
-				};
-			}];
-			return;
+	NSMutableDictionary* resultDictionary =
+  @{
+		@"images" : @[].mutableCopy,
+		@"resultInfo": @{}.mutableCopy
+	}.mutableCopy;
+	for(NSDictionary* dict in self.storage.shouldShow) {
+		NSMutableArray* images = resultDictionary[@"images"];
+		NSMutableDictionary* imageInfo = dict.mutableCopy;
+		if(self.storage.shouldShow.count == 1 /*&& self.destination == RTRImageCaptureDestintationDataUrl*/) {
+			UIImage* image = [UIImage imageWithContentsOfFile:imageInfo[@"filePath"]];
+			NSData* jpegData = UIImageJPEGRepresentation(image, 0.7);
+			imageInfo[@"base64"] = [jpegData base64EncodedStringWithOptions:0];
 		}
-		case RTRImageCaptureEncodingTypeJpg:
-		case RTRImageCaptureEncodingTypeJpeg2000:
-		case RTRImageCaptureEncodingTypePng: {
-			completion(@{
-				@"imagePaths": self.storage.manager.imagePaths
-			});
-			return;
-		}
-		default:
-			NSAssert(NO, @"unexpected export type");
-			break;
+		[images addObject:imageInfo];
+		
+	}
+	if(self.exportType == RTRImageCaptureEncodingTypePdf) {
+		[self.storage generatePdfWithCompletion:^(NSString * _Nonnull path) {
+			if(completion != nil) {
+				resultDictionary[@"pdfInfo"] =
+				@{
+				  @"filePath": path,
+				  @"pagesCount": @(self.storage.shouldShow.count),
+				  @"compressionType": [NSDictionary rtr_exportCompressionTypeToString][@(self.compressionType)],
+				  @"compressionLevel": [NSDictionary rtr_exportCompressionLevelToString][@(self.compressionLevel)]
+				  };
+				completion(resultDictionary);
+			};
+		}];
+	} else {
+		completion(resultDictionary);
 	}
 }
 

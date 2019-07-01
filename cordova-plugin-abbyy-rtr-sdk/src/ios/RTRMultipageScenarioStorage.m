@@ -3,15 +3,15 @@
 
 #import "RTRMultipageScenarioStorage.h"
 #import "RTRDocumentManager.h"
+#import <AbbyyUI/AbbyyUI.h>
 
 @interface RTRMultipageScenarioStorage ()
 
-@property (nonatomic, strong) UIImage* memoryImage;
+@property (nonatomic, strong) NSMutableDictionary* memoryImage;
 @property (nonatomic, assign) NSInteger currentImageIndex;
 @property (nonatomic, assign) BOOL retake;
 @property (nonatomic, strong) RTRDocumentManager* sessionDocumentManager;
-@property (nonatomic, strong) NSMutableArray<NSString*>* shouldShowPaths;
-@property (nonatomic, strong) NSMutableArray<NSString*>* shouldDeletePaths;
+@property (nonatomic, strong) NSMutableArray<NSDictionary*>* shouldDelete;
 @property (nonatomic, strong) RTREngine* engine;
 
 @end
@@ -23,34 +23,53 @@
 	self = [super init];
 	if(self != nil) {
 		_engine = engine;
-		_shouldDeletePaths = @[].mutableCopy;
-		_shouldShowPaths = @[].mutableCopy;
+		_shouldDelete = @[].mutableCopy;
+		_shouldShow = @[].mutableCopy;
 		_sessionDocumentManager = manager;
 		_sessionDocumentManager.rtrEngine = engine;
 	}
 	return self;
 }
 
-- (RTRDocumentManager*)manager
+- (void)generatePdfWithCompletion:(void (^)(NSString * _Nonnull))completion
 {
-	return self.sessionDocumentManager;
+	[self.sessionDocumentManager generatePdfWithCompletion:completion];
 }
 
-- (void)imageCaptured:(UIImage*)image
+- (void)imageCaptured:(AUIImageCaptureResult*)result forceCaptured:(BOOL)force
 {
-	self.memoryImage = image;
+	self.memoryImage = [self imageResultDictFrom:result forceCaptured:force];
 	if(!self.retake) {
 		self.currentImageIndex = self.imagesCount - 1;
 	}
+}
+
+- (NSMutableDictionary*)imageResultDictFrom:(AUIImageCaptureResult*)result forceCaptured:(BOOL)force
+{
+	NSMutableDictionary* info = @{}.mutableCopy;
+	info[@"nativeImage"] = result.image;
+	if(result.documentBoundary != nil) {
+		NSMutableString* quadrangleString = @"".mutableCopy;
+		for(NSValue* value in result.documentBoundary) {
+			CGPoint point = value.CGPointValue;
+			[quadrangleString appendFormat:@"%f %f ", point.x, point.y];
+		}
+		info[@"documentBoundary"] = [quadrangleString substringToIndex:quadrangleString.length - 1];
+	}
+	NSMutableDictionary* additionalInfo = @{}.mutableCopy;
+	additionalInfo[@"cropped"] = @(result.documentBoundary == nil);
+	additionalInfo[@"autoCaptured"] = @(!force);
+	info[@"resultInfo"] = additionalInfo;
+	return info;
 }
 
 - (void)deleteImageAt:(NSInteger)index
 {
 	[self confirmChanges];
 	
-	NSString* pathToDelete = self.shouldShowPaths[index];
-	[self.shouldDeletePaths addObject:pathToDelete];
-	[self.shouldShowPaths removeObjectAtIndex:index];
+	NSDictionary* pathToDelete = self.shouldShow[index];
+	[self.shouldDelete addObject:pathToDelete];
+	[self.shouldShow removeObjectAtIndex:index];
 	self.currentImageIndex = MAX(0, MIN(self.imagesCount - 1, self.currentImageIndex));
 }
 
@@ -65,17 +84,17 @@
 - (UIImage*)imageForIndex:(NSInteger)index
 {
 	if(self.memoryImage != nil && index == self.currentImageIndex) {
-		return self.memoryImage;
+		return self.memoryImage[@"nativeImage"];
 	}
-	return [UIImage imageWithContentsOfFile:self.shouldShowPaths[index]];
+	return [UIImage imageWithContentsOfFile:self.shouldShow[index][@"filePath"]];
 }
 
 - (NSInteger)imagesCount
 {
 	if(self.memoryImage == nil) {
-		return self.shouldShowPaths.count;
+		return self.shouldShow.count;
 	}
-	return self.shouldShowPaths.count + (self.retake ? 0 : 1);
+	return self.shouldShow.count + (self.retake ? 0 : 1);
 }
 
 - (void)confirmChanges
@@ -83,11 +102,13 @@
 	if(self.memoryImage == nil) {
 		return;
 	}
-	NSString* path = [self.sessionDocumentManager saveImage:self.memoryImage];
+	NSString* path = [self.sessionDocumentManager saveImage:self.memoryImage[@"nativeImage"]];
+	self.memoryImage[@"filePath"] = path;
+	[self.memoryImage removeObjectForKey:@"nativeImage"];
 	if(self.retake) {
-		[self.shouldShowPaths replaceObjectAtIndex:self.currentImageIndex withObject:path];
+		[self.shouldShow replaceObjectAtIndex:self.currentImageIndex withObject:self.memoryImage];
 	} else {
-		[self.shouldShowPaths addObject:path];
+		[self.shouldShow addObject:self.memoryImage];
 	}
 	self.memoryImage = nil;
 	self.retake = NO;
@@ -101,8 +122,8 @@
 - (void)sessionClosedSuccessfully
 {
 	[self confirmChanges];
-	for(NSString* path in self.shouldDeletePaths) {
-		[self.sessionDocumentManager removeFileAt:path];
+	for(NSDictionary* path in self.shouldDelete) {
+		[self.sessionDocumentManager removeFileAt:path[@"filePath"]];
 	}
 }
 

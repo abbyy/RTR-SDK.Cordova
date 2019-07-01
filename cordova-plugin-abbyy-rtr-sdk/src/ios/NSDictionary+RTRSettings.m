@@ -2,6 +2,7 @@
 /// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
 
 #import "NSDictionary+RTRSettings.h"
+#import <AbbyyUI/AbbyyUI.h>
 
 @implementation NSDictionary (RTRSettings)
 
@@ -20,7 +21,7 @@
 	return UIInterfaceOrientationMaskAll;
 }
 
-- (RTRCoreAPIExportCompressionLevel)rtr_exportCompressionLevelForKey:(NSString *)key
++ (NSDictionary*)rtr_stringToExportCompressionLevel
 {
 	static NSDictionary* predefined = nil;
 	if(predefined == nil) {
@@ -31,6 +32,76 @@
 			@"ExtraHigh": @(RTRCoreAPIExportCompressionExtraHighLevel)
 		};
 	}
+	return predefined;
+}
+
++ (NSDictionary*)rtr_exportCompressionLevelToString
+{
+	static NSDictionary* predefined = nil;
+	if(predefined == nil) {
+		predefined = @{
+			@(RTRCoreAPIExportCompressionLowLevel) : @"Low",
+			@(RTRCoreAPIExportCompressionNormalLevel) : @"Normal",
+			@(RTRCoreAPIExportCompressionHighLevel) : @"High",
+			@(RTRCoreAPIExportCompressionExtraHighLevel) : @"ExtraHigh"
+		};
+	}
+	return predefined;
+}
+
++ (NSDictionary*)rtr_stringToexportCompressionType
+{
+	static NSDictionary* predefined = nil;
+	if(predefined == nil) {
+		predefined = @{
+			@"jpg": @(RTRCoreAPIPdfExportJpgCompression),
+			@"jpeg2000": @(RTRCoreAPIPdfExportJpeg2000Compression)
+		};
+	}
+	return predefined;
+}
+
++ (NSDictionary*)rtr_exportCompressionTypeToString
+{
+	static NSDictionary* predefined = nil;
+	if(predefined == nil) {
+		predefined = @{
+			@(RTRCoreAPIPdfExportJpgCompression): @"jpg",
+			@(RTRCoreAPIPdfExportJpeg2000Compression): @"jpeg2000"
+		};
+	}
+	return predefined;
+}
+
++ (NSDictionary*)rtr_stringToauiCameraResolution
+{
+	static NSDictionary* predefined = nil;
+	if(predefined == nil) {
+		predefined = @{
+			@"HD": @(AUICameraResolutionHD),
+			@"FullHD": @(AUICameraResolutionFullHD),
+			@"4K": @(AUICameraResolution4K),
+		};
+	}
+	return predefined;
+}
+
++ (NSDictionary*)rtr_auiCameraResolutionToString
+{
+	static NSDictionary* predefined = nil;
+	if(predefined == nil) {
+		predefined = @{
+			@(AUICameraResolutionHD) : @"HD",
+			@(AUICameraResolutionFullHD) : @"FullHD",
+			@(AUICameraResolution4K) : @"4K",
+		};
+	}
+	return predefined;
+}
+
+- (RTRCoreAPIExportCompressionLevel)rtr_exportCompressionLevelForKey:(NSString*)key
+{
+	NSDictionary* predefined = [NSDictionary rtr_stringToExportCompressionLevel];
 	NSString* value = [self valueForKey:key];
 	if(![value isKindOfClass:[NSString class]]) {
 		return RTRCoreAPIExportCompressionNormalLevel;
@@ -43,13 +114,7 @@
 
 - (RTRCoreAPIPdfExportCompressionType)rtr_exportCompressionTypeForKey:(NSString*)key
 {
-	static NSDictionary* predefined = nil;
-	if(predefined == nil) {
-		predefined = @{
-			@"jpg": @(RTRCoreAPIPdfExportJpgCompression),
-			@"jpeg2000": @(RTRCoreAPIPdfExportJpeg2000Compression)
-		};
-	}
+	NSDictionary* predefined = [NSDictionary rtr_stringToexportCompressionType];
 	NSString* value = [self valueForKey:key];
 	if(![value isKindOfClass:[NSString class]]) {
 		return RTRCoreAPIPdfExportJpgCompression;
