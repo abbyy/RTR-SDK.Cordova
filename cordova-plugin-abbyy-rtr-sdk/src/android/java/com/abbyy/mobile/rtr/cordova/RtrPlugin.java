@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.abbyy.mobile.rtr.Engine;
@@ -14,6 +15,7 @@ import com.abbyy.mobile.rtr.Language;
 import com.abbyy.mobile.rtr.cordova.activities.DataCaptureActivity;
 import com.abbyy.mobile.rtr.cordova.activities.ImageCaptureActivity;
 import com.abbyy.mobile.rtr.cordova.activities.TextCaptureActivity;
+import com.abbyy.mobile.rtr.cordova.multipage.PageHolder;
 import com.abbyy.mobile.uicomponents.CaptureView;
 import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario;
 
@@ -24,10 +26,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 public class RtrPlugin extends CordovaPlugin {
 
@@ -53,8 +55,11 @@ public class RtrPlugin extends CordovaPlugin {
 	private static final String RTR_LICENSE_FILE_NAME_KEY = "licenseFileName";
 
 	private static final String RTR_CAMERA_RESOLUTION_KEY = "cameraResolution";
+	private static final String RTR_IS_SHOW_PREVIEW_KEY = "showPreview";
 	private static final String RTR_DESTINATION_KEY = "destination";
+	private static final String RTR_IMAGE_COUNT_KEY = "imagesCount";
 	private static final String RTR_EXPORT_TYPE_KEY = "exportType";
+	private static final String RTR_IS_MANUAL_CAPTURE_VISIBLE_KEY = "isShootButtonVisible";
 	private static final String RTR_COMPRESSION_TYPE_KEY = "compressionType";
 	private static final String RTR_COMPRESSION_LEVEL_KEY = "compressionLevel";
 	private static final String RTR_DEFAULT_IMAGE_SETTINGS_KEY = "defaultImageSettings";
@@ -64,7 +69,6 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private static final String RTR_AREA_OF_INTEREST_KEY = "areaOfInterest";
 	private static final String RTR_IS_FLASHLIGHT_VISIBLE_KEY = "isFlashlightVisible";
-	private static final String RTR_IS_MANUAL_CAPTURE_VISIBLE_KEY = "isShootButtonVisible";
 	private static final String RTR_IS_STOP_BUTTON_VISIBLE_KEY = "isStopButtonVisible";
 	private static final String RTR_ORIENTATION_KEY = "orientation";
 
@@ -103,6 +107,7 @@ public class RtrPlugin extends CordovaPlugin {
 					onError( e.getMessage() );
 					return false;
 				}
+				RtrManager.setImageCaptureResult(new SparseArray<PageHolder>() );
 				checkPermissionAndStartImageCapture();
 				return true;
 			}
@@ -422,12 +427,10 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseMinimumDocumentToViewRatio( JSONObject settings ) throws JSONException
 	{
-		float documentRatio;
+		float documentRatio = 0.15f;
 
 		if( settings.has( RTR_DOCUMENT_TO_VIEW_RATIO_KEY ) ) {
 			documentRatio = Float.parseFloat( settings.getString( RTR_DOCUMENT_TO_VIEW_RATIO_KEY ) );
-		} else {
-			documentRatio = 0.15f;
 		}
 
 		RtrManager.setDocumentToViewRatio( documentRatio );
@@ -435,7 +438,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseDocumentSize( JSONObject arg ) throws JSONException
 	{
-		ImageCaptureScenario.DocumentSize size;
+		ImageCaptureScenario.DocumentSize size = ImageCaptureScenario.DocumentSize.ANY;
 
 		if( arg.has( RTR_DOCUMENT_SIZE_KEY ) ) {
 			String[] parts = arg.getString( RTR_DOCUMENT_SIZE_KEY ).split( " " );
@@ -461,8 +464,6 @@ public class RtrPlugin extends CordovaPlugin {
 				float height = Float.parseFloat( parts[1] );
 				size = new ImageCaptureScenario.DocumentSize( width, height );
 			}
-		} else {
-			size = ImageCaptureScenario.DocumentSize.ANY;
 		}
 
 		RtrManager.setDocumentSize( size );
@@ -553,7 +554,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private HashMap<String, String> parseExtendedSettings( JSONObject arg ) throws JSONException
 	{
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		JSONObject jsonObject = arg.getJSONObject( RTR_EXTENDED_SETTINGS );
 		Iterator<?> keys = jsonObject.keys();
 		while( keys.hasNext() ) {
@@ -570,11 +571,31 @@ public class RtrPlugin extends CordovaPlugin {
 		parseToggleFlash( arg );
 		parseToggleManualCapture( arg );
 		parseOrientation( arg );
+		parseShowPreview( arg );
+		parseImageCount( arg );
 		parseDestination( arg );
 		parseExportType( arg );
 		parseCompressionType( arg );
 		parseCompressionLevel( arg );
 		parseDefaultImageSettings( arg );
+	}
+
+	private void parseShowPreview( JSONObject arg ) throws JSONException
+	{
+		boolean isShowPreview = false;
+		if( arg.has( RTR_IS_SHOW_PREVIEW_KEY ) ) {
+			isShowPreview = arg.getBoolean( RTR_IS_SHOW_PREVIEW_KEY );
+		}
+		RtrManager.setShowPreview( isShowPreview );
+	}
+
+	private void parseImageCount( JSONObject arg ) throws JSONException
+	{
+		int imageCount = 5;
+		if( arg.has( RTR_IMAGE_COUNT_KEY ) ) {
+			imageCount = arg.getInt( RTR_IMAGE_COUNT_KEY );
+		}
+		RtrManager.setImageCount( imageCount );
 	}
 
 	private Language parseLanguageName( String name )

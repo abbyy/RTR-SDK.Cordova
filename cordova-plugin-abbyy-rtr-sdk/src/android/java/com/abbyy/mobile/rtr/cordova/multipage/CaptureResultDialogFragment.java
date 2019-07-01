@@ -25,11 +25,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.utils.ImageSaver;
-import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
 import com.abbyy.rtrcordovasample.R;
-
-import java.io.File;
 
 /**
  * Fullscreen dialog to confirm or discard capture result. If confirmed, the page is saved into a file.
@@ -39,34 +37,29 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 	View.OnClickListener {
 
 	public interface ResultListener {
-		void onCaptureResult( CaptureResult result, CaptureTask nextPageTask );
+		void onCaptureResult( CaptureResult result, int nextPageNumber, Bitmap lastPageMiniature );
 	}
 
 	private TextView pageNumberText;
-	private SparseArray<PageHolder> pages = new SparseArray<>();
 	private PagesPreviewAdapter pagesAdapter;
 
 	// Dialog's result callback
 	private ResultListener resultListener;
 
 	private int selectedPageIndex;
-	private int capturedPageNumber;
-	private int capturePageNumber;
+
+	private int currentPageNumber;
+
+	private int nextPageNumber;
 
 	// Whether to finish capture scenario and return straight to main activity
 	private boolean finishCapture = false;
-	private boolean cancel = true;
-	private CaptureMode captureMode;
+	private Bitmap lastPageMiniature = null;
 
-	public static CaptureResultDialogFragment newInstance( CaptureMode captureMode, Bitmap capturedImage, int capturedPageNumber, SparseArray<PageHolder> pages )
+	public static CaptureResultDialogFragment newInstance( int pageNumber )
 	{
-		if( captureMode != CaptureMode.View ) {
-			PageHolder pageHolder = new PageHolder();
-			pageHolder.setPageImage( capturedImage );
-			pages.put( capturedPageNumber, pageHolder );
-		}
 		CaptureResultDialogFragment dialog = new CaptureResultDialogFragment();
-		dialog.setPages( captureMode, capturedPageNumber, pages );
+		dialog.setPageNumber( pageNumber );
 		return dialog;
 	}
 
@@ -105,7 +98,6 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		deletePage.setOnClickListener( this );
 
 		pageNumberText = view.findViewById( R.id.pageText );
-		// Page number is a sum of saved and additional pages
 		updatePageText();
 
 		return view;
@@ -144,6 +136,10 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		}
 	}
 
+	private SparseArray<PageHolder> getPages() {
+		return RtrManager.getImageCaptureResult();
+	}
+
 	private void initPagesPreview( View view )
 	{
 		RecyclerView pagesPreview = view.findViewById( R.id.pagesPreview );
@@ -153,7 +149,7 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		layoutManager.setOrientation( LinearLayoutManager.HORIZONTAL );
 		pagesPreview.setLayoutManager( layoutManager );
 
-		pagesAdapter = new PagesPreviewAdapter( pages );
+		pagesAdapter = new PagesPreviewAdapter( getPages() );
 		pagesPreview.setAdapter( pagesAdapter );
 
 		SnapHelper snapHelper = new PagerSnapHelper();
@@ -166,79 +162,82 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 				updatePageText();
 			}
 		} );
-		selectedPageIndex = pages.indexOfKey( capturedPageNumber );
+		selectedPageIndex = getPages().indexOfKey( currentPageNumber );
 		if (selectedPageIndex < 0) {
 			selectedPageIndex = 0;
 		}
 		pagesPreview.scrollToPosition( selectedPageIndex );
 	}
 
-	private void setPages( CaptureMode captureMode, int capturedPageNumber, SparseArray<PageHolder> pages )
+	private void setPageNumber( int currentPageNumber )
 	{
-		this.captureMode = captureMode;
-		this.capturedPageNumber = capturedPageNumber;
-		this.pages = pages;
+		nextPageNumber = this.currentPageNumber = currentPageNumber;
 	}
 
-	private void saveInMemoryPageAndDismiss( boolean addMode )
+	private void savePageAndDismiss( boolean addMode )
 	{
-		CaptureMode mode = captureMode;
 		if( addMode ) {
-			captureMode = CaptureMode.Add;
-			if (pages.size() == 0) {
-				capturePageNumber = 1;
-			} else {
-				capturePageNumber = pages.keyAt( pages.size() - 1 ) + 1;
-			}
+			nextPageNumber = getNextPageNumber(getPages());
 		}
-		if( mode != CaptureMode.View ) {
-			PageHolder pageHolder = pages.get( capturedPageNumber );
-			if (pageHolder != null) {
-				File pageFile = ImageUtils.getCaptureSessionPageFile( capturedPageNumber, getContext() );
-				pageHolder.setPageFile( pageFile );
-				String pageFilePath = pageFile.getPath();
-				ImageSaver tempImageSaver = new ImageSaver( pageHolder.getPageImage(), pageFilePath, this );
-				tempImageSaver.execute();
-				return;
-			}
+		PageHolder pageHolder = getPages().get( currentPageNumber );
+		if (pageHolder != null) {
+			lastPageMiniature = pageHolder.saveToFile(getContext(), this);
+			return;
 		}
 		dismiss();
 	}
 
+	public static int getNextPageNumber( SparseArray<PageHolder> pages )
+	{
+		int nextPageNumber;
+		if (pages.size() == 0) {
+			nextPageNumber = 1;
+		} else {
+			nextPageNumber = pages.keyAt( pages.size() - 1 ) + 1;
+		}
+		return nextPageNumber;
+	}
+
 	private void deletePage()
 	{
-		if (pages.size() == 0) {
+		if (getPages().size() == 0) {
 			dismiss();
 			return;
 		}
-		PageHolder pageHolder = pages.valueAt( selectedPageIndex );
+		PageHolder pageHolder = getPages().valueAt( selectedPageIndex );
 		if( pageHolder.getPageFile() != null ) {
 			pageHolder.getPageFile().delete();
 		}
-		updatePageText();
-		pages.removeAt( selectedPageIndex );
-		pagesAdapter.deletePage( selectedPageIndex );
-		if (pages.size() == 0) {
+		getPages().removeAt( selectedPageIndex );
+		int pageCount = getPages().size();
+		if (pageCount == 0) {
 			dismiss();
+			return;
+		} else {
+			if( selectedPageIndex >= pageCount ) {
+				selectedPageIndex = pageCount - 1;
+			}
+			updatePageText();
+			pagesAdapter.deletePage( selectedPageIndex );
 		}
 	}
 
 	private void updatePageText()
 	{
-		pageNumberText.setText( getString( R.string.page, selectedPageIndex + 1, pages.size() ) );
+		pageNumberText.setText( getString( R.string.page, selectedPageIndex + 1, getPages().size() ) );
 	}
 
 	private void deletePageAndDismiss()
 	{
-		capturePageNumber = pages.keyAt( selectedPageIndex );
-		PageHolder pageHolder = pages.valueAt( selectedPageIndex );
+		nextPageNumber = getPages().keyAt( selectedPageIndex );
+		PageHolder pageHolder = getPages().valueAt( selectedPageIndex );
 		if( pageHolder.getPageImage() != null ) {
-			pages.removeAt( selectedPageIndex );
+			getPages().removeAt( selectedPageIndex );
 			dismiss();
 		} else {
 			pageHolder.getPageFile().delete();
-			pages.removeAt( selectedPageIndex );
-			saveInMemoryPageAndDismiss(false);
+			getPages().removeAt( selectedPageIndex );
+			savePageAndDismiss(false);
 		}
 	}
 
@@ -266,21 +265,17 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		switch( v.getId() ) {
 			case R.id.addPage:
 				finishCapture = false;
-				cancel = false;
-				saveInMemoryPageAndDismiss(true);
+				savePageAndDismiss(true);
 				break;
 			case R.id.done:
 				finishCapture = true;
-				cancel = false;
-				saveInMemoryPageAndDismiss(false);
+				savePageAndDismiss(false);
 				break;
 			case R.id.deletePage:
 				deletePage();
 				break;
 			case R.id.retakePage:
 				finishCapture = false;
-				captureMode = CaptureMode.Retake;
-				cancel = false;
 				deletePageAndDismiss();
 				break;
 		}
@@ -289,17 +284,8 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 	@Override
 	public void onDismiss( DialogInterface dialog )
 	{
-		CaptureResult result;
-		CaptureTask task;
-		if (cancel) {
-			pages.remove( capturedPageNumber );
-			result = null;
-			task = null;
-		} else {
-			result = new CaptureResult( pages, capturedPageNumber, captureMode, finishCapture );
-			task = new CaptureTask( capturePageNumber, captureMode );
-		}
-		resultListener.onCaptureResult( result, task );
+		CaptureResult result = new CaptureResult( currentPageNumber, finishCapture );
+		resultListener.onCaptureResult( result, nextPageNumber, lastPageMiniature );
 		super.onDismiss( dialog );
 	}
 

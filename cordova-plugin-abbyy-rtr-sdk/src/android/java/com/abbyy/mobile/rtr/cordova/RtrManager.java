@@ -1,19 +1,22 @@
 package com.abbyy.mobile.rtr.cordova;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.SparseArray;
 
 import com.abbyy.mobile.rtr.Engine;
 import com.abbyy.mobile.rtr.IDataCaptureService;
 import com.abbyy.mobile.rtr.ITextCaptureService;
 import com.abbyy.mobile.rtr.Language;
 import com.abbyy.mobile.rtr.cordova.exceptions.InitializationException;
+import com.abbyy.mobile.rtr.cordova.multipage.PageHolder;
 import com.abbyy.mobile.uicomponents.CaptureView;
 import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class RtrManager {
 
@@ -31,6 +34,9 @@ public class RtrManager {
 	private static float ratioWidth;
 	private static HashMap<String, String> extendedSettings;
 	private static int orientation;
+
+	private static SparseArray<PageHolder> imageCaptureResult;
+	private static Bitmap imageCaptureMiniature;
 
 	public static void initWithLicense( Context context ) throws IOException, Engine.LicenseException
 	{
@@ -179,7 +185,6 @@ public class RtrManager {
 	public static void setOrientation( int orientation )
 	{
 		RtrManager.orientation = orientation;
-		ImageCaptureSettings.orientation = orientation;
 	}
 
 	public static ImageCaptureScenario getImageCaptureScenario()
@@ -229,5 +234,35 @@ public class RtrManager {
 	public static void setDocumentSize( ImageCaptureScenario.DocumentSize documentSize )
 	{
 		ImageCaptureSettings.documentSize = documentSize;
+	}
+
+	public static void setShowPreview( boolean isShowPreview )
+	{
+		ImageCaptureSettings.showResultOnCapture = isShowPreview;
+	}
+
+	public static void setImageCount( int imageCount )
+	{
+		ImageCaptureSettings.pageCount = imageCount;
+	}
+
+	public static SparseArray<PageHolder> getImageCaptureResult()
+	{
+		return imageCaptureResult;
+	}
+
+	public static void setImageCaptureResult( SparseArray<PageHolder> pages )
+	{
+		RtrManager.imageCaptureResult = pages;
+	}
+
+	public static Bitmap getImageCaptureMiniature()
+	{
+		return imageCaptureMiniature;
+	}
+
+	public static void setImageCaptureMiniature( Bitmap imageCaptureMiniature )
+	{
+		RtrManager.imageCaptureMiniature = imageCaptureMiniature;
 	}
 }

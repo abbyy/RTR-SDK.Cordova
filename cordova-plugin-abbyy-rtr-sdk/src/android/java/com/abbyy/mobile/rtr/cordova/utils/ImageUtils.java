@@ -11,6 +11,7 @@ import android.media.ThumbnailUtils;
 import android.os.Environment;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.util.SparseArray;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,42 +44,6 @@ public class ImageUtils {
 		return image;
 	}
 
-	// Load bitmap and scale it to fit required size
-	public static Bitmap loadThumbnail( File file, int requiredDimension ) throws IOException
-	{
-		int ratio = getThumbnailRatio( file, requiredDimension );
-
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inSampleSize = ratio;
-		options.inJustDecodeBounds = false;
-
-		Bitmap image;
-		try( FileInputStream fis = new FileInputStream( file ) ) {
-			image = BitmapFactory.decodeStream( fis, null, options );
-		}
-		return ThumbnailUtils.extractThumbnail( image, requiredDimension, requiredDimension );
-	}
-
-	private static int getThumbnailRatio( File file, int requiredDimension ) throws IOException
-	{
-		int ratio = 1;
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = true;
-		try( FileInputStream fis = new FileInputStream( file ) ) {
-			BitmapFactory.decodeStream( fis, null, options );
-		}
-		int height = options.outHeight;
-		int width = options.outWidth;
-
-		if( height > requiredDimension || width > requiredDimension ) {
-			int heightRatio = Math.round( (float) height / (float) requiredDimension );
-			int widthRatio = Math.round( (float) width / (float) requiredDimension );
-
-			ratio = Math.min( heightRatio, widthRatio );
-		}
-		return ratio;
-	}
-
 	public static File getCaptureSessionPageFile( int pageIndex, Context context )
 	{
 		File captureSessionDir = getCaptureSessionDir( context );
@@ -92,10 +57,26 @@ public class ImageUtils {
 	{
 		File captureSessionDir = getCaptureSessionDir( context );
 		File[] files = null;
-		if (captureSessionDir.exists()) {
+		if( captureSessionDir.exists() ) {
 			files = captureSessionDir.listFiles();
 		}
 		return files != null ? files : new File[] {};
+	}
+
+	public static int getCaptureSessionPagesArray( Context context, SparseArray<File> pagesArray )
+	{
+		int maxPageNumber = 0;
+		File[] pages = getCaptureSessionPages( context );
+		for( File page : pages ) {
+			String name = page.getName();
+			String number = name.substring( 5, name.length() - 4 );
+			int num = Integer.valueOf( number );
+			if (num > maxPageNumber) {
+				maxPageNumber = num;
+			}
+			pagesArray.append( num, page );
+		}
+		return maxPageNumber;
 	}
 
 	private static File getCaptureSessionDir( Context context )

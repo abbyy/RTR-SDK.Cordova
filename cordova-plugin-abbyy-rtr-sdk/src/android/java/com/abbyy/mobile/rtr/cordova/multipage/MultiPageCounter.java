@@ -8,6 +8,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
 import com.abbyy.rtrcordovasample.R;
 
@@ -54,7 +55,11 @@ public class MultiPageCounter extends FrameLayout {
 	public void updatePageCount( int captureSessionPageCount, Bitmap lastPageMiniature )
 	{
 		if( captureSessionPageCount > 0 ) {
+			if( lastPageMiniature == null && RtrManager.getImageCaptureMiniature() != null ) {
+				lastPageMiniature = RtrManager.getImageCaptureMiniature();
+			}
 			if( lastPageMiniature != null ) {
+				RtrManager.setImageCaptureMiniature( lastPageMiniature );
 				lastPageMiniatureView.setImageDrawable( ImageUtils.getRoundedImage( getContext(), lastPageMiniature ) );
 			}
 			pageCounter.setText( String.valueOf( captureSessionPageCount ) );
