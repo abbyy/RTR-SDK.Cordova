@@ -70,15 +70,22 @@ To get started:
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/RtrManager.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/ResourcesUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/DataCaptureScenario.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/ImageCaptureSettings.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
 
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/exceptions/InitializationException.java" target-dir="src/com/abbyy/mobile/rtr/cordova/exceptions"/>
 
-		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/fragments/CaptureResultDialogFragment.java" target-dir="src/com/abbyy/mobile/rtr/cordova/fragments"/>
-		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/fragments/MultiPageCounter.java" target-dir="src/com/abbyy/mobile/rtr/cordova/fragments"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/multipage/CaptureResult.java" target-dir="src/com/abbyy/mobile/rtr/cordova/multipage"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/multipage/CaptureResultDialogFragment.java" target-dir="src/com/abbyy/mobile/rtr/cordova/multipage"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/multipage/MultiCaptureResult.java" target-dir="src/com/abbyy/mobile/rtr/cordova/multipage"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/multipage/MultiPageCounter.java" target-dir="src/com/abbyy/mobile/rtr/cordova/multipage"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/multipage/PageHolder.java" target-dir="src/com/abbyy/mobile/rtr/cordova/multipage"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/multipage/PagesPreviewAdapter.java" target-dir="src/com/abbyy/mobile/rtr/cordova/multipage"/>
 		
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/ImageUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/ImageSaver.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/ImageLoader.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/MemoryCappedCache.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/MultiPagesProcessor.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
 
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/ImageCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/DataCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities"/>
@@ -105,7 +112,10 @@ To get started:
 		<resource-file src="src/android/res/drawable/ic_flash_on_24dp.xml" target="res/drawable/ic_flash_on_24dp.xml"/>
 		<resource-file src="src/android/res/drawable/ic_flash_off_24dp.xml" target="res/drawable/ic_flash_off_24dp.xml"/>
 		<resource-file src="src/android/res/drawable/icon_close.xml" target="res/drawable/icon_close.xml"/>
+		<resource-file src="src/android/res/drawable/icon_delete.xml" target="res/drawable/icon_delete.xml"/>
+		<resource-file src="src/android/res/drawable/icon_retake.xml" target="res/drawable/icon_retake.xml"/>
 		<resource-file src="src/android/res/drawable/icon_trash.xml" target="res/drawable/icon_trash.xml"/>
+		<resource-file src="src/android/res/drawable/rounded_corner_background.xml" target="res/drawable/rounded_corner_background.xml"/>
 		<resource-file src="src/android/res/drawable/rounded_corner_half_tile.xml" target="res/drawable/rounded_corner_half_tile.xml"/>
 
 		<resource-file src="src/android/res/mipmap-hdpi/ic_launcher.png" target="res/mipmap-hdpi/ic_launcher.png"/>
@@ -119,6 +129,7 @@ To get started:
 		<resource-file src="src/android/res/values/dimens.xml" target="res/values/dimens.xml"/>
 		<resource-file src="src/android/res/values/strings.xml" target="res/values/strings.xml"/>
 		<resource-file src="src/android/res/values/styles.xml" target="res/values/styles.xml"/>
+		<resource-file src="src/android/res/values-sw600dp/styles.xml" target="res/values-sw600dp/styles.xml"/>
 
 		<!-- Gradle extra settings: -->
 		<framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
