@@ -27,7 +27,7 @@
 
 @end
 
-@interface RTRFixedOrientationMaskNavigationController: UINavigationController
+@interface RTRFixedOrientationMaskNavigationController : UINavigationController
 @property (nonatomic, assign) UIInterfaceOrientationMask supportedInterfaceOrientations;
 @end
 

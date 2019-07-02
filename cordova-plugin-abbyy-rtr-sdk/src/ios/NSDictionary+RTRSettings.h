@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSDictionary*)rtr_stringToExportCompressionLevel;
 
 + (NSDictionary*)rtr_exportCompressionTypeToString;
-+ (NSDictionary*)rtr_stringToexportCompressionType;
++ (NSDictionary*)rtr_stringToExportCompressionType;
 
 + (NSDictionary*)rtr_auiCameraResolutionToString;
 + (NSDictionary*)rtr_stringToauiCameraResolution;

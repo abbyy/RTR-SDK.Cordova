@@ -96,7 +96,7 @@
 		float denom = 0;
 		BOOL badValue = NO;
 		if(parts.count == 2) {
-			badValue = ![[NSScanner scannerWithString:parts.firstObject] scanFloat:&nom];//parts.firstObject.floatValue;
+			badValue = ![[NSScanner scannerWithString:parts.firstObject] scanFloat:&nom];
 			if(!badValue) {
 				badValue &= ![[NSScanner scannerWithString:parts.lastObject] scanFloat:&denom];
 			}
@@ -130,10 +130,14 @@
 	for(NSDictionary* dict in self.storage.shouldShow) {
 		NSMutableArray* images = resultDictionary[@"images"];
 		NSMutableDictionary* imageInfo = dict.mutableCopy;
-		if(self.storage.shouldShow.count == 1 /*&& self.destination == RTRImageCaptureDestintationDataUrl*/) {
-			UIImage* image = [UIImage imageWithContentsOfFile:imageInfo[@"filePath"]];
-			NSData* jpegData = UIImageJPEGRepresentation(image, 0.7);
-			imageInfo[@"base64"] = [jpegData base64EncodedStringWithOptions:0];
+		if(self.destination == RTRImageCaptureDestintationDataUrl) {
+			if(self.storage.shouldShow.count == 1) {
+				NSData* imageData = [NSData dataWithContentsOfFile:imageInfo[@"filePath"]];
+				imageInfo[@"base64"] = [imageData base64EncodedStringWithOptions:0];
+				[imageInfo removeObjectForKey:@"filePath"];
+			} else {
+				NSLog(@"Warning: If more then one image are captured, base64 export option value will be ignored and the result will be saved to a file anyway");
+			}
 		}
 		[images addObject:imageInfo];
 		

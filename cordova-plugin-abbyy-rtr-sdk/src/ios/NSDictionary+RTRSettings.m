@@ -49,7 +49,7 @@
 	return predefined;
 }
 
-+ (NSDictionary*)rtr_stringToexportCompressionType
++ (NSDictionary*)rtr_stringToExportCompressionType
 {
 	static NSDictionary* predefined = nil;
 	if(predefined == nil) {
@@ -114,7 +114,7 @@
 
 - (RTRCoreAPIPdfExportCompressionType)rtr_exportCompressionTypeForKey:(NSString*)key
 {
-	NSDictionary* predefined = [NSDictionary rtr_stringToexportCompressionType];
+	NSDictionary* predefined = [NSDictionary rtr_stringToExportCompressionType];
 	NSString* value = [self valueForKey:key];
 	if(![value isKindOfClass:[NSString class]]) {
 		return RTRCoreAPIPdfExportJpgCompression;
@@ -127,6 +127,20 @@
 
 - (RTRImageCaptureDestintationType)rtr_destinationTypeForKey:(NSString*)key
 {
+	static NSDictionary* predefined = nil;
+	if(predefined == nil) {
+		predefined = @{
+			@"base64": @(RTRImageCaptureDestintationDataUrl),
+			@"file": @(RTRImageCaptureDestintationUri)
+		};
+	}
+	NSString* value = [self valueForKey:key];
+	if(![value isKindOfClass:[NSString class]]) {
+		return RTRImageCaptureDestintationUri;
+	}
+	if([predefined valueForKey:value] != nil) {
+		return (RTRImageCaptureDestintationType)[predefined[value] integerValue];
+	}
 	return RTRImageCaptureDestintationUri;
 }
 
