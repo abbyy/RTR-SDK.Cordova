@@ -61,7 +61,7 @@ public class RtrPlugin extends CordovaPlugin {
 	private static final String RTR_DESTINATION_KEY = "destination";
 	private static final String RTR_IMAGE_COUNT_KEY = "imagesCount";
 	private static final String RTR_EXPORT_TYPE_KEY = "exportType";
-	private static final String RTR_IS_MANUAL_CAPTURE_VISIBLE_KEY = "isShootButtonVisible";
+	private static final String RTR_IS_MANUAL_CAPTURE_VISIBLE_KEY = "captureButtonVisible";
 	private static final String RTR_COMPRESSION_TYPE_KEY = "compressionType";
 	private static final String RTR_COMPRESSION_LEVEL_KEY = "compressionLevel";
 	private static final String RTR_DEFAULT_IMAGE_SETTINGS_KEY = "defaultImageSettings";
@@ -357,7 +357,7 @@ public class RtrPlugin extends CordovaPlugin {
 		ImageCaptureSettings.Destination destination = ImageCaptureSettings.Destination.FILE;
 		if( arg.has( RTR_DESTINATION_KEY ) ) {
 			String value = arg.getString( RTR_DESTINATION_KEY );
-			if( value.equals( "data" ) ) {
+			if( value.equals( "base64" ) ) {
 				destination = ImageCaptureSettings.Destination.BASE64;
 			} else if( value.equals( "file" ) ) {
 				destination = ImageCaptureSettings.Destination.FILE;

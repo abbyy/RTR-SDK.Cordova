@@ -19,7 +19,7 @@
 
     <style name="DeleteButtonStyle">
         <item name="android:layout_marginEnd">12dp</item>
-        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginTop">12dp</item>
     </style>
 
     <style name="PagePreviewStyle">
@@ -33,16 +33,17 @@
         <item name="android:textSize">20sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:layout_marginStart">24dp</item>
+        <item name="android:layout_marginTop">16dp</item>
         <item name="android:textColor">#000000</item>
     </style>
 
     <style name="FinishCaptureButtonStyle">
         <item name="android:layout_gravity">end|bottom</item>
-        <item name="android:layout_margin">48dp</item>
+        <item name="android:layout_margin">24dp</item>
     </style>
 
     <style name="CancelCaptureButtonStyle">
         <item name="android:layout_gravity">start|bottom</item>
-        <item name="android:layout_margin">48dp</item>
+        <item name="android:layout_margin">24dp</item>
     </style>
 </resources>

@@ -15,9 +15,10 @@
     <string name="cancel">Cancel</string>
     <string name="discard">Discard</string>
     <string name="add_page">Add New Page</string>
-    <string name="unknown_error">Unknown error</string>
+    <string name="unknown_error">Something has gone wrong</string>
     <string name="add_pages">Add Pages</string>
     <string name="done">Done</string>
     <string name="page">Page %1$d of %2$d</string>
-    <string name="build_number">Build: %1$s</string>
+    <string name="retake">Retake</string>
+    <string name="delete">Delete</string>
 </resources>

@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.abbyy.mobile.rtr.cordova.ImageCaptureSettings;
 import com.abbyy.mobile.rtr.cordova.RtrManager;
@@ -25,9 +24,9 @@ import com.abbyy.mobile.rtr.cordova.multipage.CaptureResultDialogFragment;
 import com.abbyy.mobile.rtr.cordova.multipage.MultiCaptureResult;
 import com.abbyy.mobile.rtr.cordova.multipage.MultiPageCounter;
 import com.abbyy.mobile.rtr.cordova.multipage.PageHolder;
-import com.abbyy.mobile.rtr.cordova.utils.MultiPagesProcessor;
 import com.abbyy.mobile.rtr.cordova.utils.ImageSaver;
 import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
+import com.abbyy.mobile.rtr.cordova.utils.MultiPagesProcessor;
 import com.abbyy.mobile.uicomponents.CaptureView;
 import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario;
 import com.abbyy.rtrcordovasample.R;
@@ -232,14 +231,8 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 	@Override
 	public void onError( @NonNull Exception error )
 	{
-		String errorMessage;
-		if( error.getMessage() != null ) {
-			errorMessage = error.getMessage();
-		} else {
-			errorMessage = getString( R.string.unknown_error );
-		}
 		error.printStackTrace();
-		Toast.makeText( this, errorMessage, Toast.LENGTH_SHORT ).show();
+		finishWithEmptyResult( error );
 	}
 
 	// Callback methods for CaptureResultDialogFragment
@@ -273,7 +266,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 			// There are pages that would be discarded, needs confirmation
 			showDiscardPagesDialog();
 		} else {
-			finishWithEmptyResult();
+			finishWithEmptyResult( null );
 		}
 	}
 
@@ -288,7 +281,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 				public void onClick( DialogInterface dialog, int which )
 				{
 					ImageUtils.clearCaptureSessionPages( ImageCaptureActivity.this );
-					finishWithEmptyResult();
+					finishWithEmptyResult( null );
 				}
 			} )
 			.setNegativeButton( R.string.cancel, null )
@@ -302,11 +295,11 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 		discardPagesDialog = builder.show();
 	}
 
-	private void finishWithEmptyResult()
+	private void finishWithEmptyResult( Exception error )
 	{
 		Intent intent = new Intent();
 
-		HashMap<String, Object> json = MultiCaptureResult.getErrorJsonResult( this );
+		HashMap<String, Object> json = MultiCaptureResult.getErrorJsonResult( error, context );
 		intent.putExtra( "result", json );
 		setResult( RtrPlugin.RESULT_FAIL, intent );
 		RtrManager.setImageCaptureResult( null );

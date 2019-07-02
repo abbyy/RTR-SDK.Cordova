@@ -42,7 +42,7 @@ public class MultiCaptureResult {
 	private static HashMap<String, Object> getPageInfoJson( PageHolder pageHolder )
 	{
 		HashMap<String, Object> pageJson = new HashMap<>();
-		if (pageHolder.getBase64() != null) {
+		if( pageHolder.getBase64() != null ) {
 			pageJson.put( "base64", pageHolder.getBase64() );
 		}
 		pageJson.put( "filePath", pageHolder.getPageFile().getPath() );
@@ -81,24 +81,31 @@ public class MultiCaptureResult {
 	public static boolean shouldReturnBase64()
 	{
 		return ImageCaptureSettings.destination == ImageCaptureSettings.Destination.BASE64 &&
-			!ImageCaptureSettings.showResultOnCapture && ImageCaptureSettings.pageCount == 1 &&
 			ImageCaptureSettings.exportType != ImageCaptureSettings.ExportType.PDF;
 	}
 
-	public static HashMap<String, Object> getErrorJsonResult( Context context )
+	public static HashMap<String, Object> getErrorJsonResult( Exception exception, Context context )
 	{
 		HashMap<String, Object> json = new HashMap<>();
-		json.put( "error", getErrorJson( context ) );
+		if( exception != null ) {
+			json.put( "error", getErrorJson( exception, context ) );
+		}
 		HashMap<String, Object> resultInfo = new HashMap<>();
 		resultInfo.put( "userAction", "Canceled" );
 		json.put( "resultInfo", resultInfo );
 		return json;
 	}
 
-	private static HashMap<String, Object> getErrorJson( Context context )
+	private static HashMap<String, Object> getErrorJson( Exception exception, Context context )
 	{
 		HashMap<String, Object> pdfInfo = new HashMap<>();
-		pdfInfo.put( "description", context.getString( R.string.unknown_error ) );
+		String description;
+		if (exception.getMessage() != null) {
+			description = exception.getMessage();
+		} else {
+			description = context.getString( R.string.unknown_error );
+		}
+		pdfInfo.put( "description", description );
 		return pdfInfo;
 	}
 }

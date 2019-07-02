@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         tools:context=".ImageCaptureActivity" />
 
-    <com.abbyy.mobile.rtr.cordova.fragments.MultiPageCounter
+    <com.abbyy.mobile.rtr.cordova.multipage.MultiPageCounter
         android:id="@+id/finishCapture"
         style="@style/FinishCaptureButtonStyle"
         android:layout_width="@dimen/miniature_size"

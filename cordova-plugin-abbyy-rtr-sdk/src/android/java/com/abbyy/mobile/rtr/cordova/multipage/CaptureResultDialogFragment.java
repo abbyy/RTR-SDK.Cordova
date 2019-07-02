@@ -94,9 +94,9 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		done.setOnClickListener( this );
 		Button addPage = view.findViewById( R.id.addPage );
 		addPage.setOnClickListener( this );
-		ImageButton retakePage = view.findViewById( R.id.retakePage );
+		Button retakePage = view.findViewById( R.id.retakePage );
 		retakePage.setOnClickListener( this );
-		ImageButton deletePage = view.findViewById( R.id.deletePage );
+		Button deletePage = view.findViewById( R.id.deletePage );
 		deletePage.setOnClickListener( this );
 
 		pageNumberText = view.findViewById( R.id.pageText );
@@ -215,11 +215,11 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		if (pageCount == 0) {
 			dismiss();
 		} else {
+			pagesAdapter.deletePage( selectedPageIndex );
 			if( selectedPageIndex >= pageCount ) {
 				selectedPageIndex = pageCount - 1;
 			}
 			updatePageText();
-			pagesAdapter.deletePage( selectedPageIndex );
 		}
 	}
 
