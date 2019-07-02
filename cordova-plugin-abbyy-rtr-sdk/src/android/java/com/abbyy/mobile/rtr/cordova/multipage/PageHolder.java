@@ -2,6 +2,7 @@ package com.abbyy.mobile.rtr.cordova.multipage;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 
 import com.abbyy.mobile.rtr.cordova.utils.ImageSaver;
 import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
@@ -13,6 +14,11 @@ public class PageHolder {
 	private int pageNumber;
 	private File pageFile;
 	private Bitmap pageImage;
+	private String pageBase64;
+	private boolean cropped = false;
+	private Point[] documentBoundary;
+	private Point frameSize;
+	private String base64;
 
 	public PageHolder( int capturePageNumber, Bitmap pageImage )
 	{
@@ -51,7 +57,6 @@ public class PageHolder {
 			return null;
 		}
 		this.pageFile = ImageUtils.getCaptureSessionPageFile( pageNumber, context );
-		String pageFilePath = pageFile.getPath();
 
 		// Create page miniature
 		Bitmap pageMiniature = ImageUtils.getMiniature(
@@ -59,9 +64,49 @@ public class PageHolder {
 			context.getResources().getDimensionPixelSize( R.dimen.miniature_size )
 		);
 
-		ImageSaver tempImageSaver = new ImageSaver( pageImage, pageFilePath, callback );
+		ImageSaver tempImageSaver = new ImageSaver( pageImage, pageFile, callback );
 		pageImage = null;
 		tempImageSaver.execute();
 		return pageMiniature;
+	}
+
+	public boolean isCropped()
+	{
+		return cropped;
+	}
+
+	public void setCropped( boolean isCropped )
+	{
+		cropped = isCropped;
+	}
+
+	public void setDocumentBoundary( Point[] documentBoundary )
+	{
+		this.documentBoundary = documentBoundary;
+	}
+
+	public Point[] getDocumentBoundary()
+	{
+		return documentBoundary;
+	}
+
+	public Point getFrameSize()
+	{
+		return frameSize;
+	}
+
+	public void setFrameSize( Point frameSize )
+	{
+		this.frameSize = frameSize;
+	}
+
+	public void setBase64( String base64 )
+	{
+		this.base64 = base64;
+	}
+
+	public String getBase64()
+	{
+		return base64;
 	}
 }

@@ -11,10 +11,12 @@ import android.media.ThumbnailUtils;
 import android.os.Environment;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.util.Base64;
 import android.util.SparseArray;
 
 import com.abbyy.mobile.rtr.cordova.ImageCaptureSettings;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -31,7 +33,7 @@ public class ImageUtils {
 	public static void saveBitmap( Bitmap image, File file ) throws IOException
 	{
 		try( FileOutputStream fos = new FileOutputStream( file ) ) {
-			if ( ImageCaptureSettings.exportType == ImageCaptureSettings.ExportType.PNG ) {
+			if( ImageCaptureSettings.exportType == ImageCaptureSettings.ExportType.PNG ) {
 				image.compress( Bitmap.CompressFormat.PNG, 0, fos );
 			} else {
 				int quality = 0;
@@ -52,6 +54,21 @@ public class ImageUtils {
 				image.compress( Bitmap.CompressFormat.JPEG, quality, fos );
 			}
 			fos.flush();
+		}
+	}
+
+	public static String convertFileToBase64( File file ) throws IOException
+	{
+		try( FileInputStream fis = new FileInputStream( file ) ) {
+			byte[] bytes = new byte[(int) file.length()];
+
+			int offset = 0;
+			int bytesRead = 0;
+			while( offset < bytes.length && bytesRead >= 0 ) {
+				bytesRead = fis.read( bytes, offset, bytes.length - offset );
+				offset += bytesRead;
+			}
+			return Base64.encodeToString( bytes, Base64.DEFAULT );
 		}
 	}
 
@@ -95,8 +112,7 @@ public class ImageUtils {
 
 	private static File getCaptureSessionDir( Context context )
 	{
-		File root = Environment.getExternalStoragePublicDirectory( Environment.DIRECTORY_PICTURES );
-		return new File( root/*context.getFilesDir()*/, "session_pages" );
+		return new File( context.getFilesDir(), "pages" );
 	}
 
 	public static void clearCaptureSessionPages( Context context )

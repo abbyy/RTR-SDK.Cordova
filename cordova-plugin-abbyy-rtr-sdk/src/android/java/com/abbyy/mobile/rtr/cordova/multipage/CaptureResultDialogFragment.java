@@ -29,6 +29,8 @@ import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.utils.ImageSaver;
 import com.abbyy.rtrcordovasample.R;
 
+import java.io.File;
+
 /**
  * Fullscreen dialog to confirm or discard capture result. If confirmed, the page is saved into a file.
  * It is retained across orientation changes and stores the captured page bitmap
@@ -241,7 +243,7 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 	}
 
 	@Override
-	public void onImageSaved( @NonNull String filePath )
+	public void onImageSaved( @NonNull File file )
 	{
 		dismiss();
 	}

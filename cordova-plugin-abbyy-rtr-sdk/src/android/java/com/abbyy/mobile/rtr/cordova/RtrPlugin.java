@@ -16,6 +16,7 @@ import com.abbyy.mobile.rtr.Language;
 import com.abbyy.mobile.rtr.cordova.activities.DataCaptureActivity;
 import com.abbyy.mobile.rtr.cordova.activities.ImageCaptureActivity;
 import com.abbyy.mobile.rtr.cordova.activities.TextCaptureActivity;
+import com.abbyy.mobile.rtr.cordova.multipage.MultiCaptureResult;
 import com.abbyy.mobile.rtr.cordova.multipage.PageHolder;
 import com.abbyy.mobile.uicomponents.CaptureView;
 import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario;
@@ -83,7 +84,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private static final String RTR_STOP_WHEN_STABLE_KEY = "stopWhenStable";
 
-	private static final String INTENT_RESULT_KEY = "result";
+	public static final String INTENT_RESULT_KEY = "result";
 
 	//endregion constants for parsing
 
@@ -108,7 +109,7 @@ public class RtrPlugin extends CordovaPlugin {
 					onError( e.getMessage() );
 					return false;
 				}
-				RtrManager.setImageCaptureResult(new SparseArray<PageHolder>() );
+				RtrManager.setImageCaptureResult( new SparseArray<PageHolder>() );
 				checkPermissionAndStartImageCapture();
 				return true;
 			}
@@ -273,6 +274,12 @@ public class RtrPlugin extends CordovaPlugin {
 			switch( resultCode ) {
 				case RESULT_OK:
 					HashMap<String, Object> result = (HashMap<String, Object>) intent.getSerializableExtra( INTENT_RESULT_KEY );
+					if( requestCode == REQUEST_CODE_IMAGE_CAPTURE ) {
+						// For image capture we constuct successful result json right before passing to JS
+						boolean isAutomaticCapture = (boolean) result.get( "captureFinishAutomatically" );
+						result = MultiCaptureResult.getJsonResult( RtrManager.getImageCaptureResult(), cordova.getContext(), isAutomaticCapture );
+						RtrManager.setImageCaptureResult( null );
+					}
 					callback.success( new JSONObject( result ) );
 					break;
 				case RESULT_FAIL:

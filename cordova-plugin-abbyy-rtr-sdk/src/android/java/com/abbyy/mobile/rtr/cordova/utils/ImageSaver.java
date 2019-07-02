@@ -15,21 +15,21 @@ import java.io.IOException;
 public class ImageSaver extends AsyncTask<Void, Void, Void> {
 	public interface Callback {
 		@UiThread
-		void onImageSaved( @NonNull String filePath );
+		void onImageSaved( @NonNull File file );
 
 		@UiThread
 		void onError( @NonNull Exception error );
 	}
 
 	private Bitmap image;
-	private Exception exception = null;
-	private String filePath;
+	private Exception exception;
+	private File file;
 	private Callback callback;
 
-	public ImageSaver( Bitmap image, String filePath, Callback callback )
+	public ImageSaver( Bitmap image, File file, Callback callback )
 	{
 		this.image = image;
-		this.filePath = filePath;
+		this.file = file;
 		this.callback = callback;
 	}
 
@@ -37,7 +37,6 @@ public class ImageSaver extends AsyncTask<Void, Void, Void> {
 	protected Void doInBackground( Void... args )
 	{
 		try {
-			File file = new File( filePath );
 			ImageUtils.saveBitmap( image, file );
 		} catch( IOException exception ) {
 			this.exception = exception;
@@ -51,7 +50,7 @@ public class ImageSaver extends AsyncTask<Void, Void, Void> {
 		if( exception != null ) {
 			callback.onError( exception );
 		} else {
-			callback.onImageSaved( filePath );
+			callback.onImageSaved( file );
 		}
 	}
 }
