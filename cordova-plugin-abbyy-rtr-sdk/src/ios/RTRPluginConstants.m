@@ -27,10 +27,10 @@ NSString* const RTRCallbackResultInfoKey = @"resultInfo";
 NSString* const RTRCallbackUserActionKey = @"userAction";
 
 NSString* const RTRICCameraResolutionKey = @"cameraResolution";
-NSString* const RTRICFlashlightButtonVisibleKey = @"isFlashlightVisible";
-NSString* const RTRICCaptureButtonVisibleKey = @"captureButtonVisible";
+NSString* const RTRICFlashlightButtonVisibleKey = @"isFlashlightButtonVisible";
+NSString* const RTRICCaptureButtonVisibleKey = @"isCaptureButtonVisible";
 NSString* const RTRICShowPreviewKey = @"showPreview";
-NSString* const RTRICImagesCountKey = @"imagesCount";
+NSString* const RTRICImagesCountKey = @"maxImagesCount";
 NSString* const RTRICCompressionTypeKey = @"compressionType";
 NSString* const RTRICCompressionLevelKey = @"compressionLevel";
 NSString* const RTRICExportTypeKey = @"exportType";

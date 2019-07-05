@@ -46,6 +46,7 @@
 	self.captureButton.hidden = !self.config.isCaptureButtonVisible;
 	[self.captureButton addTarget:self action:@selector(forceCaptured:) forControlEvents:UIControlEventTouchUpInside];
 
+	self.cameraSettings.preferredResolution = self.config.cameraResolution;
 	self.captureScenario = self.config.scenario;
 	self.captureScenario.delegate = self;
 }

@@ -52,7 +52,7 @@
 		NSMutableString* quadrangleString = @"".mutableCopy;
 		for(NSValue* value in result.documentBoundary) {
 			CGPoint point = value.CGPointValue;
-			[quadrangleString appendFormat:@"%f %f ", point.x, point.y];
+			[quadrangleString appendFormat:@"%d %d ", (int)point.x, (int)point.y];
 		}
 		info[@"documentBoundary"] = [quadrangleString substringToIndex:quadrangleString.length - 1];
 	}

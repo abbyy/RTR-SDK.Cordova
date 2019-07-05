@@ -36,7 +36,7 @@
 		_isFlashlightButtonVisible = args[RTRICFlashlightButtonVisibleKey] ? [args[RTRICFlashlightButtonVisibleKey] boolValue] : YES;
 		_isCaptureButtonVisible = args[RTRICCaptureButtonVisibleKey] ? [args[RTRICCaptureButtonVisibleKey] boolValue] : NO;
 
-		_shouldShowPreview = args[RTRICShowPreviewKey] ? [args[RTRICShowPreviewKey] boolValue] : YES;
+		_shouldShowPreview = args[RTRICShowPreviewKey] ? [args[RTRICShowPreviewKey] boolValue] : NO;
 		_maxImagesCount = args[RTRICImagesCountKey] ? [args[RTRICImagesCountKey] integerValue] : 0;
 		
 		_compressionType = [args rtr_exportCompressionTypeForKey:RTRICCompressionTypeKey];
@@ -175,28 +175,41 @@
 	return [RTRDocumentManager defaultManagerWithImageContainer:self.imageContainer pdfContainer:self.pdfContainer];
 }
 
+- (RTRImageContainer*)jpgContainer
+{
+	RTRImageContainer* container = [[RTRJpgImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
+	container.operationCustomization = ^(id<RTRCoreAPIExportToJpgOperation> _Nonnull op) {
+		NSAssert([op conformsToProtocol:@protocol(RTRCoreAPIExportToJpgOperation)], @"unexpected");
+		op.compression = self.compressionLevel;
+	};
+	return container;
+}
+
+- (RTRImageContainer*)jpeg2000Container
+{
+	RTRImageContainer* container = [[RTRJpeg2000ImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
+	container.operationCustomization = ^(id<RTRCoreAPIExportToJpeg2000Operation> _Nonnull op) {
+		NSAssert([op conformsToProtocol:@protocol(RTRCoreAPIExportToJpeg2000Operation)], @"unexpected");
+		op.compression = self.compressionLevel;
+	};
+	return container;
+}
+
 - (RTRImageContainer*)imageContainer
 {
 	switch(self.exportType) {
+		case RTRImageCaptureEncodingTypeJpg:
+			return [self jpgContainer];
+		case RTRImageCaptureEncodingTypeJpeg2000:
+			return [self jpeg2000Container];
 		case RTRImageCaptureEncodingTypePng:
-		case RTRImageCaptureEncodingTypeJpg: {
-			RTRImageContainer* container = [[RTRJpgImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
-			container.operationCustomization = ^(id<RTRCoreAPIExportToJpgOperation> _Nonnull op) {
-				NSAssert([op conformsToProtocol:@protocol(RTRCoreAPIExportToJpgOperation)], @"unexpected");
-				op.compression = self.compressionLevel;
-			};
-			return container;
-		}
-		case RTRImageCaptureEncodingTypeJpeg2000: {
-			RTRImageContainer* container = [[RTRJpeg2000ImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
-			container.operationCustomization = ^(id<RTRCoreAPIExportToJpeg2000Operation> _Nonnull op) {
-				NSAssert([op conformsToProtocol:@protocol(RTRCoreAPIExportToJpeg2000Operation)], @"unexpected");
-				op.compression = self.compressionLevel;
-			};
-			return container;
-		}
-		case RTRImageCaptureEncodingTypePdf:
 			return [[RTRPngImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
+		case RTRImageCaptureEncodingTypePdf:
+			if(self.compressionType == RTRCoreAPIPdfExportJpeg2000Compression) {
+				return [self jpeg2000Container];
+			} else {
+				return [self jpgContainer];
+			}
 		default:
 			NSAssert(NO, @"Unknown export type");
 	}
