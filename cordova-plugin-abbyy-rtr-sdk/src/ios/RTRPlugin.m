@@ -183,16 +183,15 @@
 					}
 				} mutableCopy];
 
-				if(weakController.errorOccurred != nil) {
-					NSDictionary* errorDictionary = @{
-						RTRCallbackErrorDescriptionKey : weakController.errorOccurred ?: @""
-					};
-					result[RTRCallbackErrorKey] = errorDictionary;
-				}
-
 				CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
 				[weakSelf.viewController dismissViewControllerAnimated:YES completion:^{
 					[weakSelf.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+				}];
+			};
+			self.imageCaptureHolder.onError = ^(NSError* error) {
+				CDVPluginResult* result = [CDVPluginResult rtrResultWithError:error];
+				[weakSelf.viewController dismissViewControllerAnimated:YES completion:^{
+					[weakSelf.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 				}];
 			};
 			[self.viewController presentViewController:self.imageCaptureHolder animated:YES completion:nil];

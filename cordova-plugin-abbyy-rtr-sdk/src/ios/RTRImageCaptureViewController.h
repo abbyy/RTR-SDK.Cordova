@@ -14,8 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) void (^onCancel)(void);
 @property (nonatomic, copy) void (^onSuccess)(NSDictionary* capturedData);
+@property (nonatomic, copy) void (^onError)(NSError* error);
 
-@property (nonatomic, strong) NSString* errorOccurred;
 @property (nonatomic, strong) RTRMultipageScenarioConfiguration* config;
 
 @end

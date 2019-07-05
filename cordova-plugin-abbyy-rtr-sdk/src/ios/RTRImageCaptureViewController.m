@@ -104,17 +104,7 @@
 - (void)captureScenario:(AUIImageCaptureScenario*)scenario didFailWithError:(nonnull NSError*)error
 {
 	NSLog(@"Capture controller error: %@", error);
-	UIAlertController* alert = [UIAlertController
-		alertControllerWithTitle:@"SomethingWentWrong".rtr_localized
-		message:error.localizedDescription
-		preferredStyle:UIAlertControllerStyleAlert];
-	[alert addAction:[UIAlertAction
-		actionWithTitle:@"Ok".rtr_localized
-		style:UIAlertActionStyleCancel
-		handler:nil]];
-	[self presentViewController:alert animated:YES completion:^{
-		[self setPaused:YES];
-	}];
+	self.onError(error);
 }
 
 - (void)captureScenario:(AUIImageCaptureScenario*)captureScenario didCaptureImageWithResult:(AUIImageCaptureResult*)result
