@@ -124,7 +124,9 @@
 				self.onSuccess(dict);
 			}];
 		} else {
-			captureScenario.active = YES;
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+				captureScenario.active = YES;
+			});
 		}
 	}
 }
@@ -167,8 +169,6 @@
 - (void)previewControllerDidDelete:(RTRMultiImagePreviewController*)viewController atIndex:(NSInteger)index
 {
 	[self.config.storage deleteImageAt:index];
-	viewController.pageIndex = self.config.storage.currentImageIndex;
-	viewController.imagesCount = self.config.storage.imagesCount;
 	[self updateOverlay];
 }
 

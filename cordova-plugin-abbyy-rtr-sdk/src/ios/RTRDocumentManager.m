@@ -96,7 +96,7 @@
 
 - (NSString*)filename
 {
-	return [NSString stringWithFormat:@"%ld.%@", (NSInteger)[NSDate date].timeIntervalSince1970 * 1000, self.fileExtension];
+	return [NSString stringWithFormat:@"%ld.%@", (NSInteger)([NSDate date].timeIntervalSince1970 * 1000.0), self.fileExtension];
 }
 
 - (NSArray<NSString*>*)imagePaths
@@ -204,8 +204,7 @@
 - (NSString*)filename
 {
 	NSDateFormatter* formatter = [NSDateFormatter new];
-	formatter.dateStyle = NSDateFormatterMediumStyle;
-	formatter.timeStyle = NSDateFormatterMediumStyle;
+	[formatter setDateFormat:@"yyyy-MM-dd HH_mm_ss"];
 	NSString* dateString = [formatter stringFromDate:[NSDate date]];
 	return [NSString stringWithFormat:@"ImageCapture - %@.pdf", dateString];
 }

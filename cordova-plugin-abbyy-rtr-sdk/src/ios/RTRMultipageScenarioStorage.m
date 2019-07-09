@@ -70,7 +70,6 @@
 	NSDictionary* pathToDelete = self.shouldShow[index];
 	[self.shouldDelete addObject:pathToDelete];
 	[self.shouldShow removeObjectAtIndex:index];
-	self.currentImageIndex = MAX(0, MIN(self.imagesCount - 1, self.currentImageIndex));
 }
 
 - (void)retakeImageAt:(NSInteger)index

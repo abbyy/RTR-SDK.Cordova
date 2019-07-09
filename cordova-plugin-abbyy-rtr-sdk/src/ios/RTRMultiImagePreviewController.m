@@ -5,11 +5,17 @@
 #import "RTRSingleImageViewController.h"
 #import "NSString+RTRPluginLocalization.h"
 
+typedef NS_ENUM(NSUInteger, RTRSwipeDirection) {
+	RTRSwipeDirectionLeft,
+	RTRSwipeDirectionRight
+};
+
 @interface RTRMultiImagePreviewController () <UIPageViewControllerDelegate, UIPageViewControllerDataSource>
 
 @property (nonatomic, strong) UIPageViewController* pages;
 @property (weak, nonatomic) IBOutlet UIView *pagesContainer;
 @property (nonatomic, weak) IBOutlet UILabel* pagesLabel;
+@property (nonatomic, assign) RTRSwipeDirection lastSwipe;
 
 @end
 
@@ -23,7 +29,7 @@
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	
+	self.lastSwipe = RTRSwipeDirectionLeft;
 	[self setupPagesPreview];
 	[self setupNavigationBar];
 	[self updatePagesLabel];
@@ -36,7 +42,7 @@
 		initWithTitle:@"Delete".rtr_localized
 		style:UIBarButtonItemStylePlain
 		target:self
-		action:@selector(didPressCancel:)];
+		action:@selector(didPressDelete:)];
 	cancelButton.tintColor = [UIColor whiteColor];
 	UIBarButtonItem* retakeButton = [[UIBarButtonItem alloc]
 		initWithTitle:@"Retake".rtr_localized
@@ -113,6 +119,11 @@
 	if(!completed) {
 		return;
 	}
+	if(self.pageIndex > [self currentPageViewController].index) {
+		self.lastSwipe = RTRSwipeDirectionRight;
+	} else if(self.pageIndex < [self currentPageViewController].index) {
+		self.lastSwipe = RTRSwipeDirectionLeft;
+	}
 	self.pageIndex = [self currentPageViewController].index;
 	[self updatePagesLabel];
 }
@@ -125,16 +136,26 @@
 			@(self.imagesCount).intValue];
 }
 
-- (void)didPressCancel:(id)sender
+- (void)didPressDelete:(id)sender
 {
 	if([self.delegate respondsToSelector:@selector(previewControllerDidDelete:atIndex:)]) {
 		[self.delegate previewControllerDidDelete:self atIndex:self.pageIndex];
 	}
-	if(self.imagesCount == 0) {
+	if(self.imagesCount == 1) {
 		[self dismissViewControllerAnimated:YES completion:nil];
 		return;
 	}
-	UIViewController* pageToPresent = [self controllerWithIndex:self.pageIndex];
+	self.imagesCount--;
+	UIViewController* pageToPresent;
+	if(self.lastSwipe == RTRSwipeDirectionLeft) {
+		NSInteger index = MIN(self.pageIndex, self.imagesCount - 1);
+		pageToPresent = [self controllerWithIndex:index];
+		self.pageIndex = index;
+	} else {
+		NSInteger index = MAX(0, self.pageIndex - 1);
+		pageToPresent = [self controllerWithIndex:index];
+		self.pageIndex = index;
+	}
 	__weak RTRMultiImagePreviewController* weakSelf = self;
 	[self.pages
 		setViewControllers:@[pageToPresent]
