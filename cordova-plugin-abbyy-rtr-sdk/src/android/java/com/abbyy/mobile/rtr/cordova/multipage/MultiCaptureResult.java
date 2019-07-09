@@ -29,7 +29,7 @@ public class MultiCaptureResult {
 		json.put( "images", pagesPaths );
 		if( ImageCaptureSettings.exportType == ImageCaptureSettings.ExportType.PDF ) {
 			HashMap<String, Object> pdfInfo = getPdfInfoJson( context, pageCount );
-			json.put( "pdfinfo", pdfInfo );
+			json.put( "pdfInfo", pdfInfo );
 		}
 		HashMap<String, Object> resultInfo = new HashMap<>();
 		if( !automaticallyStopped ) {
@@ -71,7 +71,7 @@ public class MultiCaptureResult {
 	{
 		File pdfFile = ImageUtils.getCaptureSessionPdfFile( context );
 		HashMap<String, Object> pdfInfo = new HashMap<>();
-		pdfInfo.put( "path", pdfFile.getPath() );
+		pdfInfo.put( "filePath", pdfFile.getPath() );
 		pdfInfo.put( "pagesCount", pageCount );
 		pdfInfo.put( "compressionType", ImageCaptureSettings.compressionType.toString() );
 		pdfInfo.put( "compressionLevel", ImageCaptureSettings.compressionLevel.toString() );

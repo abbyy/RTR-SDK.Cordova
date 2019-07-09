@@ -166,7 +166,7 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		} );
 		selectedPageIndex = getPages().indexOfKey( currentPageNumber );
 		if (selectedPageIndex < 0) {
-			selectedPageIndex = 0;
+			selectedPageIndex = getPages().size() - 1;
 		}
 		pagesPreview.scrollToPosition( selectedPageIndex );
 	}
@@ -182,7 +182,7 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 			nextPageNumber = getNextPageNumber(getPages());
 		}
 		PageHolder pageHolder = getPages().get( currentPageNumber );
-		if (pageHolder != null) {
+		if (pageHolder != null && !pageHolder.isSaved()) {
 			lastPageMiniature = pageHolder.saveToFile(getContext(), this);
 			return;
 		}
@@ -232,13 +232,12 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 	{
 		nextPageNumber = getPages().keyAt( selectedPageIndex );
 		PageHolder pageHolder = getPages().valueAt( selectedPageIndex );
-		if( pageHolder.getPageImage() != null ) {
-			getPages().removeAt( selectedPageIndex );
-			dismiss();
-		} else {
+		getPages().removeAt( selectedPageIndex );
+		if( pageHolder.isSaved() ) {
 			pageHolder.getPageFile().delete();
-			getPages().removeAt( selectedPageIndex );
 			savePageAndDismiss(false);
+		} else {
+			dismiss();
 		}
 	}
 

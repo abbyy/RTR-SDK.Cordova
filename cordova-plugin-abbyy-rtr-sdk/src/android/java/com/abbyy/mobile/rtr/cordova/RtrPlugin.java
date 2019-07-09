@@ -59,9 +59,9 @@ public class RtrPlugin extends CordovaPlugin {
 	private static final String RTR_CAMERA_RESOLUTION_KEY = "cameraResolution";
 	private static final String RTR_IS_SHOW_PREVIEW_KEY = "showPreview";
 	private static final String RTR_DESTINATION_KEY = "destination";
-	private static final String RTR_IMAGE_COUNT_KEY = "imagesCount";
+	private static final String RTR_IMAGE_COUNT_KEY = "maxImagesCount";
 	private static final String RTR_EXPORT_TYPE_KEY = "exportType";
-	private static final String RTR_IS_MANUAL_CAPTURE_VISIBLE_KEY = "captureButtonVisible";
+	private static final String RTR_IS_MANUAL_CAPTURE_VISIBLE_KEY = "isCaptureButtonVisible";
 	private static final String RTR_COMPRESSION_TYPE_KEY = "compressionType";
 	private static final String RTR_COMPRESSION_LEVEL_KEY = "compressionLevel";
 	private static final String RTR_DEFAULT_IMAGE_SETTINGS_KEY = "defaultImageSettings";
@@ -70,7 +70,7 @@ public class RtrPlugin extends CordovaPlugin {
 	private static final String RTR_DOCUMENT_SIZE_KEY = "documentSize";
 
 	private static final String RTR_AREA_OF_INTEREST_KEY = "areaOfInterest";
-	private static final String RTR_IS_FLASHLIGHT_VISIBLE_KEY = "isFlashlightVisible";
+	private static final String RTR_IS_FLASHLIGHT_VISIBLE_KEY = "isFlashlightButtonVisible";
 	private static final String RTR_IS_STOP_BUTTON_VISIBLE_KEY = "isStopButtonVisible";
 	private static final String RTR_ORIENTATION_KEY = "orientation";
 

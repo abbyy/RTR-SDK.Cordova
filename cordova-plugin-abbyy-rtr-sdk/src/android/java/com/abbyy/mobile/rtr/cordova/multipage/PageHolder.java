@@ -109,4 +109,9 @@ public class PageHolder {
 	{
 		return base64;
 	}
+
+	public boolean isSaved()
+	{
+		return pageImage == null && pageFile != null;
+	}
 }

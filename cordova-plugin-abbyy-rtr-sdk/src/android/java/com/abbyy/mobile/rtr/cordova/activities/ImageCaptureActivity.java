@@ -45,6 +45,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 
 	public static final String RESULT_SHOWN_EXTRA = "result_shown";
 	public static final String CAPTURE_PAGE_EXTRA = "capture_page";
+	private static final long AUTOMATIC_CAPTURE_DELAY = 3000;
 
 	private MultiPageCounter multiPageCounter;
 
@@ -108,7 +109,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 			@Override
 			public void onClick( View v )
 			{
-				showResultFragment();
+				stopCaptureAndShowResult();
 			}
 		} );
 
@@ -128,7 +129,9 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 
 		captureView.setCaptureScenario( imageCaptureScenario );
 
-		startCapture();
+		if (resultDialogShown) {
+			stopCapture();
+		}
 	}
 
 	private void startCapture()
@@ -140,9 +143,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 
 	private void stopCapture()
 	{
-		if( !resultDialogShown ) {
-			imageCaptureScenario.stop();
-		}
+		imageCaptureScenario.stop();
 	}
 
 	@Override
@@ -183,7 +184,12 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 						finishCapture( true );
 					} else {
 						capturePageNumber = CaptureResultDialogFragment.getNextPageNumber( getPages() );
-						startCapture(); // Resume capture
+						captureView.postDelayed( new Runnable() {
+							@Override public void run()
+							{
+								startCapture(); // Resume capture
+							}
+						}, AUTOMATIC_CAPTURE_DELAY );
 					}
 				}
 
@@ -214,6 +220,17 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 			pageHolder.setCropped( true );
 		}
 		return pageHolder;
+	}
+
+	private void stopCaptureAndShowResult() {
+		if( resultDialogShown ) {
+			return;
+		}
+		stopCapture();
+		CaptureResultDialogFragment resultFragment = CaptureResultDialogFragment.newInstance( capturePageNumber );
+		resultFragment.show( getSupportFragmentManager(), "result" );
+
+		resultDialogShown = true;
 	}
 
 	private void showResultFragment()
@@ -299,7 +316,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 	{
 		Intent intent = new Intent();
 
-		HashMap<String, Object> json = MultiCaptureResult.getErrorJsonResult( error, context );
+		HashMap<String, Object> json = MultiCaptureResult.getErrorJsonResult( error, this );
 		intent.putExtra( "result", json );
 		setResult( RtrPlugin.RESULT_FAIL, intent );
 		RtrManager.setImageCaptureResult( null );
