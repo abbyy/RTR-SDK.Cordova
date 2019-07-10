@@ -12,6 +12,7 @@
 @property (nonatomic, assign) BOOL retake;
 @property (nonatomic, strong) RTRDocumentManager* sessionDocumentManager;
 @property (nonatomic, strong) NSMutableArray<NSDictionary*>* shouldDelete;
+@property (nonatomic, strong) NSCache* imageCache;
 @property (nonatomic, strong) RTREngine* engine;
 
 @end
@@ -27,6 +28,7 @@
 		_shouldShow = @[].mutableCopy;
 		_sessionDocumentManager = manager;
 		_sessionDocumentManager.rtrEngine = engine;
+		_imageCache = [NSCache new];
 	}
 	return self;
 }
@@ -47,6 +49,7 @@
 - (NSMutableDictionary*)imageResultDictFrom:(AUIImageCaptureResult*)result forceCaptured:(BOOL)force
 {
 	NSMutableDictionary* info = @{}.mutableCopy;
+	NSMutableDictionary* additionalInfo = @{}.mutableCopy;
 	info[@"nativeImage"] = result.image;
 	if(result.documentBoundary != nil) {
 		NSMutableString* quadrangleString = @"".mutableCopy;
@@ -54,9 +57,9 @@
 			CGPoint point = value.CGPointValue;
 			[quadrangleString appendFormat:@"%d %d ", (int)point.x, (int)point.y];
 		}
-		info[@"documentBoundary"] = [quadrangleString substringToIndex:quadrangleString.length - 1];
+		additionalInfo[@"documentBoundary"] = [quadrangleString substringToIndex:quadrangleString.length - 1];
+		additionalInfo[@"frameSize"] = [NSString stringWithFormat:@"%@ %@", @(result.image.size.width), @(result.image.size.height)];
 	}
-	NSMutableDictionary* additionalInfo = @{}.mutableCopy;
 	additionalInfo[@"cropped"] = @(result.documentBoundary == nil);
 	additionalInfo[@"autoCaptured"] = @(!force);
 	info[@"resultInfo"] = additionalInfo;
@@ -85,7 +88,10 @@
 	if(self.memoryImage != nil && index == self.currentImageIndex) {
 		return self.memoryImage[@"nativeImage"];
 	}
-	return [UIImage imageWithContentsOfFile:self.shouldShow[index][@"filePath"]];
+	NSString* imagePath = self.shouldShow[index][@"filePath"];
+	UIImage* image = [self.imageCache objectForKey:imagePath];
+
+	return image ?: [UIImage imageWithContentsOfFile:imagePath];
 }
 
 - (NSInteger)imagesCount
@@ -102,6 +108,7 @@
 		return;
 	}
 	NSString* path = [self.sessionDocumentManager saveImage:self.memoryImage[@"nativeImage"]];
+	[self.imageCache setObject:self.memoryImage[@"nativeImage"] forKey:path];
 	self.memoryImage[@"filePath"] = path;
 	[self.memoryImage removeObjectForKey:@"nativeImage"];
 	if(self.retake) {

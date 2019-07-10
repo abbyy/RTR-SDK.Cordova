@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSDictionary*)rtr_auiCameraResolutionToString;
 + (NSDictionary*)rtr_stringToauiCameraResolution;
 
++ (NSDictionary*)rtr_stringToExportType;
++ (NSDictionary*)rtr_exportTypeToString;
 
 @end
 

@@ -139,6 +139,7 @@
 				NSLog(@"Warning: If more then one image are captured, base64 export option value will be ignored and the result will be saved to a file anyway");
 			}
 		}
+		imageInfo[@"resultInfo"][@"exportType"] = [NSDictionary rtr_exportTypeToString][@([self imageExportType])];
 		[images addObject:imageInfo];
 		
 	}
@@ -213,6 +214,15 @@
 		default:
 			NSAssert(NO, @"Unknown export type");
 	}
+}
+
+// getting single images export type while actual exportType is pdf
+- (RTRImageCaptureEncodingType)imageExportType
+{
+	if(self.exportType == RTRImageCaptureEncodingTypePdf) {
+		return self.compressionType == RTRCoreAPIPdfExportJpeg2000Compression ? RTRImageCaptureEncodingTypeJpeg2000 : RTRImageCaptureEncodingTypeJpg;
+	}
+	return self.exportType;
 }
 
 - (RTRPdfContainer*)pdfContainer

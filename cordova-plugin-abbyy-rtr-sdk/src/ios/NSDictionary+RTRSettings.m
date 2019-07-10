@@ -99,6 +99,34 @@
 	return predefined;
 }
 
++ (NSDictionary*)rtr_exportTypeToString
+{
+	static NSDictionary* predefined = nil;
+	if(predefined == nil) {
+		predefined = @{
+			@(RTRImageCaptureEncodingTypeJpeg2000): @"jpeg2000",
+			@(RTRImageCaptureEncodingTypeJpg): @"jpg",
+			@(RTRImageCaptureEncodingTypePng): @"png",
+			@(RTRImageCaptureEncodingTypePdf): @"pdf"
+		};
+	}
+	return predefined;
+}
+
++ (NSDictionary*)rtr_stringToExportType
+{
+	static NSDictionary* predefined = nil;
+	if(predefined == nil) {
+		predefined = @{
+			@"jpeg2000": @(RTRImageCaptureEncodingTypeJpeg2000),
+			@"jpg": @(RTRImageCaptureEncodingTypeJpg),
+			@"png": @(RTRImageCaptureEncodingTypePng),
+			@"pdf": @(RTRImageCaptureEncodingTypePdf)
+		};
+	}
+	return predefined;
+}
+
 - (RTRCoreAPIExportCompressionLevel)rtr_exportCompressionLevelForKey:(NSString*)key
 {
 	NSDictionary* predefined = [NSDictionary rtr_stringToExportCompressionLevel];
@@ -146,15 +174,7 @@
 
 - (RTRImageCaptureEncodingType)rtr_exportTypeForKey:(NSString*)key
 {
-	static NSDictionary* predefined = nil;
-	if(predefined == nil) {
-		predefined = @{
-			@"jpeg2000": @(RTRImageCaptureEncodingTypeJpeg2000),
-			@"jpg": @(RTRImageCaptureEncodingTypeJpg),
-			@"png": @(RTRImageCaptureEncodingTypePng),
-			@"pdf": @(RTRImageCaptureEncodingTypePdf)
-		};
-	}
+	NSDictionary* predefined = [NSDictionary rtr_stringToExportType];
 	NSString* value = [self valueForKey:key];
 	if(![value isKindOfClass:[NSString class]]) {
 		return RTRImageCaptureEncodingTypeJpg;
