@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.utils.ImageSaver;
+import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
 import com.abbyy.rtrcordovasample.R;
 
 import java.io.File;
@@ -183,7 +184,13 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		}
 		PageHolder pageHolder = getPages().get( currentPageNumber );
 		if (pageHolder != null && !pageHolder.isSaved()) {
-			lastPageMiniature = pageHolder.saveToFile(getContext(), this);
+			if (addMode) {
+				lastPageMiniature = ImageUtils.getMiniature(
+					pageHolder.getPageImage(),
+					getContext().getResources().getDimensionPixelSize( R.dimen.miniature_size )
+				);
+			}
+			pageHolder.saveToFile(getContext(), this);
 			return;
 		}
 		dismiss();
@@ -231,14 +238,7 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 	private void deletePageAndDismiss()
 	{
 		nextPageNumber = getPages().keyAt( selectedPageIndex );
-		PageHolder pageHolder = getPages().valueAt( selectedPageIndex );
-		getPages().removeAt( selectedPageIndex );
-		if( pageHolder.isSaved() ) {
-			pageHolder.getPageFile().delete();
-			savePageAndDismiss(false);
-		} else {
-			dismiss();
-		}
+		dismiss();
 	}
 
 	@Override

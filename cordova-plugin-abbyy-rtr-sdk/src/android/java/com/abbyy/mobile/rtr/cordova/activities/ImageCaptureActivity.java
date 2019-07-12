@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.abbyy.mobile.rtr.cordova.ImageCaptureSettings;
 import com.abbyy.mobile.rtr.cordova.RtrManager;
@@ -188,7 +189,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 			showResultFragment();
 		} else {
 			// Proceed automatically
-			Bitmap pageMiniature = pageHolder.saveToFile( this, new ImageSaver.Callback() {
+			pageHolder.saveToFile( this, new ImageSaver.Callback() {
 				@Override public void onImageSaved( @NonNull File file )
 				{
 					if( ImageCaptureSettings.pageCount > 0 && getPages().size() >= ImageCaptureSettings.pageCount ) {
@@ -206,9 +207,15 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 
 				@Override public void onError( @NonNull Exception error )
 				{
+					error.printStackTrace();
+					Toast.makeText( ImageCaptureActivity.this, R.string.unknown_error, Toast.LENGTH_SHORT ).show();
 					startCapture();
 				}
 			} );
+			Bitmap pageMiniature = ImageUtils.getMiniature(
+				documentCaptureResult.getBitmap(),
+				getResources().getDimensionPixelSize( R.dimen.miniature_size )
+			);
 			updatePageCount( pageMiniature );
 		}
 	}
@@ -331,6 +338,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 		intent.putExtra( "result", json );
 		setResult( RtrPlugin.RESULT_FAIL, intent );
 		RtrManager.setImageCaptureResult( null );
+		MultiPageCounter.setImageCaptureMiniature( null );
 		finish();
 	}
 
@@ -364,6 +372,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 
 		intent.putExtra( INTENT_RESULT_KEY, json );
 		setResult( RtrPlugin.RESULT_OK, intent );
+		MultiPageCounter.setImageCaptureMiniature( null );
 		finish();
 	}
 }

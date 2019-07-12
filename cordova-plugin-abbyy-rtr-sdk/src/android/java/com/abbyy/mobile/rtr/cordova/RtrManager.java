@@ -37,7 +37,6 @@ public class RtrManager {
 	private static int orientation;
 
 	private static SparseArray<PageHolder> imageCaptureResult;
-	private static Bitmap imageCaptureMiniature;
 
 	public static void initWithLicense( Context context ) throws IOException, Engine.LicenseException
 	{
@@ -214,7 +213,7 @@ public class RtrManager {
 
 	public static void setCompressionType( IImagingCoreAPI.ExportOperation.CompressionType compressionType )
 	{
-		ImageCaptureSettings.compressionType = compressionType;
+		ImageCaptureSettings.pdfCompressionType = compressionType;
 	}
 
 	public static void setCompressionLevel( IImagingCoreAPI.ExportOperation.Compression compressionLevel )
@@ -255,16 +254,6 @@ public class RtrManager {
 	public static void setImageCaptureResult( SparseArray<PageHolder> pages )
 	{
 		RtrManager.imageCaptureResult = pages;
-	}
-
-	public static Bitmap getImageCaptureMiniature()
-	{
-		return imageCaptureMiniature;
-	}
-
-	public static void setImageCaptureMiniature( Bitmap imageCaptureMiniature )
-	{
-		RtrManager.imageCaptureMiniature = imageCaptureMiniature;
 	}
 
 	public static IImagingCoreAPI getImagingCoreAPI() {

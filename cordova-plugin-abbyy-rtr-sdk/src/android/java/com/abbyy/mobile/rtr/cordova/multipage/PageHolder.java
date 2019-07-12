@@ -14,7 +14,6 @@ public class PageHolder {
 	private int pageNumber;
 	private File pageFile;
 	private Bitmap pageImage;
-	private String pageBase64;
 	private boolean cropped = false;
 	private Point[] documentBoundary;
 	private Point frameSize;
@@ -51,23 +50,16 @@ public class PageHolder {
 		return pageNumber;
 	}
 
-	public Bitmap saveToFile( Context context, ImageSaver.Callback callback )
+	public void saveToFile( Context context, ImageSaver.Callback callback )
 	{
 		if (pageImage == null) {
-			return null;
+			return;
 		}
 		this.pageFile = ImageUtils.getCaptureSessionPageFile( pageNumber, context );
-
-		// Create page miniature
-		Bitmap pageMiniature = ImageUtils.getMiniature(
-			pageImage,
-			context.getResources().getDimensionPixelSize( R.dimen.miniature_size )
-		);
 
 		ImageSaver tempImageSaver = new ImageSaver( pageImage, pageFile, callback );
 		pageImage = null;
 		tempImageSaver.execute();
-		return pageMiniature;
 	}
 
 	public boolean isCropped()
