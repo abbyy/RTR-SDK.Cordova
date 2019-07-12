@@ -20,7 +20,7 @@ public class ImageCaptureSettings {
 	public static int pageCount = 0;
 	public static Destination destination = Destination.FILE;
 	public static ExportType exportType = ExportType.PNG;
-	public static IImagingCoreAPI.ExportOperation.CompressionType compressionType = IImagingCoreAPI.ExportOperation.CompressionType.Jpg;
+	public static IImagingCoreAPI.ExportOperation.CompressionType pdfCompressionType = IImagingCoreAPI.ExportOperation.CompressionType.Jpg;
 	public static IImagingCoreAPI.ExportOperation.Compression compressionLevel = IImagingCoreAPI.ExportOperation.Compression.Low;
 	public static boolean cropEnabled = true;
 	public static float documentToViewRatio = 0.15f;

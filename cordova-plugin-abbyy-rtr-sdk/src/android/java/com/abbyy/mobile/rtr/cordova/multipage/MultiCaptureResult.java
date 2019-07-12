@@ -73,7 +73,7 @@ public class MultiCaptureResult {
 		HashMap<String, Object> pdfInfo = new HashMap<>();
 		pdfInfo.put( "filePath", pdfFile.getPath() );
 		pdfInfo.put( "pagesCount", pageCount );
-		pdfInfo.put( "compressionType", ImageCaptureSettings.compressionType.toString() );
+		pdfInfo.put( "pdfCompressionType", ImageCaptureSettings.pdfCompressionType.toString() );
 		pdfInfo.put( "compressionLevel", ImageCaptureSettings.compressionLevel.toString() );
 		return pdfInfo;
 	}

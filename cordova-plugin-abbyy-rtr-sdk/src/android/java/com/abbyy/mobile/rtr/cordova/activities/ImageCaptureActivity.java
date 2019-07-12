@@ -6,6 +6,7 @@ package com.abbyy.mobile.rtr.cordova.activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -14,6 +15,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.SparseArray;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 
 import com.abbyy.mobile.rtr.cordova.ImageCaptureSettings;
@@ -70,6 +73,14 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 	protected void onCreate( Bundle savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
+
+		if( RtrManager.getOrientation() != ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED ) {
+			setRequestedOrientation( RtrManager.getOrientation() );
+		}
+
+		requestWindowFeature( Window.FEATURE_NO_TITLE );
+		getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN,
+			WindowManager.LayoutParams.FLAG_FULLSCREEN );
 
 		if( savedInstanceState != null ) {
 			resultDialogShown = savedInstanceState.getBoolean( RESULT_SHOWN_EXTRA, false );

@@ -45,7 +45,7 @@ public class MultiPagesProcessor extends AsyncTask<Void, Void, Void> {
 				try( FileOutputStream fos = new FileOutputStream( pdfFile ) ) {
 					try( IImagingCoreAPI.ExportToPdfOperation operation = api.createExportToPdfOperation( fos ) ) {
 						operation.Compression = ImageCaptureSettings.compressionLevel;
-						operation.CompressionType = ImageCaptureSettings.compressionType;
+						operation.CompressionType = ImageCaptureSettings.pdfCompressionType;
 						for( int i = 0; i < pages.size(); ++i ) {
 							PageHolder page = pages.valueAt( i );
 							Bitmap pageImage = ImageUtils.loadBitmap( page.getPageFile() );

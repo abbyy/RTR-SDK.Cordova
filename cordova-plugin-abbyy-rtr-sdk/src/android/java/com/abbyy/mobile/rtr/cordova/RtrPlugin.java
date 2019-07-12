@@ -62,7 +62,7 @@ public class RtrPlugin extends CordovaPlugin {
 	private static final String RTR_IMAGE_COUNT_KEY = "maxImagesCount";
 	private static final String RTR_EXPORT_TYPE_KEY = "exportType";
 	private static final String RTR_IS_MANUAL_CAPTURE_VISIBLE_KEY = "isCaptureButtonVisible";
-	private static final String RTR_COMPRESSION_TYPE_KEY = "compressionType";
+	private static final String RTR_PDF_COMPRESSION_TYPE_KEY = "pdfCompressionType";
 	private static final String RTR_COMPRESSION_LEVEL_KEY = "compressionLevel";
 	private static final String RTR_DEFAULT_IMAGE_SETTINGS_KEY = "defaultImageSettings";
 	private static final String RTR_IS_CROP_ENABLED_KEY = "cropEnabled";
@@ -191,12 +191,10 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void checkPermissionAndStartImageCapture()
 	{
-		if( !this.cordova.hasPermission( REQUIRED_PERMISSION ) ) {
-			this.cordova.requestPermission( this, REQUEST_CODE_PERMISSIONS_IMAGE_CAPTURE, REQUIRED_PERMISSION );
-			return;
-		}
-		if( !this.cordova.hasPermission( Manifest.permission.WRITE_EXTERNAL_STORAGE ) ) {
-			this.cordova.requestPermission( this, REQUEST_CODE_PERMISSIONS_IMAGE_CAPTURE, Manifest.permission.WRITE_EXTERNAL_STORAGE );
+		if( !this.cordova.hasPermission( REQUIRED_PERMISSION ) ||
+			!this.cordova.hasPermission( Manifest.permission.WRITE_EXTERNAL_STORAGE )) {
+			this.cordova.requestPermissions( this, REQUEST_CODE_PERMISSIONS_IMAGE_CAPTURE,
+				new String[]{REQUIRED_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE } );
 			return;
 		}
 		startImageCapture();
@@ -312,7 +310,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseCameraResolution( JSONObject arg ) throws JSONException
 	{
-		CaptureView.CameraSettings.Resolution resolution = CaptureView.CameraSettings.Resolution.HD;
+		CaptureView.CameraSettings.Resolution resolution = ImageCaptureSettings.cameraResolution;
 		if( arg.has( RTR_CAMERA_RESOLUTION_KEY ) ) {
 			String resolutionName = arg.getString( RTR_CAMERA_RESOLUTION_KEY );
 			switch( resolutionName ) {
@@ -354,7 +352,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseDestination( JSONObject arg ) throws JSONException
 	{
-		ImageCaptureSettings.Destination destination = ImageCaptureSettings.Destination.FILE;
+		ImageCaptureSettings.Destination destination = ImageCaptureSettings.destination;
 		if( arg.has( RTR_DESTINATION_KEY ) ) {
 			String value = arg.getString( RTR_DESTINATION_KEY );
 			if( value.equals( "base64" ) ) {
@@ -368,7 +366,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseExportType( JSONObject arg ) throws JSONException
 	{
-		ImageCaptureSettings.ExportType exportType = ImageCaptureSettings.ExportType.JPG;
+		ImageCaptureSettings.ExportType exportType = ImageCaptureSettings.exportType;
 		if( arg.has( RTR_EXPORT_TYPE_KEY ) ) {
 			String value = arg.getString( RTR_EXPORT_TYPE_KEY );
 			switch( value ) {
@@ -388,21 +386,21 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseCompressionType( JSONObject arg ) throws JSONException
 	{
-		IImagingCoreAPI.ExportOperation.CompressionType compressionType = IImagingCoreAPI.ExportOperation.CompressionType.Jpg;
-		if( arg.has( RTR_COMPRESSION_TYPE_KEY ) ) {
-			String value = arg.getString( RTR_COMPRESSION_TYPE_KEY );
+		IImagingCoreAPI.ExportOperation.CompressionType pdfCompressionType = ImageCaptureSettings.pdfCompressionType;
+		if( arg.has( RTR_PDF_COMPRESSION_TYPE_KEY ) ) {
+			String value = arg.getString( RTR_PDF_COMPRESSION_TYPE_KEY );
 			switch( value ) {
 				case "jpg":
-					compressionType = IImagingCoreAPI.ExportOperation.CompressionType.Jpg;
+					pdfCompressionType = IImagingCoreAPI.ExportOperation.CompressionType.Jpg;
 					break;
 			}
 		}
-		RtrManager.setCompressionType( compressionType );
+		RtrManager.setCompressionType( pdfCompressionType );
 	}
 
 	private void parseCompressionLevel( JSONObject arg ) throws JSONException
 	{
-		IImagingCoreAPI.ExportOperation.Compression compressionLevel = IImagingCoreAPI.ExportOperation.Compression.Low;
+		IImagingCoreAPI.ExportOperation.Compression compressionLevel = ImageCaptureSettings.compressionLevel;
 		if( arg.has( RTR_COMPRESSION_LEVEL_KEY ) ) {
 			String value = arg.getString( RTR_COMPRESSION_LEVEL_KEY );
 			switch( value ) {
@@ -435,7 +433,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseCropEnabled( JSONObject settings ) throws JSONException
 	{
-		boolean cropEnabled = true;
+		boolean cropEnabled = ImageCaptureSettings.cropEnabled;
 		if( settings.has( RTR_IS_CROP_ENABLED_KEY ) ) {
 			cropEnabled = settings.getBoolean( RTR_IS_CROP_ENABLED_KEY );
 		}
@@ -444,7 +442,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseMinimumDocumentToViewRatio( JSONObject settings ) throws JSONException
 	{
-		float documentRatio = 0.15f;
+		float documentRatio = ImageCaptureSettings.documentToViewRatio;
 
 		if( settings.has( RTR_DOCUMENT_TO_VIEW_RATIO_KEY ) ) {
 			documentRatio = Float.parseFloat( settings.getString( RTR_DOCUMENT_TO_VIEW_RATIO_KEY ) );
@@ -455,7 +453,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseDocumentSize( JSONObject arg ) throws JSONException
 	{
-		ImageCaptureScenario.DocumentSize size = ImageCaptureScenario.DocumentSize.ANY;
+		ImageCaptureScenario.DocumentSize size = ImageCaptureSettings.documentSize;
 
 		if( arg.has( RTR_DOCUMENT_SIZE_KEY ) ) {
 			String[] parts = arg.getString( RTR_DOCUMENT_SIZE_KEY ).split( " " );
@@ -497,7 +495,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseToggleFlash( JSONObject arg ) throws JSONException
 	{
-		boolean isFlashlightVisible = true;
+		boolean isFlashlightVisible = RtrManager.isFlashlightVisible();
 		if( arg.has( RTR_IS_FLASHLIGHT_VISIBLE_KEY ) ) {
 			isFlashlightVisible = arg.getBoolean( RTR_IS_FLASHLIGHT_VISIBLE_KEY );
 		}
@@ -506,7 +504,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseToggleManualCapture( JSONObject arg ) throws JSONException
 	{
-		boolean isManualCaptureVisible = true;
+		boolean isManualCaptureVisible = ImageCaptureSettings.manualCaptureVisible;
 		if( arg.has( RTR_IS_MANUAL_CAPTURE_VISIBLE_KEY ) ) {
 			isManualCaptureVisible = arg.getBoolean( RTR_IS_MANUAL_CAPTURE_VISIBLE_KEY );
 		}
@@ -608,7 +606,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseImageCount( JSONObject arg ) throws JSONException
 	{
-		int imageCount = 5;
+		int imageCount = ImageCaptureSettings.pageCount;
 		if( arg.has( RTR_IMAGE_COUNT_KEY ) ) {
 			imageCount = arg.getInt( RTR_IMAGE_COUNT_KEY );
 		}

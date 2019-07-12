@@ -88,7 +88,19 @@ public class ImageUtils {
 		if( !captureSessionDir.exists() ) {
 			captureSessionDir.mkdir();
 		}
-		return new File( captureSessionDir, "page_" + ( pageIndex + 1 ) + ".png" );
+		return new File( captureSessionDir, "page_" + ( pageIndex + 1 ) + "."+ getFileExtension() );
+	}
+
+	private static String getFileExtension()
+	{
+		switch( ImageCaptureSettings.exportType ) {
+			case JPG:
+			case PDF:
+				return "jpg";
+			case PNG:
+				return "png";
+		}
+		return "jpg";
 	}
 
 	public static File getCaptureSessionPdfFile( Context context )
@@ -97,7 +109,7 @@ public class ImageUtils {
 		if( !captureSessionDir.exists() ) {
 			captureSessionDir.mkdir();
 		}
-		return new File( captureSessionDir, "pages.pdf" );
+		return new File( captureSessionDir, "document.pdf" );
 	}
 
 	public static File[] getCaptureSessionPages( Context context )
