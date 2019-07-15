@@ -26,6 +26,8 @@ typedef void (^PdfCompletion)(NSString* path);
 - (NSArray<NSString*>*)saveImageFiles:(NSArray<NSString*>*)pathArray;
 /// Create PDF document from saved images
 - (void)generatePdfWithCompletion:(PdfCompletion)completion;
+/// Create PDF with external filepaths
+- (void)generatePdfWithFiles:(NSArray*)files completion:(PdfCompletion)completion;
 /// Remove previously saved files
 - (void)removeAllFiles;
 /// Remove specified file

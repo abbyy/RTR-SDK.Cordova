@@ -286,8 +286,15 @@
 {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
 		NSArray* pathArray = self.imageContainer.imagePaths;
-		NSMutableArray* images = [NSMutableArray arrayWithCapacity:pathArray.count];
-		for(NSString* path in pathArray) {
+		[self generatePdfWithFiles:pathArray completion:completion];
+	});
+}
+
+- (void)generatePdfWithFiles:(NSArray*)files completion:(PdfCompletion)completion
+{
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+		NSMutableArray* images = [NSMutableArray arrayWithCapacity:files.count];
+		for(NSString* path in files) {
 			UIImage* image = [UIImage imageWithContentsOfFile:path];
 			if(image != nil) {
 				[images addObject:image];

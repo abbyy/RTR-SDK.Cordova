@@ -7,8 +7,7 @@
 
 @interface RTRMultipageScenarioStorage ()
 
-@property (nonatomic, strong) NSMutableDictionary* memoryImage;
-@property (nonatomic, assign) NSInteger currentImageIndex;
+@property (nonatomic, assign) NSInteger retakeImageIndex;
 @property (nonatomic, assign) BOOL retake;
 @property (nonatomic, strong) RTRDocumentManager* sessionDocumentManager;
 @property (nonatomic, strong) NSMutableArray<NSDictionary*>* shouldDelete;
@@ -35,22 +34,31 @@
 
 - (void)generatePdfWithCompletion:(void (^)(NSString * _Nonnull))completion
 {
-	[self.sessionDocumentManager generatePdfWithCompletion:completion];
+	NSMutableArray* filepaths = @[].mutableCopy;
+	for(NSDictionary* dict in self.shouldShow) {
+		[filepaths addObject:dict[@"filePath"]];
+	}
+	[self.sessionDocumentManager generatePdfWithFiles:filepaths completion:completion];
 }
 
 - (void)imageCaptured:(AUIImageCaptureResult*)result forceCaptured:(BOOL)force
 {
-	self.memoryImage = [self imageResultDictFrom:result forceCaptured:force];
-	if(!self.retake) {
-		self.currentImageIndex = self.imagesCount - 1;
+	NSDictionary* imageInfo = [self saveImageResult:result forceCaptured:force];
+	if(self.retake) {
+		[self.shouldDelete addObject:self.shouldShow[self.retakeImageIndex]];
+		[self.shouldShow replaceObjectAtIndex:self.retakeImageIndex withObject:imageInfo];
+	} else {
+		[self.shouldShow addObject:imageInfo];
 	}
 }
 
-- (NSMutableDictionary*)imageResultDictFrom:(AUIImageCaptureResult*)result forceCaptured:(BOOL)force
+- (NSMutableDictionary*)saveImageResult:(AUIImageCaptureResult*)result forceCaptured:(BOOL)force
 {
 	NSMutableDictionary* info = @{}.mutableCopy;
 	NSMutableDictionary* additionalInfo = @{}.mutableCopy;
-	info[@"nativeImage"] = result.image;
+	NSString* path = [self.sessionDocumentManager saveImage:result.image];
+	[self.imageCache setObject:result.image forKey:path];
+	info[@"filePath"] = path;
 	if(result.documentBoundary != nil) {
 		NSMutableString* quadrangleString = @"".mutableCopy;
 		for(NSValue* value in result.documentBoundary) {
@@ -68,26 +76,25 @@
 
 - (void)deleteImageAt:(NSInteger)index
 {
-	[self confirmChanges];
-	
+	self.retake = NO;
 	NSDictionary* pathToDelete = self.shouldShow[index];
 	[self.shouldDelete addObject:pathToDelete];
 	[self.shouldShow removeObjectAtIndex:index];
 }
 
+- (NSInteger)currentImageIndex
+{
+	return self.retake ? self.retakeImageIndex : self.shouldShow.count - 1;
+}
+
 - (void)retakeImageAt:(NSInteger)index
 {
-	[self confirmChanges];
-	
 	self.retake = YES;
-	self.currentImageIndex = index;
+	self.retakeImageIndex = index;
 }
 
 - (UIImage*)imageForIndex:(NSInteger)index
 {
-	if(self.memoryImage != nil && index == self.currentImageIndex) {
-		return self.memoryImage[@"nativeImage"];
-	}
 	NSString* imagePath = self.shouldShow[index][@"filePath"];
 	UIImage* image = [self.imageCache objectForKey:imagePath];
 
@@ -96,27 +103,11 @@
 
 - (NSInteger)imagesCount
 {
-	if(self.memoryImage == nil) {
-		return self.shouldShow.count;
-	}
-	return self.shouldShow.count + (self.retake ? 0 : 1);
+	return self.shouldShow.count;
 }
 
 - (void)confirmChanges
 {
-	if(self.memoryImage == nil) {
-		return;
-	}
-	NSString* path = [self.sessionDocumentManager saveImage:self.memoryImage[@"nativeImage"]];
-	[self.imageCache setObject:self.memoryImage[@"nativeImage"] forKey:path];
-	self.memoryImage[@"filePath"] = path;
-	[self.memoryImage removeObjectForKey:@"nativeImage"];
-	if(self.retake) {
-		[self.shouldShow replaceObjectAtIndex:self.currentImageIndex withObject:self.memoryImage];
-	} else {
-		[self.shouldShow addObject:self.memoryImage];
-	}
-	self.memoryImage = nil;
 	self.retake = NO;
 }
 
@@ -127,7 +118,6 @@
 
 - (void)sessionClosedSuccessfully
 {
-	[self confirmChanges];
 	for(NSDictionary* path in self.shouldDelete) {
 		[self.sessionDocumentManager removeFileAt:path[@"filePath"]];
 	}

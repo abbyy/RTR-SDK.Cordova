@@ -125,7 +125,6 @@
 	NSMutableDictionary* resultDictionary =
   @{
 		@"images" : @[].mutableCopy,
-		@"resultInfo": @{}.mutableCopy
 	}.mutableCopy;
 	for(NSDictionary* dict in self.storage.shouldShow) {
 		NSMutableArray* images = resultDictionary[@"images"];
@@ -150,8 +149,8 @@
 				@{
 				  @"filePath": path,
 				  @"pagesCount": @(self.storage.shouldShow.count),
-				  @"compressionType": [NSDictionary rtr_exportCompressionTypeToString][@(self.compressionType)],
-				  @"compressionLevel": [NSDictionary rtr_exportCompressionLevelToString][@(self.compressionLevel)]
+				  RTRICCompressionTypeKey: [NSDictionary rtr_exportCompressionTypeToString][@(self.compressionType)],
+				  RTRICCompressionLevelKey: [NSDictionary rtr_exportCompressionLevelToString][@(self.compressionLevel)]
 				  };
 				completion(resultDictionary);
 			};

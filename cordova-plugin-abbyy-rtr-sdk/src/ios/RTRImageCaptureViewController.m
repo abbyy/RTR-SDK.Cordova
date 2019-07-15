@@ -120,8 +120,9 @@
 		[self.config.storage confirmChanges];
 		[self updateOverlay];
 		if(!self.config.shouldShowPreview && self.config.maxImagesCount == self.config.storage.imagesCount) {
+			[self.config.storage sessionClosedSuccessfully];
 			[self.config exportResult:^(NSDictionary* dict) {
-				self.onSuccess(dict);
+				self.onSuccess(NO, dict);
 			}];
 		} else {
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
@@ -153,8 +154,8 @@
 
 - (void)previewControllerDidAdd:(RTRMultiImagePreviewController*)viewController
 {
-	[self.config.storage confirmChanges];
 	[self updateOverlay];
+	[self.config.storage confirmChanges];
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -162,7 +163,7 @@
 {
 	[self.config.storage sessionClosedSuccessfully];
 	[self.config exportResult:^(NSDictionary* dict) {
-		self.onSuccess(dict);
+		self.onSuccess(YES, dict);
 	}];
 }
 

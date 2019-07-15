@@ -162,12 +162,14 @@
 			__weak RTRPlugin* weakSelf = self;
 
 			self.imageCaptureHolder.config = [[RTRMultipageScenarioConfiguration alloc] initWithManager:self.rtrManager args:command.arguments.firstObject];
-			self.imageCaptureHolder.onSuccess = ^(NSDictionary* response) {
+			self.imageCaptureHolder.onSuccess = ^(BOOL manuallyStopped, NSDictionary* response) {
 				NSMutableDictionary* mutableResponce = response.mutableCopy;
-				mutableResponce[RTRCallbackResultInfoKey] =
-				@{
+				if(manuallyStopped) {
+					mutableResponce[RTRCallbackResultInfoKey] =
+					@{
 					  RTRCallbackUserActionKey : @"Manually Stopped"
-				};
+					};
+				}
 
 				CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:mutableResponce];
 				[weakSelf.viewController dismissViewControllerAnimated:YES completion:^{
