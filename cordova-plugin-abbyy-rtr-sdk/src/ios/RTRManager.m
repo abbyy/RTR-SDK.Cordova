@@ -4,8 +4,6 @@
 #import "RTRManager.h"
 #import "RTRDataCaptureScenario.h"
 
-static NSString* const RTRAssetsPath = @"www/rtr_assets";
-
 @interface RTRManager ()
 
 @end
@@ -14,13 +12,7 @@ static NSString* const RTRAssetsPath = @"www/rtr_assets";
 
 + (instancetype)managerWithLicense:(NSString*)licenseName error:(NSError**)error
 {
-	NSString* licensePath = [NSBundle.mainBundle pathForResource:licenseName.stringByDeletingPathExtension
-		ofType:licenseName.pathExtension inDirectory:RTRAssetsPath];
-	if(licensePath.length == 0) {
-		licensePath = [[NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:RTRAssetsPath]
-			stringByAppendingPathComponent:licenseName];
-	}
-
+	NSString* licensePath = [NSBundle.mainBundle pathForResource:licenseName.stringByDeletingPathExtension ofType:licenseName.pathExtension];
 	NSData* licenseData = [NSData dataWithContentsOfFile:licensePath options:0 error:error];
 
 	if(licenseData == nil) {
@@ -35,8 +27,6 @@ static NSString* const RTRAssetsPath = @"www/rtr_assets";
 	self = [super init];
 	if(self != nil) {
 		self.engine = [RTREngine sharedEngineWithLicenseData:licenseData];
-		NSString* assetsPath = [NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:RTRAssetsPath];
-		self.engine.extendedSettings.externalAssetsPath = assetsPath;
 		
 		if(self.engine == nil) {
 			return nil;
