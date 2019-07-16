@@ -1,6 +1,6 @@
 # ABBYY Mobile Capture Cordova Plugin
 
-ABBYY Mobile Capture Cordova Plugin allows to use the Text Capture and Data Capture features of ABBYY Mobile Capture in apps based on the [Apache Cordova](https://cordova.apache.org) framework.
+ABBYY Mobile Capture Cordova Plugin allows to use the Text Capture, Data Capture and Image Capture features of ABBYY Mobile Capture in apps based on the [Apache Cordova](https://cordova.apache.org) framework.
 
 This plugin requires the ABBYY Mobile Capture native library which is available for Android and iOS. You can request ABBYY Mobile Capture trial version on the [ABBYY website](http://www.abbyy.com/mobile-capture-sdk/#request-demo).
 
