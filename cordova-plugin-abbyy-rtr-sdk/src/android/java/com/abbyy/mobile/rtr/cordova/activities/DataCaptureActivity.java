@@ -134,16 +134,35 @@ public class DataCaptureActivity extends BaseActivity {
 						}
 
 						ArrayList<HashMap<String, String>> lineList = new ArrayList<>();
-						for( IDataCaptureService.DataField line : field.Components ) {
+						IDataCaptureService.DataField[] components = field.Components;
+						if( components != null ) {
+							for( IDataCaptureService.DataField line : field.Components ) {
+								HashMap<String, String> lineInfo = new HashMap<>();
+								lineInfo.put( "text", line.Text );
+								if( line.Quadrangle != null ) {
+									StringBuilder lineBuilder = new StringBuilder();
+									for( int i = 0; i < line.Quadrangle.length; i++ ) {
+										lineBuilder.append( line.Quadrangle[i].x );
+										lineBuilder.append( ' ' );
+										lineBuilder.append( line.Quadrangle[i].y );
+										if( i != line.Quadrangle.length - 1 ) {
+											lineBuilder.append( ' ' );
+										}
+									}
+									lineInfo.put( "quadrangle", lineBuilder.toString() );
+								}
+								lineList.add( lineInfo );
+							}
+						} else {
 							HashMap<String, String> lineInfo = new HashMap<>();
-							lineInfo.put( "text", line.Text );
-							if( line.Quadrangle != null ) {
+							lineInfo.put( "text", field.Text );
+							if( field.Quadrangle != null ) {
 								StringBuilder lineBuilder = new StringBuilder();
-								for( int i = 0; i < line.Quadrangle.length; i++ ) {
-									lineBuilder.append( line.Quadrangle[i].x );
+								for( int i = 0; i < field.Quadrangle.length; i++ ) {
+									lineBuilder.append( field.Quadrangle[i].x );
 									lineBuilder.append( ' ' );
-									lineBuilder.append( line.Quadrangle[i].y );
-									if( i != line.Quadrangle.length - 1 ) {
+									lineBuilder.append( field.Quadrangle[i].y );
+									if( i != field.Quadrangle.length - 1 ) {
 										lineBuilder.append( ' ' );
 									}
 								}
