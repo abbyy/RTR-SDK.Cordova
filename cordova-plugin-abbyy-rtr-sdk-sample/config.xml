@@ -11,6 +11,7 @@
         <preference name="android-minSdkVersion" value="21" />
     </platform>
     <platform name="ios">
+        <preference name="deployment-target" value="11.0" />
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>

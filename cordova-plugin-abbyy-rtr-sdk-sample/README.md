@@ -7,7 +7,7 @@ This plugin requires the ABBYY Mobile Capture native library which is available 
 The native libraries support the following systems:
 
 * Android version: 5.0 or later for ARMv7 (armeabi-v7a) and ARMv8 (arm64-v8a) processors
-* iOS: versions 10.x and later
+* iOS: versions 11.x and later
 
 
 ## Getting started
