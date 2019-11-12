@@ -5,7 +5,7 @@
 #import "NSDictionary+RTRSettings.h"
 #import "RTRPluginConstants.h"
 
-@interface RTRMultipageScenarioConfiguration()
+@interface RTRMultipageScenarioConfiguration() <AUIMultiPageCaptureSettings>
 
 @property (nonatomic, strong) RTREngine* engine;
 
@@ -25,7 +25,6 @@
 @synthesize cropEnabled = _cropEnabled;
 @synthesize cameraResolution = _cameraResolution;
 @synthesize supportedOrientations = _supportedOrientations;
-@synthesize storage = _storage;
 
 - (instancetype)initWithManager:(RTRManager*)manager args:(NSDictionary*)args
 {
@@ -111,139 +110,220 @@
 	}
 }
 
-#pragma mark - ui config
-
-- (BOOL)isFlashlightButtonVisible
-{
-	return [UIImagePickerController isFlashAvailableForCameraDevice:UIImagePickerControllerCameraDeviceRear] & _isFlashlightButtonVisible;
-}
-
 #pragma mark - export
 
-- (void)exportResult:(void(^)(NSDictionary*))completion
+- (void)exportResult:(id<AUIMultiPageImageCaptureResult>)result withCompletion:(void(^)(NSDictionary*))completion
 {
-	NSMutableDictionary* resultDictionary =
-  @{
-		@"images" : @[].mutableCopy,
-	}.mutableCopy;
-	for(NSDictionary* dict in self.storage.shouldShow) {
-		NSMutableArray* images = resultDictionary[@"images"];
-		NSMutableDictionary* imageInfo = dict.mutableCopy;
-		if(self.destination == RTRImageCaptureDestintationDataUrl) {
-			if(self.storage.shouldShow.count == 1) {
-				NSData* imageData = [NSData dataWithContentsOfFile:imageInfo[@"filePath"]];
-				imageInfo[@"base64"] = [imageData base64EncodedStringWithOptions:0];
-				[imageInfo removeObjectForKey:@"filePath"];
-			} else {
-				NSLog(@"Warning: If more then one image are captured, base64 export option value will be ignored and the result will be saved to a file anyway");
-			}
+	NSError* error;
+	NSArray<AUIPageId>* ids = [result pagesWithError:&error];
+	if(ids == nil) {
+		completion(nil);
+	}
+	NSMutableDictionary* exportDict = @{}.mutableCopy;
+	NSArray* images = [self exportImagesFrom:result error:&error];
+	if(images == nil) {
+		// TODO: error callback
+	}
+	exportDict[@"images"] = images;
+	if(self.exportType == RTRImageCaptureEncodingTypePdf) {
+		NSDictionary* pdfDict = [self exportAsPdf:result error:&error];
+		if(pdfDict == nil) {
+			// TODO: error callback
 		}
-		imageInfo[@"resultInfo"][@"exportType"] = [NSDictionary rtr_exportTypeToString][@([self imageExportType])];
-		[images addObject:imageInfo];
-		
+		exportDict[@"pdfInfo"] = pdfDict;
 	}
-	if(self.exportType == RTRImageCaptureEncodingTypePdf) {
-		[self.storage generatePdfWithCompletion:^(NSString * _Nonnull path) {
-			if(completion != nil) {
-				resultDictionary[@"pdfInfo"] =
-				@{
-				  @"filePath": path,
-				  @"pagesCount": @(self.storage.shouldShow.count),
-				  RTRICCompressionTypeKey: [NSDictionary rtr_exportCompressionTypeToString][@(self.compressionType)],
-				  RTRICCompressionLevelKey: [NSDictionary rtr_exportCompressionLevelToString][@(self.compressionLevel)]
-				  };
-				completion(resultDictionary);
-			};
-		}];
-	} else {
-		completion(resultDictionary);
+	completion(exportDict);
+}
+
+- (NSString*)exportDirectory
+{
+	return NSTemporaryDirectory();
+}
+
+- (NSArray*)exportImagesFrom:(id<AUIMultiPageImageCaptureResult>)result error:(NSError**)error
+{
+	NSMutableArray* images = @[].mutableCopy;
+	NSArray<AUIPageId>* ids = [result pagesWithError:error];
+	if(ids == nil) {
+		return nil;
 	}
-}
-
-#pragma mark - files storage
-
-- (RTRMultipageScenarioStorage*)storage
-{
-	if(_storage == nil) {
-		_storage = [[RTRMultipageScenarioStorage alloc] initWithEngine:self.engine manager:self.documentManager];
+	if(self.destination == RTRImageCaptureDestintationDataUrl) {
+		if(ids.count != 1) {
+			NSLog(@"Warning: If more then one image are captured, base64 export option value will be ignored and the result will be saved to a file anyway");
+		} else {
+			return [self exportSingleImageBase64:result identifier:ids.firstObject error:error];
+		}
 	}
-	return _storage;
-}
-
-- (RTRDocumentManager*)documentManager
-{
-	return [RTRDocumentManager defaultManagerWithImageContainer:self.imageContainer pdfContainer:self.pdfContainer];
-}
-
-- (RTRImageContainer*)jpgContainer
-{
-	RTRImageContainer* container = [[RTRJpgImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
-	container.operationCustomization = ^(id<RTRCoreAPIExportToJpgOperation> _Nonnull op) {
-		NSAssert([op conformsToProtocol:@protocol(RTRCoreAPIExportToJpgOperation)], @"unexpected");
-		op.compression = self.compressionLevel;
-	};
-	return container;
-}
-
-- (RTRImageContainer*)jpeg2000Container
-{
-	RTRImageContainer* container = [[RTRJpeg2000ImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
-	container.operationCustomization = ^(id<RTRCoreAPIExportToJpeg2000Operation> _Nonnull op) {
-		NSAssert([op conformsToProtocol:@protocol(RTRCoreAPIExportToJpeg2000Operation)], @"unexpected");
-		op.compression = self.compressionLevel;
-	};
-	return container;
-}
-
-- (RTRImageContainer*)imageContainer
-{
-	switch(self.exportType) {
-		case RTRImageCaptureEncodingTypeJpg:
-			return [self jpgContainer];
-		case RTRImageCaptureEncodingTypeJpeg2000:
-			return [self jpeg2000Container];
-		case RTRImageCaptureEncodingTypePng:
-			return [[RTRPngImageContainer alloc] initWithDirectory:NSTemporaryDirectory()];
-		case RTRImageCaptureEncodingTypePdf:
-			if(self.compressionType == RTRCoreAPIPdfExportJpeg2000Compression) {
-				return [self jpeg2000Container];
-			} else {
-				return [self jpgContainer];
+	for(AUIPageId identifier in ids) {
+		UIImage* image = [result loadImageWithId:identifier error:error];
+		if(image == nil) {
+			return nil;
+		}
+		NSString* path = [[self exportDirectory] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.jpg", identifier]];
+		RTRFileOutputStream* stream = [[RTRFileOutputStream alloc] initWithFilePath:path];
+		id<RTRCoreAPIExportOperation> export = [self exporterWithOutput:stream];
+		if(![export addPageWithImage:image]) {
+			if(error != nil) {
+				*error = export.error;
 			}
-		default:
-			NSAssert(NO, @"Unknown export type");
+			return nil;
+		}
+		if(![export close]) {
+			if(error != nil) {
+				*error = export.error;
+			}
+			return nil;
+		}
+		[images addObject:@{
+			@"filePath": path,
+			@"resultInfo": @{
+				@"exportType": [NSDictionary rtr_exportTypeToString][@([self singleImageExportType])]
+			}
+		}];
 	}
+	return images;
 }
 
-// getting single images export type while actual exportType is pdf
-- (RTRImageCaptureEncodingType)imageExportType
+- (NSDictionary*)exportAsPdf:(id<AUIMultiPageImageCaptureResult>)result error:(NSError**)error
+{
+	NSArray<AUIPageId>* ids = [result pagesWithError:error];
+	if(ids == nil) {
+		return nil;
+	}
+	NSString* filepath = [[self exportDirectory] stringByAppendingPathComponent:@"somepdf.pdf"];
+	RTRFileOutputStream* stream = [[RTRFileOutputStream alloc] initWithFilePath:filepath];
+	id<RTRCoreAPI> coreApi = [self.engine createCoreAPI];
+	id<RTRCoreAPIExportToPdfOperation> op = [coreApi createExportToPdfOperation:stream];
+	for(AUIPageId identifier in ids) {
+		UIImage* image = [result loadImageWithId:identifier error:error];
+		if(image == nil) {
+			return nil;
+		}
+		if(![op addPageWithImage:image]) {
+			if(error != nil) {
+				*error = op.error;
+			}
+			return nil;
+		}
+	}
+	if(![op close]) {
+		if(error != nil) {
+			*error = op.error;
+		}
+		return nil;
+	}
+	return @{
+		@"filePath": filepath,
+		@"pagesCount": @(ids.count),
+		RTRICCompressionTypeKey: [NSDictionary rtr_exportCompressionTypeToString][@(self.compressionType)],
+		RTRICCompressionLevelKey: [NSDictionary rtr_exportCompressionLevelToString][@(self.compressionLevel)]
+	};
+}
+
+- (NSArray*)exportSingleImageBase64:(id<AUIMultiPageImageCaptureResult>)result identifier:(AUIPageId)identifier error:(NSError**)error
+{
+	UIImage* image = [result loadOriginalImageWithId:identifier error:error];
+	if(image == nil) {
+		return nil;
+	}
+	return [self exportSingleImageBase64:image error:error];
+}
+
+- (NSArray*)exportSingleImageBase64:(UIImage*)image error:(NSError**)error
+{
+	RTRMemoryOutputStream* stream = [RTRMemoryOutputStream new];
+	id<RTRCoreAPIExportOperation> exporter = [self exporterWithOutput:stream];
+	[exporter addPageWithImage:image];
+	if(![exporter close]) {
+		if(error != nil) {
+			*error = exporter.error;
+		}
+		return nil;
+	}
+	return @[@{
+		@"base64": [stream.data base64EncodedStringWithOptions:0],
+		@"resultInfo": @{
+			@"exportType": [NSDictionary rtr_exportTypeToString][@([self singleImageExportType])]
+		}
+	}];
+}
+
+- (BOOL)exportImage:(UIImage*)image stream:(id<RTROutputStream>)stream error:(NSError**)error
+{
+	id<RTRCoreAPIExportOperation> operation = [self exporterWithOutput:stream];
+	[operation addPageWithImage:image];
+	if(![operation close]) {
+		if(error != nil) {
+			*error = operation.error;
+		}
+		return NO;
+	}
+	return YES;
+}
+
+- (RTRImageCaptureEncodingType)singleImageExportType
 {
 	if(self.exportType == RTRImageCaptureEncodingTypePdf) {
-		return self.compressionType == RTRCoreAPIPdfExportJpeg2000Compression ? RTRImageCaptureEncodingTypeJpeg2000 : RTRImageCaptureEncodingTypeJpg;
+		return self.compressionType == RTRCoreAPIPdfExportJpgCompression ? RTRImageCaptureEncodingTypeJpg : RTRImageCaptureEncodingTypeJpeg2000;
 	}
 	return self.exportType;
 }
 
-- (RTRPdfContainer*)pdfContainer
+- (id<RTRCoreAPIExportOperation>)exporterWithOutput:(id<RTROutputStream>)stream
 {
-	RTRPdfContainer* container = [[RTRPdfContainer alloc] initWithDirectory:NSTemporaryDirectory()];
-	container.operationCustomization = ^(id<RTRCoreAPIExportToPdfOperation> op) {
-		NSAssert([op conformsToProtocol:@protocol(RTRCoreAPIExportToPdfOperation)], @"unexpected");
-		op.compressionType = self.compressionType;
-		op.compression = self.compressionLevel;
-	};
-	return container;
+	return [self exporterWithEncoding:[self singleImageExportType] output:stream];
+}
+
+- (id<RTRCoreAPIExportOperation>)exporterWithEncoding:(RTRImageCaptureEncodingType)type output:(id<RTROutputStream>)stream
+{
+	id<RTRCoreAPI> coreApi = [self.engine createCoreAPI];
+	switch(type) {
+		case RTRImageCaptureEncodingTypeJpg: {
+			id<RTRCoreAPIExportToJpgOperation> op = [coreApi createExportToJpgOperation:stream];
+			op.compression = self.compressionLevel;
+			return op;
+		}
+		case RTRImageCaptureEncodingTypeJpeg2000: {
+			id<RTRCoreAPIExportToJpeg2000Operation> op = [coreApi createExportToJpeg2000Operation:stream];
+			op.compression = self.compressionLevel;
+			return op;
+		}
+		case RTRImageCaptureEncodingTypePng:
+			return [coreApi createExportToPngOperation:stream];
+		case RTRImageCaptureEncodingTypePdf:
+			NSAssert(NO, @"Unexpected");
+			return nil;
+	}
 }
 
 #pragma mark - image scenario
 
-- (AUIImageCaptureScenario*)scenario
+- (AUIMultiPageImageCaptureScenario*)scenario
 {
-	AUIImageCaptureScenario* scenario = [[AUIImageCaptureScenario alloc] initWithEngine:self.engine];
-	scenario.minimumDocumentToViewRatio = self.minimumDocumentToViewRatio;
-	scenario.cropEnabled = self.cropEnabled;
-	scenario.documentSize = self.documentSize;
+	NSString* documentsFolder = NSSearchPathForDirectoriesInDomains(
+		NSLibraryDirectory,
+		NSUserDomainMask,
+		YES).firstObject;
+	NSError* error;
+	AUIMultiPageImageCaptureScenario* scenario = [[AUIMultiPageImageCaptureScenario alloc]
+		initWithEngine:self.engine
+		storagePath:documentsFolder
+		error:&error];
+	scenario.requiredPageCount = self.maxImagesCount;
+	scenario.isShowPreviewEnabled = self.shouldShowPreview;
+	[scenario.result clearWithError:&error];
+	scenario.captureSettings = self;
 	return scenario;
+}
+
+#pragma mark - AUIMultiPageCaptureSettings
+
+- (void)captureScenario:(AUIMultiPageImageCaptureScenario*)captureScenario
+	onConfigureImageCaptureSettings:(id<AUIImageCaptureSettings>)settings
+	forPageAtIndex:(NSUInteger)index
+{
+	settings.minimumDocumentToViewRatio = self.minimumDocumentToViewRatio;
+	settings.documentSize = self.documentSize;
 }
 
 @end

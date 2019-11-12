@@ -4,8 +4,8 @@
 #import <UIKit/UIKit.h>
 #import <AbbyyUI/AbbyyUI.h>
 #import "RTRPlugin.h"
-#import "RTRDocumentManager.h"
-#import "RTRMultipageScenarioStorage.h"
+//#import "RTRDocumentManager.h"
+//#import "RTRMultipageScenarioStorage.h"
 #import "RTRManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -28,13 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) CGSize documentSize;
 @property (nonatomic, readonly) BOOL cropEnabled;
 
-@property (nonatomic, readonly) RTRMultipageScenarioStorage* storage;
-
 - (instancetype)initWithManager:(RTRManager*)manager args:(NSDictionary*)args;
 
 - (RTREngine*)engine;
-- (AUIImageCaptureScenario*)scenario;
-- (void)exportResult:(void(^)(NSDictionary*))completion;
+- (AUIMultiPageImageCaptureScenario*)scenario;
+- (void)exportResult:(id<AUIMultiPageImageCaptureResult>)result withCompletion:(void(^)(NSDictionary*))completion;
 
 @end
 

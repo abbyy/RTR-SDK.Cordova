@@ -10,7 +10,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /// Root controller
-@interface RTRImageCaptureViewController : AUICaptureController
+@interface RTRImageCaptureViewController : AUICaptureController<AUIMultiPageImageCaptureScenarioDelegate>
 
 @property (nonatomic, copy) void (^onCancel)(void);
 @property (nonatomic, copy) void (^onSuccess)(BOOL manuallyStopped, NSDictionary* capturedData);

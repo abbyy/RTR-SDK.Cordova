@@ -173,34 +173,14 @@ To get started:
 		<header-file src="src/ios/RTRViewController.h" />
 		<source-file src="src/ios/RTRViewController.m" />
 
-		<header-file src="src/ios/RTRDocumentManager.h" />
-		<source-file src="src/ios/RTRDocumentManager.m" />
-		<header-file src="src/ios/RTRThumbnailButton.h" />
-		<source-file src="src/ios/RTRThumbnailButton.m" />
 		<header-file src="src/ios/RTRImageCaptureViewController.h" />
 		<source-file src="src/ios/RTRImageCaptureViewController.m" />
-
-		<header-file src="src/ios/RTRMultiImagePreviewController.h" />
-		<source-file src="src/ios/RTRMultiImagePreviewController.m" />
-
-		<header-file src="src/ios/RTRSingleImageViewController.h" />
-		<source-file src="src/ios/RTRSingleImageViewController.m" />
 
 		<header-file src="src/ios/NSDictionary+RTRSettings.h" />
 		<source-file src="src/ios/NSDictionary+RTRSettings.m" />
 
 		<header-file src="src/ios/RTRMultipageScenarioConfiguration.h" />
 		<source-file src="src/ios/RTRMultipageScenarioConfiguration.m" />
-
-		<header-file src="src/ios/RTRZoomImageView.h" />
-		<source-file src="src/ios/RTRZoomImageView.m" />
-		<resource-file src="src/ios/RTRZoomImageView.xib" />
-
-		<header-file src="src/ios/RTRZoomImageViewBase.h" />
-		<source-file src="src/ios/RTRZoomImageViewBase.m" />
-
-		<header-file src="src/ios/RTRMultipageScenarioStorage.h" />
-		<source-file src="src/ios/RTRMultipageScenarioStorage.m" />
 
 		<resource-file src="src/ios/RTRViewController.xib" />
 

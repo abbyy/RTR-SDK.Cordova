@@ -156,8 +156,7 @@
 		}
 
 		dispatch_async(dispatch_get_main_queue(), ^{
-			UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-			self.imageCaptureHolder = [storyboard instantiateInitialViewController];
+			self.imageCaptureHolder = [RTRImageCaptureViewController new];
 
 			__weak RTRPlugin* weakSelf = self;
 
