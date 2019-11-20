@@ -5,8 +5,8 @@ import android.graphics.Point;
 import android.util.SparseArray;
 
 import com.abbyy.mobile.rtr.cordova.ImageCaptureSettings;
+import com.abbyy.mobile.rtr.cordova.ResourcesUtils;
 import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
-import com.abbyy.rtrcordovasample.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -100,10 +100,10 @@ public class MultiCaptureResult {
 	{
 		HashMap<String, Object> pdfInfo = new HashMap<>();
 		String description;
-		if (exception.getMessage() != null) {
+		if( exception.getMessage() != null ) {
 			description = exception.getMessage();
 		} else {
-			description = context.getString( R.string.unknown_error );
+			description = context.getString( ResourcesUtils.getResId( "string", "unknown_error", context ) );
 		}
 		pdfInfo.put( "description", description );
 		return pdfInfo;

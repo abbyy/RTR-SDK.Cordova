@@ -6,7 +6,6 @@ import android.graphics.Point;
 
 import com.abbyy.mobile.rtr.cordova.utils.ImageSaver;
 import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
-import com.abbyy.rtrcordovasample.R;
 
 import java.io.File;
 

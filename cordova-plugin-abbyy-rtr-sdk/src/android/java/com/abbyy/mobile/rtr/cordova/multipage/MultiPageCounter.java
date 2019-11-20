@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
-import com.abbyy.rtrcordovasample.R;
+import com.abbyy.mobile.rtr.cordova.ResourcesUtils;
 
 /**
  * Auxiliary class for the view that displays the current session's page count
@@ -57,9 +57,9 @@ public class MultiPageCounter extends FrameLayout {
 
 	private void init()
 	{
-		inflate( getContext(), R.layout.page_counter, this );
-		lastPageMiniatureView = findViewById( R.id.lastPage );
-		pageCounter = findViewById( R.id.pageCounter );
+		inflate( getContext(), ResourcesUtils.getResId( "layout", "page_counter", getContext()), this );
+		lastPageMiniatureView = findViewById( ResourcesUtils.getResId( "id", "lastPage", getContext()) );
+		pageCounter = findViewById( ResourcesUtils.getResId( "id", "pageCounter", getContext()) );
 	}
 
 	public void updatePageCount( int captureSessionPageCount, Bitmap lastPageMiniature )

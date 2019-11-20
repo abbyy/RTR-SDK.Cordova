@@ -21,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.abbyy.mobile.rtr.cordova.ImageCaptureSettings;
+import com.abbyy.mobile.rtr.cordova.ResourcesUtils;
 import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.RtrPlugin;
 import com.abbyy.mobile.rtr.cordova.multipage.CaptureResult;
@@ -33,7 +34,6 @@ import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
 import com.abbyy.mobile.rtr.cordova.utils.MultiPagesProcessor;
 import com.abbyy.mobile.uicomponents.CaptureView;
 import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario;
-import com.abbyy.rtrcordovasample.R;
 
 import java.io.File;
 import java.util.HashMap;
@@ -88,8 +88,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 			capturePageNumber = savedInstanceState.getInt( CAPTURE_PAGE_EXTRA, 0 );
 		}
 
-		setContentView( R.layout.activity_image_capture );
-
+		setContentView( ResourcesUtils.getResId( "layout", "activity_image_capture", this ) );
 		initCaptureView();
 
 		// Initialize page counter view
@@ -131,7 +130,7 @@ public class ImageCaptureActivity extends AppCompatActivity implements ImageCapt
 
 	private void initCaptureView()
 	{
-		captureView = (CaptureView) findViewById( R.id.captureView );
+		captureView = (CaptureView) findViewById( ResourcesUtils.getResId( "id", "captureView", this ) );
 		captureView.getUISettings().setCaptureButtonVisible( ImageCaptureSettings.manualCaptureVisible );
 		captureView.getUISettings().setFlashlightButtonVisible( ImageCaptureSettings.flashlightVisible );
 		captureView.getCameraSettings().setResolution( ImageCaptureSettings.cameraResolution );

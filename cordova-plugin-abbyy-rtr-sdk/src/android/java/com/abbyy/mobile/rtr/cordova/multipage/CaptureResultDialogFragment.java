@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.utils.ImageSaver;
 import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
-import com.abbyy.rtrcordovasample.R;
+import com.abbyy.mobile.rtr.cordova.ResourcesUtils;
 
 import java.io.File;
 
@@ -88,19 +88,19 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 	{
 		super.onCreateView( inflater, container, savedInstanceState );
 
-		View view = inflater.inflate( R.layout.fragment_result, container, false );
+		View view = inflater.inflate( ResourcesUtils.getResId( "layout", "fragment_result", getContext()), container, false );
 		initPagesPreview( view );
 
-		Button done = view.findViewById( R.id.done );
+		Button done = view.findViewById( ResourcesUtils.getResId( "id", "done", getContext()) );
 		done.setOnClickListener( this );
-		Button addPage = view.findViewById( R.id.addPage );
+		Button addPage = view.findViewById( ResourcesUtils.getResId( "id", "addPage", getContext()) );
 		addPage.setOnClickListener( this );
-		Button retakePage = view.findViewById( R.id.retakePage );
+		Button retakePage = view.findViewById( ResourcesUtils.getResId( "id", "retakePage", getContext()) );
 		retakePage.setOnClickListener( this );
-		Button deletePage = view.findViewById( R.id.deletePage );
+		Button deletePage = view.findViewById( ResourcesUtils.getResId( "id", "deletePage", getContext()) );
 		deletePage.setOnClickListener( this );
 
-		pageNumberText = view.findViewById( R.id.pageText );
+		pageNumberText = view.findViewById(  ResourcesUtils.getResId( "id", "pageText", getContext()) );
 		updatePageText();
 
 		return view;
@@ -145,7 +145,7 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 
 	private void initPagesPreview( View view )
 	{
-		RecyclerView pagesPreview = view.findViewById( R.id.pagesPreview );
+		RecyclerView pagesPreview = view.findViewById( ResourcesUtils.getResId( "id", "pagesPreview", getContext()) );
 		pagesPreview.setHasFixedSize( true );
 
 		LinearLayoutManager layoutManager = new LinearLayoutManager( getContext() );
@@ -187,7 +187,9 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 			if (addMode) {
 				lastPageMiniature = ImageUtils.getMiniature(
 					pageHolder.getPageImage(),
-					getContext().getResources().getDimensionPixelSize( R.dimen.miniature_size )
+					getContext().getResources().getDimensionPixelSize(
+						ResourcesUtils.getResId( "dimen", "miniature_size", getContext())
+					)
 				);
 			}
 			pageHolder.saveToFile(getContext(), this);
@@ -232,7 +234,11 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 
 	private void updatePageText()
 	{
-		pageNumberText.setText( getString( R.string.page, selectedPageIndex + 1, getPages().size() ) );
+		pageNumberText.setText( getString( 
+			ResourcesUtils.getResId( "string", "page", getContext()),
+			selectedPageIndex + 1,
+			getPages().size()
+		) );
 	}
 
 	private void deletePageAndDismiss()
@@ -254,7 +260,7 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 		if( error.getMessage() != null ) {
 			errorMessage = error.getMessage();
 		} else {
-			errorMessage = getString( R.string.unknown_error );
+			errorMessage = getString( ResourcesUtils.getResId( "string", "unknown_error", getContext()) );
 		}
 		Toast.makeText( getContext(), errorMessage, Toast.LENGTH_SHORT ).show();
 	}
@@ -262,22 +268,17 @@ public class CaptureResultDialogFragment extends DialogFragment implements Image
 	@Override
 	public void onClick( View v )
 	{
-		switch( v.getId() ) {
-			case R.id.addPage:
-				finishCapture = false;
-				savePageAndDismiss(true);
-				break;
-			case R.id.done:
-				finishCapture = true;
-				savePageAndDismiss(false);
-				break;
-			case R.id.deletePage:
-				deletePage();
-				break;
-			case R.id.retakePage:
-				finishCapture = false;
-				deletePageAndDismiss();
-				break;
+		if( v.getId() ==  ResourcesUtils.getResId( "id", "addPage", getContext())) {
+			finishCapture = false;
+			savePageAndDismiss(true);
+		} else if( v.getId() ==  ResourcesUtils.getResId( "id", "done", getContext())) {
+			finishCapture = true;
+			savePageAndDismiss(false);
+		} else if( v.getId() ==  ResourcesUtils.getResId( "id", "deletePage", getContext())) {
+			deletePage();
+		} else if( v.getId() ==  ResourcesUtils.getResId( "id", "retakePage", getContext())) {
+			finishCapture = false;
+			deletePageAndDismiss();
 		}
 	}
 
