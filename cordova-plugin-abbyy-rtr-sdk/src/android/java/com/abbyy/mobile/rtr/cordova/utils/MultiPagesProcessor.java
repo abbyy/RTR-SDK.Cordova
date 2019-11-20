@@ -1,77 +1,105 @@
-// ABBYY ® Mobile Imaging UI Components © 2018 ABBYY Production LLC.
-// ABBYY is either a registered trademark or a trademark of ABBYY Software Ltd.
+// ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
 
 package com.abbyy.mobile.rtr.cordova.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
-import android.util.SparseArray;
+import android.graphics.Point;
+import android.util.Pair;
 
 import com.abbyy.mobile.rtr.IImagingCoreAPI;
 import com.abbyy.mobile.rtr.cordova.ImageCaptureSettings;
 import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.multipage.MultiCaptureResult;
 import com.abbyy.mobile.rtr.cordova.multipage.PageHolder;
+import com.abbyy.mobile.uicomponents.scenario.MultiPageImageCaptureScenario;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.List;
 
-// Utility class to asynchronously save bitmap to file
-public class MultiPagesProcessor extends AsyncTask<Void, Void, Void> {
-	public interface Callback {
-		void onProcessed();
-	}
+/**
+ * Utility class to save the result of the multipage image capture scenario to files
+ */
+public class MultiPagesProcessor extends BackgroundWorker<Boolean, Boolean> {
+	private final MultiPageImageCaptureScenario.Result result;
 
-	private SparseArray<PageHolder> pages;
 	private WeakReference<Context> contextRef;
-	private Callback callback;
 
-	public MultiPagesProcessor( SparseArray<PageHolder> pages, Context context, Callback callback )
+	public MultiPagesProcessor( MultiPageImageCaptureScenario.Result result, Context context, WeakReference<Callback<Boolean, Boolean>> callback )
 	{
-		this.pages = pages;
+		super( callback );
+		this.result = result;
 		this.contextRef = new WeakReference<>( context );
-		this.callback = callback;
 	}
 
-	@Override
-	protected Void doInBackground( Void... args )
+	public Boolean processPages( boolean finishedSuccessfully )
 	{
-		if( ImageCaptureSettings.exportType == ImageCaptureSettings.ExportType.PDF ) {
-			File pdfFile = ImageUtils.getCaptureSessionPdfFile( contextRef.get() );
-			try( IImagingCoreAPI api = RtrManager.getImagingCoreAPI() ) {
-				try( FileOutputStream fos = new FileOutputStream( pdfFile ) ) {
-					try( IImagingCoreAPI.ExportToPdfOperation operation = api.createExportToPdfOperation( fos ) ) {
-						operation.Compression = ImageCaptureSettings.compressionLevel;
-						operation.CompressionType = ImageCaptureSettings.pdfCompressionType;
-						for( int i = 0; i < pages.size(); ++i ) {
-							PageHolder page = pages.valueAt( i );
-							Bitmap pageImage = ImageUtils.loadBitmap( page.getPageFile() );
-							operation.addPage( pageImage );
-						}
+		try {
+			List<String> pages = result.getPages();
+			if( !finishedSuccessfully ) {
+				return !pages.isEmpty();
+			}
+			if( ImageCaptureSettings.exportType == ImageCaptureSettings.ExportType.PDF ) {
+				File pdfFile = ImageUtils.getCaptureSessionPdfFile( contextRef.get() );
+				try( IImagingCoreAPI api = RtrManager.getImagingCoreAPI() ) {
+					try( FileOutputStream fos = new FileOutputStream( pdfFile ) ) {
+						storePagesAndAddToPdf( pages, api, fos );
 					}
+				} catch( Exception e ) {
+					e.printStackTrace();
 				}
-			} catch( Exception e ) {
-				e.printStackTrace();
+			} else {
+				int pageNumber = 0;
+				for( String pageId : pages ) {
+					Pair<PageHolder, Bitmap> page = getPageFromResult( pageNumber++, pageId );
+					page.first.saveToFile( page.second, contextRef.get() );
+					page.second.recycle();
+					pageNumber++;
+				}
 			}
-		}
-		if( MultiCaptureResult.shouldReturnBase64() && pages.size() == 1 ) {
-			PageHolder page = pages.valueAt( 0 );
-			try {
+			if( MultiCaptureResult.shouldReturnBase64() && pages.size() == 1 ) {
+				PageHolder page = RtrManager.getImageCaptureResult().valueAt( 0 );
 				page.setBase64( ImageUtils.convertFileToBase64( page.getPageFile() ) );
-			} catch( IOException e ) {
-				e.printStackTrace();
 			}
+		} catch( Exception e ) {
+			e.printStackTrace();
 		}
 
-		return null;
+		return false;
 	}
 
-	@Override
-	protected void onPostExecute( Void arg )
+	private void storePagesAndAddToPdf( List<String> pages, IImagingCoreAPI api, FileOutputStream fos ) throws Exception
 	{
-		callback.onProcessed();
+		try( IImagingCoreAPI.ExportToPdfOperation operation = api.createExportToPdfOperation( fos ) ) {
+			operation.Compression = ImageCaptureSettings.compressionLevel;
+			operation.CompressionType = ImageCaptureSettings.pdfCompressionType;
+			int pageNumber = 0;
+			for( String pageId : pages ) {
+				Pair<PageHolder, Bitmap> page = getPageFromResult( pageNumber++, pageId );
+				operation.addPage( page.second );
+				page.first.saveToFile( page.second, contextRef.get() );
+				page.second.recycle();
+			}
+		}
+	}
+
+	private Pair<PageHolder, Bitmap> getPageFromResult( int pageNumber, String pageId ) throws Exception
+	{
+		Bitmap pageImage = result.loadImage( pageId );
+		PageHolder pageHolder = new PageHolder( pageNumber );
+		pageHolder.setDocumentBoundary( result.loadBoundary( pageId ) );
+		if( pageImage != null ) {
+			pageHolder.setFrameSize( new Point( pageImage.getWidth(), pageImage.getHeight() ) );
+		}
+		RtrManager.getImageCaptureResult().append( pageNumber, pageHolder );
+		return new Pair<>( pageHolder, pageImage );
+	}
+
+	public MultiPageImageCaptureScenario.Result getResult()
+	{
+		return result;
 	}
 }

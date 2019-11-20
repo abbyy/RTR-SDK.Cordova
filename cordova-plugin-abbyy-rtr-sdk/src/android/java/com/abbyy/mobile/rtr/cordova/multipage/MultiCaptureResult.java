@@ -1,3 +1,6 @@
+// ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
+
 package com.abbyy.mobile.rtr.cordova.multipage;
 
 import android.content.Context;
@@ -13,9 +16,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Utility class to build the JSON results
+ */
 public class MultiCaptureResult {
 
-	public static HashMap<String, Object> getJsonResult( SparseArray<PageHolder> pages, Context context, boolean automaticallyStopped )
+	public static HashMap<String, Object> getJsonResult( SparseArray<PageHolder> pages, Context context )
 	{
 		HashMap<String, Object> json = new HashMap<>();
 		int pageCount = pages.size();
@@ -32,9 +38,6 @@ public class MultiCaptureResult {
 			json.put( "pdfInfo", pdfInfo );
 		}
 		HashMap<String, Object> resultInfo = new HashMap<>();
-		if( !automaticallyStopped ) {
-			resultInfo.put( "userAction", "Manually Stopped" );
-		}
 		json.put( "resultInfo", resultInfo );
 		return json;
 	}
@@ -47,7 +50,6 @@ public class MultiCaptureResult {
 		}
 		pageJson.put( "filePath", pageHolder.getPageFile().getPath() );
 		HashMap<String, Object> pageResultJson = new HashMap<>();
-		pageResultJson.put( "cropped", pageHolder.isCropped() );
 		pageResultJson.put( "exportType", ImageCaptureSettings.exportType.toString() );
 		if( pageHolder.getDocumentBoundary() != null ) {
 			StringBuilder boundary = new StringBuilder();

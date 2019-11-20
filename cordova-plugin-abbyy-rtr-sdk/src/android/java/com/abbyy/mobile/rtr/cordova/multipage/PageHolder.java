@@ -1,27 +1,27 @@
+// ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
+
 package com.abbyy.mobile.rtr.cordova.multipage;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 
-import com.abbyy.mobile.rtr.cordova.utils.ImageSaver;
 import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 public class PageHolder {
 	private int pageNumber;
 	private File pageFile;
-	private Bitmap pageImage;
-	private boolean cropped = false;
 	private Point[] documentBoundary;
 	private Point frameSize;
 	private String base64;
 
-	public PageHolder( int capturePageNumber, Bitmap pageImage )
+	public PageHolder( int capturePageNumber )
 	{
 		pageNumber = capturePageNumber;
-		this.pageImage = pageImage;
 	}
 
 	public File getPageFile()
@@ -29,46 +29,16 @@ public class PageHolder {
 		return pageFile;
 	}
 
-	public void setPageFile( File pageFile )
-	{
-		this.pageFile = pageFile;
-	}
-
-	public Bitmap getPageImage()
-	{
-		return pageImage;
-	}
-
-	public void setPageImage( Bitmap pageImage )
-	{
-		this.pageImage = pageImage;
-	}
-
 	public int getPageNumber()
 	{
 		return pageNumber;
 	}
 
-	public void saveToFile( Context context, ImageSaver.Callback callback )
+	public void saveToFile( Bitmap pageImage, Context context ) throws IOException
 	{
-		if (pageImage == null) {
-			return;
-		}
 		this.pageFile = ImageUtils.getCaptureSessionPageFile( pageNumber, context );
 
-		ImageSaver tempImageSaver = new ImageSaver( pageImage, pageFile, callback );
-		pageImage = null;
-		tempImageSaver.execute();
-	}
-
-	public boolean isCropped()
-	{
-		return cropped;
-	}
-
-	public void setCropped( boolean isCropped )
-	{
-		cropped = isCropped;
+		ImageUtils.saveBitmap( pageImage, pageFile );
 	}
 
 	public void setDocumentBoundary( Point[] documentBoundary )
@@ -99,10 +69,5 @@ public class PageHolder {
 	public String getBase64()
 	{
 		return base64;
-	}
-
-	public boolean isSaved()
-	{
-		return pageImage == null && pageFile != null;
 	}
 }
