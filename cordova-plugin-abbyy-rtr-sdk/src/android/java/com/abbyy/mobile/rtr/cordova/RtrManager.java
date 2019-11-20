@@ -138,10 +138,10 @@ public class RtrManager {
 	{
 		return ratioWidth;
 	}
-	
-	public static int getOrientation() 
-	{ 
-		return orientation; 
+
+	public static int getOrientation()
+	{
+		return orientation;
 	}
 
 	public static void setLicenseFileName( String licenseFileName )
@@ -181,7 +181,7 @@ public class RtrManager {
 	{
 		ratioWidth = width;
 	}
-	
+
 	public static void setOrientation( int orientation )
 	{
 		RtrManager.orientation = orientation;
@@ -256,7 +256,8 @@ public class RtrManager {
 		RtrManager.imageCaptureResult = pages;
 	}
 
-	public static IImagingCoreAPI getImagingCoreAPI() {
+	public static IImagingCoreAPI getImagingCoreAPI()
+	{
 		return engine.createImagingCoreAPI();
 	}
 }

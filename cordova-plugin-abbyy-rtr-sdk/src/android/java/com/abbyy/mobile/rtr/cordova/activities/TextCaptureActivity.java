@@ -87,7 +87,7 @@ public class TextCaptureActivity extends BaseActivity {
 		public void onError( Exception e )
 		{
 			// An error occurred while processing. Log it. Processing will continue
-			Log.e( getString( ResourcesUtils.getResId( "string", "app_name", context ) ), "Error: " + e.getMessage() );
+			Log.e( getString( ResourcesUtils.getResId( "string", "app_name", TextCaptureActivity.this ) ), "Error: " + e.getMessage() );
 
 			// Make the error easily visible to the developer
 			String message = e.getMessage();
@@ -153,8 +153,8 @@ public class TextCaptureActivity extends BaseActivity {
 				putErrorIfEssential( json );
 
 				intent.putExtra( "result", json );
-				( (Activity) context ).setResult( RtrPlugin.RESULT_OK, intent );
-				( (Activity) context ).finish();
+				TextCaptureActivity.this.setResult( RtrPlugin.RESULT_OK, intent );
+				TextCaptureActivity.this.finish();
 			}
 		}, 0 );
 	}
@@ -226,17 +226,16 @@ public class TextCaptureActivity extends BaseActivity {
 		// Clear error text, e.g. for errors depending on current selected languages.
 		errorTextView.setText( "" );
 
-		Intent intent = LanguagesSettingActivity.newIntent( context );
+		Intent intent = LanguagesSettingActivity.newIntent( this );
 		ActivityOptions options =
-			ActivityOptions.makeCustomAnimation( context, ResourcesUtils.getResId( "anim", "from_left_to_right", context ), 0 );
+			ActivityOptions.makeCustomAnimation( this, ResourcesUtils.getResId( "anim", "from_left_to_right", this ), 0 );
 		startActivityForResult( intent, 0, options.toBundle() ); //don't need any codes
 	}
 
 	@Override
 	protected void checkPreferences()
 	{
-
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( context );
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( this );
 
 		List<Language> tempList = new ArrayList<>();
 		for( Language language : RtrManager.getLanguages() ) {
@@ -274,9 +273,9 @@ public class TextCaptureActivity extends BaseActivity {
 	@Override
 	protected void onCreate( @Nullable Bundle savedInstanceState )
 	{
-		surfaceViewWithOverlay = new TextCaptureSurfaceView( context );
+		surfaceViewWithOverlay = new TextCaptureSurfaceView( this );
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( context );
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( this );
 		for( Language language : RtrManager.getSelectedLanguages() ) {
 			sharedPreferences.edit().putBoolean( language.name(), true ).apply();
 		}

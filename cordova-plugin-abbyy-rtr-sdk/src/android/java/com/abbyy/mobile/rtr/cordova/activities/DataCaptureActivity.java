@@ -88,7 +88,7 @@ public class DataCaptureActivity extends BaseActivity {
 		public void onError( Exception e )
 		{
 			// An error occurred while processing. Log it. Processing will continue
-			Log.e( getString( ResourcesUtils.getResId( "string", "app_name", context ) ), "Error: " + e.getMessage() );
+			Log.e( getString( ResourcesUtils.getResId( "string", "app_name", DataCaptureActivity.this ) ), "Error: " + e.getMessage() );
 			//Make the error easily visible to the developer
 			String message = e.getMessage();
 			errorTextView.setText( message );
@@ -188,8 +188,8 @@ public class DataCaptureActivity extends BaseActivity {
 				putErrorIfEssential( json );
 
 				intent.putExtra( "result", json );
-				( (Activity) context ).setResult( RtrPlugin.RESULT_OK, intent );
-				( (Activity) context ).finish();
+				DataCaptureActivity.this.setResult( RtrPlugin.RESULT_OK, intent );
+				DataCaptureActivity.this.finish();
 			}
 		}, 0 );
 	}
@@ -319,7 +319,7 @@ public class DataCaptureActivity extends BaseActivity {
 	@Override
 	protected void onCreate( @Nullable Bundle savedInstanceState )
 	{
-		surfaceView = new DataCaptureSurfaceView( context );
+		surfaceView = new DataCaptureSurfaceView( this );
 		super.onCreate( savedInstanceState );
 	}
 

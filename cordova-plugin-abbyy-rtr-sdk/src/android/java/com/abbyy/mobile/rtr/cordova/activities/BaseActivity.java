@@ -38,8 +38,6 @@ import java.util.List;
 @SuppressWarnings( "deprecation" )
 abstract class BaseActivity extends Activity {
 
-	protected Context context = this;
-
 	///////////////////////////////////////////////////////////////////////////////
 	// Some application settings that can be changed to modify application behavior:
 	// The camera zoom. Optically zooming with a good camera often improves results
@@ -133,7 +131,7 @@ abstract class BaseActivity extends Activity {
 		try {
 			camera.setPreviewDisplay( previewSurfaceHolder );
 		} catch( Throwable t ) {
-			Log.e( getString( ResourcesUtils.getResId( "string", "app_name", context ) ), "Exception in setPreviewDisplay()", t );
+			Log.e( getString( ResourcesUtils.getResId( "string", "app_name", this ) ), "Exception in setPreviewDisplay()", t );
 		}
 		configureCameraAndStartPreview( camera );
 	}
@@ -360,7 +358,7 @@ abstract class BaseActivity extends Activity {
 				setCameraFocusMode( Camera.Parameters.FOCUS_MODE_AUTO );
 				camera.autoFocus( callback );
 			} catch( Exception e ) {
-				Log.e( getString( ResourcesUtils.getResId( "string", "app_name", context ) ), "Error: " + e.getMessage() );
+				Log.e( getString( ResourcesUtils.getResId( "string", "app_name", this ) ), "Error: " + e.getMessage() );
 			}
 		}
 	}
@@ -522,8 +520,8 @@ abstract class BaseActivity extends Activity {
 				putErrorIfEssential( json );
 
 				intent.putExtra( "result", json );
-				( (Activity) context ).setResult( RtrPlugin.RESULT_OK, intent );
-				( (Activity) context ).finish();
+				BaseActivity.this.setResult( RtrPlugin.RESULT_OK, intent );
+				BaseActivity.this.finish();
 			}
 		}, 0 );
 	}
@@ -538,8 +536,8 @@ abstract class BaseActivity extends Activity {
 		putErrorIfEssential( json );
 
 		intent.putExtra( "result", json );
-		( (Activity) context ).setResult( RtrPlugin.RESULT_FAIL, intent );
-		( (Activity) context ).finish();
+		setResult( RtrPlugin.RESULT_FAIL, intent );
+		finish();
 	}
 
 	public void onFlashButtonClick( View view )
@@ -547,16 +545,17 @@ abstract class BaseActivity extends Activity {
 		if( camera == null ) {
 			return;
 		}
+		ImageButton flashButton = (ImageButton) view;
 
 		Camera.Parameters params = camera.getParameters();
 		if( !isFlashLightOn ) {
 			params.setFlashMode( Camera.Parameters.FLASH_MODE_TORCH );
 			isFlashLightOn = true;
-			( (ImageButton) view ).setImageResource( ResourcesUtils.getResId( "drawable", "ic_flash_off_24dp", context ) );
+			flashButton.setImageResource( ResourcesUtils.getResId( "drawable", "ic_flash_off_24dp", this ) );
 		} else {
 			params.setFlashMode( Camera.Parameters.FLASH_MODE_OFF );
 			isFlashLightOn = false;
-			( (ImageButton) view ).setImageResource( ResourcesUtils.getResId( "drawable", "ic_flash_on_24dp", context ) );
+			flashButton.setImageResource( ResourcesUtils.getResId( "drawable", "ic_flash_on_24dp", this ) );
 		}
 		camera.setParameters( params );
 
@@ -609,15 +608,15 @@ abstract class BaseActivity extends Activity {
 		getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN,
 			WindowManager.LayoutParams.FLAG_FULLSCREEN );
 
-		setContentView( ResourcesUtils.getResId( "layout", "activity_capture", context ) );
+		setContentView( ResourcesUtils.getResId( "layout", "activity_capture", this ) );
 
 		// Retrieve some ui components
-		warningTextView = (TextView) findViewById( ResourcesUtils.getResId( "id", "warningText", context ) );
-		errorTextView = (TextView) findViewById( ResourcesUtils.getResId( "id", "errorText", context ) );
-		startButton = (Button) findViewById( ResourcesUtils.getResId( "id", "startButton", context ) );
-		preferenceButton = (Button) findViewById( ResourcesUtils.getResId( "id", "preferenceButton", context ) );
-		flashButton = (ImageButton) findViewById( ResourcesUtils.getResId( "id", "flashButton", context ) );
-		scenarioDescription = (TextView) findViewById( ResourcesUtils.getResId( "id", "scenarioDescription", context ) );
+		warningTextView = (TextView) findViewById( ResourcesUtils.getResId( "id", "warningText", this ) );
+		errorTextView = (TextView) findViewById( ResourcesUtils.getResId( "id", "errorText", this ) );
+		startButton = (Button) findViewById( ResourcesUtils.getResId( "id", "startButton", this ) );
+		preferenceButton = (Button) findViewById( ResourcesUtils.getResId( "id", "preferenceButton", this ) );
+		flashButton = (ImageButton) findViewById( ResourcesUtils.getResId( "id", "flashButton", this ) );
+		scenarioDescription = (TextView) findViewById( ResourcesUtils.getResId( "id", "scenarioDescription", this ) );
 
 		configureUi();
 
