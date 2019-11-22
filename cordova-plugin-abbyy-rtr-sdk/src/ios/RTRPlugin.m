@@ -193,6 +193,7 @@
 					[weakSelf.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 				}];
 			};
+			self.imageCaptureHolder.modalPresentationStyle = UIModalPresentationFullScreen;
 			[self.viewController presentViewController:self.imageCaptureHolder animated:YES completion:nil];
 		});
 
