@@ -174,10 +174,20 @@
 			}
 			return nil;
 		}
+		NSArray<NSValue*>* boudnary = [result loadBoundaryWithId:identifier error:error];
+		if(boudnary == nil) {
+			return nil;
+		}
+		NSMutableString* boundaryString = @"".mutableCopy;
+		for(NSValue* pointValue in boudnary) {
+			CGPoint point = pointValue.CGPointValue;
+			[boundaryString appendFormat:@"%@ %@ ", @((int)point.x), @((int)point.y)];
+		}
 		[images addObject:@{
 			@"filePath": path,
 			@"resultInfo": @{
-				@"exportType": [NSDictionary rtr_exportTypeToString][@([self singleImageExportType])]
+				@"exportType": [NSDictionary rtr_exportTypeToString][@([self singleImageExportType])],
+				@"boundary": boundaryString
 			}
 		}];
 	}
@@ -226,10 +236,22 @@
 	if(image == nil) {
 		return nil;
 	}
-	return [self exportSingleImageBase64:image error:error];
+	NSArray<NSValue*>* boudnary = [result loadBoundaryWithId:identifier error:error];
+	if(boudnary == nil) {
+		return nil;
+	}
+	NSMutableString* boundaryString = @"".mutableCopy;
+	for(NSValue* pointValue in boudnary) {
+		CGPoint point = pointValue.CGPointValue;
+		[boundaryString appendFormat:@"%@ %@ ", @((int)point.x), @((int)point.y)];
+	}
+	return [self exportSingleImageBase64:image info:@{
+		@"boundary": boundaryString,
+		@"exportType": [NSDictionary rtr_exportTypeToString][@([self singleImageExportType])]
+	} error:error];
 }
 
-- (NSArray*)exportSingleImageBase64:(UIImage*)image error:(NSError**)error
+- (NSArray*)exportSingleImageBase64:(UIImage*)image info:(NSDictionary*)info error:(NSError**)error
 {
 	RTRMemoryOutputStream* stream = [RTRMemoryOutputStream new];
 	id<RTRCoreAPIExportOperation> exporter = [self exporterWithOutput:stream];
@@ -242,9 +264,7 @@
 	}
 	return @[@{
 		@"base64": [stream.data base64EncodedStringWithOptions:0],
-		@"resultInfo": @{
-			@"exportType": [NSDictionary rtr_exportTypeToString][@([self singleImageExportType])]
-		}
+		@"resultInfo": info
 	}];
 }
 
