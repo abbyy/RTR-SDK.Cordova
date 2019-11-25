@@ -1,3 +1,6 @@
+// ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
+
 package com.abbyy.mobile.rtr.cordova;
 
 import android.Manifest;
@@ -92,7 +95,7 @@ public class RtrPlugin extends CordovaPlugin {
 	private JSONObject inputParameters;
 
 	@Override
-	public boolean execute( String action, JSONArray args, final CallbackContext callbackContext ) throws JSONException
+	public boolean execute( String action, JSONArray args, final CallbackContext callbackContext )
 	{
 		if( "startImageCapture".equals( action ) ) {
 			PreferenceManager.getDefaultSharedPreferences( cordova.getActivity().getApplicationContext() ).edit().clear().apply();
@@ -102,10 +105,7 @@ public class RtrPlugin extends CordovaPlugin {
 						RtrManager.setExtendedSettings( parseExtendedSettings( inputParameters ) );
 					}
 					parseImageCaptureSettings( inputParameters );
-				} catch( IllegalArgumentException e ) {
-					onError( e.getMessage() );
-					return false;
-				} catch( JSONException e ) {
+				} catch( IllegalArgumentException | JSONException e ) {
 					onError( e.getMessage() );
 					return false;
 				}
@@ -143,10 +143,7 @@ public class RtrPlugin extends CordovaPlugin {
 				try {
 					parseScenario( inputParameters );
 					parseUiSettings( inputParameters );
-				} catch( IllegalArgumentException e ) {
-					onError( e.getMessage() );
-					return false;
-				} catch( JSONException e ) {
+				} catch( IllegalArgumentException | JSONException e ) {
 					onError( e.getMessage() );
 					return false;
 				}
@@ -192,9 +189,9 @@ public class RtrPlugin extends CordovaPlugin {
 	private void checkPermissionAndStartImageCapture()
 	{
 		if( !this.cordova.hasPermission( REQUIRED_PERMISSION ) ||
-			!this.cordova.hasPermission( Manifest.permission.WRITE_EXTERNAL_STORAGE )) {
+			!this.cordova.hasPermission( Manifest.permission.WRITE_EXTERNAL_STORAGE ) ) {
 			this.cordova.requestPermissions( this, REQUEST_CODE_PERMISSIONS_IMAGE_CAPTURE,
-				new String[]{REQUIRED_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE } );
+				new String[] { REQUIRED_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE } );
 			return;
 		}
 		startImageCapture();
@@ -241,7 +238,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	@Override
 	public void onRequestPermissionResult( int requestCode, String[] permissions,
-		int[] grantResults ) throws JSONException
+		int[] grantResults )
 	{
 		for( int result : grantResults ) {
 			if( result == PackageManager.PERMISSION_DENIED ) {
@@ -274,8 +271,7 @@ public class RtrPlugin extends CordovaPlugin {
 					HashMap<String, Object> result = (HashMap<String, Object>) intent.getSerializableExtra( INTENT_RESULT_KEY );
 					if( requestCode == REQUEST_CODE_IMAGE_CAPTURE ) {
 						// For image capture we constuct successful result json right before passing to JS
-						boolean isAutomaticCapture = (boolean) result.get( "captureFinishAutomatically" );
-						result = MultiCaptureResult.getJsonResult( RtrManager.getImageCaptureResult(), cordova.getContext(), isAutomaticCapture );
+						result = MultiCaptureResult.getJsonResult( RtrManager.getImageCaptureResult(), cordova.getContext() );
 						RtrManager.setImageCaptureResult( null );
 					}
 					callback.success( new JSONObject( result ) );
@@ -459,9 +455,6 @@ public class RtrPlugin extends CordovaPlugin {
 			String[] parts = arg.getString( RTR_DOCUMENT_SIZE_KEY ).split( " " );
 			if( parts.length == 1 ) {
 				switch( parts[0] ) {
-					case "Any":
-						size = ImageCaptureScenario.DocumentSize.ANY;
-						break;
 					case "A4":
 						size = ImageCaptureScenario.DocumentSize.A4;
 						break;
@@ -471,6 +464,7 @@ public class RtrPlugin extends CordovaPlugin {
 					case "Letter":
 						size = ImageCaptureScenario.DocumentSize.LETTER;
 						break;
+					case "Any":
 					default:
 						size = ImageCaptureScenario.DocumentSize.ANY;
 				}

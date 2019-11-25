@@ -1,3 +1,6 @@
+// ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
+
 package com.abbyy.mobile.rtr.cordova.settings;
 
 import android.content.Context;
@@ -47,7 +50,7 @@ public class LanguagesSettingActivity extends PreferenceActivity {
 
 		setPreferenceScreen( screen );
 
-		TextView okButton = (TextView) findViewById( ResourcesUtils.getResId( "id", "ok_button", this ) );
+		TextView okButton = findViewById( ResourcesUtils.getResId( "id", "ok_button", this ) );
 		okButton.setOnClickListener( new View.OnClickListener() {
 			@Override
 			public void onClick( View v )

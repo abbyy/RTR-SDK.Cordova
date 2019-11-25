@@ -1,6 +1,8 @@
+// ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
+
 package com.abbyy.mobile.rtr.cordova.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -224,9 +226,7 @@ public class DataCaptureActivity extends BaseActivity {
 		if( profile != null ) {
 			try {
 				captureService = RtrManager.createDataCaptureService( profile, captureCallback );
-			} catch( InitializationException e ) {
-				onStartupError( e );
-			} catch( IllegalArgumentException e ) {
+			} catch( InitializationException | IllegalArgumentException e ) {
 				onStartupError( e );
 			}
 		} else {
@@ -246,11 +246,7 @@ public class DataCaptureActivity extends BaseActivity {
 				field.setRegEx( currentScenario.regEx );
 
 				profileBuilder.checkAndApply();
-			} catch( InitializationException e ) {
-				onStartupError( e );
-			} catch( IDataCaptureProfileBuilder.ProfileCheckException e ) {
-				onStartupError( e );
-			} catch( IllegalArgumentException e ) {
+			} catch( InitializationException | IDataCaptureProfileBuilder.ProfileCheckException | IllegalArgumentException e ) {
 				onStartupError( e );
 			}
 		}
@@ -278,7 +274,6 @@ public class DataCaptureActivity extends BaseActivity {
 		return captureService;
 	}
 
-	@Override
 	public void onStartButtonClick( View view )
 	{
 		if( startButton.getText().equals( BUTTON_TEXT_STOP ) ) {

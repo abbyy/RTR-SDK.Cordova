@@ -1,6 +1,8 @@
+// ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
+
 package com.abbyy.mobile.rtr.cordova.activities;
 
-import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
@@ -18,8 +20,8 @@ import com.abbyy.mobile.rtr.Language;
 import com.abbyy.mobile.rtr.cordova.ResourcesUtils;
 import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.RtrPlugin;
-import com.abbyy.mobile.rtr.cordova.settings.LanguagesSettingActivity;
 import com.abbyy.mobile.rtr.cordova.exceptions.InitializationException;
+import com.abbyy.mobile.rtr.cordova.settings.LanguagesSettingActivity;
 import com.abbyy.mobile.rtr.cordova.surfaces.BaseSurfaceView;
 import com.abbyy.mobile.rtr.cordova.surfaces.TextCaptureSurfaceView;
 
@@ -202,7 +204,6 @@ public class TextCaptureActivity extends BaseActivity {
 		return captureService;
 	}
 
-	@Override
 	public void onStartButtonClick( View view )
 	{
 		if( startButton.getText().equals( BUTTON_TEXT_STOP ) ) {

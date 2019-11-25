@@ -1,7 +1,10 @@
+// ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
+
 package com.abbyy.mobile.rtr.cordova;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
 import com.abbyy.mobile.rtr.Engine;
@@ -13,6 +16,7 @@ import com.abbyy.mobile.rtr.cordova.exceptions.InitializationException;
 import com.abbyy.mobile.rtr.cordova.multipage.PageHolder;
 import com.abbyy.mobile.uicomponents.CaptureView;
 import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario;
+import com.abbyy.mobile.uicomponents.scenario.MultiPageImageCaptureScenario;
 
 import java.io.IOException;
 import java.util.List;
@@ -187,13 +191,22 @@ public class RtrManager {
 		RtrManager.orientation = orientation;
 	}
 
-	public static ImageCaptureScenario getImageCaptureScenario()
+	public static MultiPageImageCaptureScenario getImageCaptureScenario( Context context ) throws Exception
 	{
-		ImageCaptureScenario scenario = new ImageCaptureScenario( engine );
-		scenario.setCropEnabled( ImageCaptureSettings.cropEnabled );
-		scenario.setDocumentSize( ImageCaptureSettings.documentSize );
-		scenario.setMinimumDocumentToViewRatio( ImageCaptureSettings.documentToViewRatio );
-		return scenario;
+		MultiPageImageCaptureScenario.Builder builder = new MultiPageImageCaptureScenario.Builder( engine, context );
+		builder.setShowPreviewEnabled( ImageCaptureSettings.showResultOnCapture );
+		builder.setRequiredPageCount( ImageCaptureSettings.pageCount );
+		builder.setCaptureSettings( new MultiPageImageCaptureScenario.CaptureSettings() {
+			@Override
+			public void onConfigureImageCaptureSettings(
+				@NonNull com.abbyy.mobile.uicomponents.scenario.ImageCaptureSettings imageCaptureSettings, int index
+			)
+			{
+				imageCaptureSettings.setDocumentSize( ImageCaptureSettings.documentSize );
+				imageCaptureSettings.setMinimumDocumentToViewRatio( ImageCaptureSettings.documentToViewRatio );
+			}
+		} );
+		return builder.build();
 	}
 
 	public static void setCameraResolution( CaptureView.CameraSettings.Resolution resolution )

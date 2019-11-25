@@ -1,3 +1,6 @@
+// ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
+
 package com.abbyy.mobile.rtr.cordova.surfaces;
 
 import android.content.Context;
@@ -84,7 +87,6 @@ public abstract class BaseSurfaceView extends SurfaceView {
 
 	protected void setTextPaint( IRecognitionService.ResultStabilityStatus resultStatus )
 	{
-
 		switch( resultStatus ) {
 			case NotReady:
 				textPaint.setARGB( 255, 128, 0, 0 );
@@ -105,7 +107,6 @@ public abstract class BaseSurfaceView extends SurfaceView {
 				textPaint.setARGB( 255, 0, 128, 0 );
 				break;
 		}
-
 	}
 
 	// Transforms point to canvas coordinates

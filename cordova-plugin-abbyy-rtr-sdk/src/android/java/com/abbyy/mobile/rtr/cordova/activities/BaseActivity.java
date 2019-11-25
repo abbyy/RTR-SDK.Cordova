@@ -1,3 +1,6 @@
+// ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
+
 package com.abbyy.mobile.rtr.cordova.activities;
 
 import android.app.Activity;
@@ -30,7 +33,9 @@ import com.abbyy.mobile.rtr.cordova.ResourcesUtils;
 import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.RtrPlugin;
 import com.abbyy.mobile.rtr.cordova.surfaces.BaseSurfaceView;
+import com.abbyy.mobile.rtr.cordova.utils.BackgroundWorker;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -447,8 +452,26 @@ abstract class BaseActivity extends Activity {
 		}
 	}
 
-	// The 'Start' and 'Stop' button
-	public abstract void onStartButtonClick( View view );
+	private BackgroundWorker.Callback<Void, Void> recognitionStopCallback = new BackgroundWorker.Callback<Void, Void>() {
+		@Override
+		public Void doWork( Void aVoid, BackgroundWorker<Void, Void> worker )
+		{
+			getCaptureService().stop();
+			return null;
+		}
+
+		@Override
+		public void onDone( Void result, Exception exception, BackgroundWorker<Void, Void> worker )
+		{
+			if( previewSurfaceHolder != null ) {
+				// Restore normal power saving behaviour
+				previewSurfaceHolder.setKeepScreenOn( false );
+			}
+			// Change the text on the stop button back to 'Start'
+			startButton.setText( BUTTON_TEXT_START );
+			startButton.setEnabled( true );
+		}
+	};
 
 	// Stop recognition
 	protected void stopRecognition()
@@ -458,24 +481,7 @@ abstract class BaseActivity extends Activity {
 
 		// Stop the service asynchronously to make application more responsive. Stopping can take some time
 		// waiting for all processing threads to stop
-		new AsyncTask<Void, Void, Void>() {
-			protected Void doInBackground( Void... params )
-			{
-				getCaptureService().stop();
-				return null;
-			}
-
-			protected void onPostExecute( Void result )
-			{
-				if( previewSurfaceHolder != null ) {
-					// Restore normal power saving behaviour
-					previewSurfaceHolder.setKeepScreenOn( false );
-				}
-				// Change the text on the stop button back to 'Start'
-				startButton.setText( BUTTON_TEXT_START );
-				startButton.setEnabled( true );
-			}
-		}.execute();
+		new BackgroundWorker<>( new WeakReference<>( recognitionStopCallback ) ).execute();
 	}
 
 	protected void startRecognition()
@@ -558,7 +564,6 @@ abstract class BaseActivity extends Activity {
 			flashButton.setImageResource( ResourcesUtils.getResId( "drawable", "ic_flash_on_24dp", this ) );
 		}
 		camera.setParameters( params );
-
 	}
 
 	protected abstract void checkPreferences();
@@ -599,7 +604,7 @@ abstract class BaseActivity extends Activity {
 	protected void onCreate( @Nullable Bundle savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
-		
+
 		if( RtrManager.getOrientation() != ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED ) {
 			setRequestedOrientation( RtrManager.getOrientation() );
 		}

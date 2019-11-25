@@ -1,3 +1,6 @@
+// ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
+
 package com.abbyy.mobile.rtr.cordova.surfaces;
 
 import android.content.Context;
@@ -24,7 +27,7 @@ public class DataCaptureSurfaceView extends BaseSurfaceView {
 		fieldPaint.setARGB( 255, 128, 128, 128 );
 	}
 
-	public void setLines( IDataCaptureService.DataField fields[],
+	public void setLines( IDataCaptureService.DataField[] fields,
 		IDataCaptureService.ResultStabilityStatus resultStatus )
 	{
 		if( fields != null && scaleDenominatorX > 0 && scaleDenominatorY > 0 ) {
