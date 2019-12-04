@@ -108,6 +108,7 @@ h1 {
 #tab_settings_tc:checked ~ #settings { display: block; }
 #tab_settings_regex:checked ~ #settings { display: block; }
 #tab_settings_mrz:checked ~ #settings { display: block; }
+#tab_settings_bcr:checked ~ #settings { display: block; }
 
 .settings {
 	font-size: 16px;

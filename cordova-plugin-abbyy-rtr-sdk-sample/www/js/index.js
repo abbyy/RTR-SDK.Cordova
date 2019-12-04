@@ -103,7 +103,8 @@ var stopWhenStable = document.getElementById('stopWhenStable');
 var imageCaptureTab = document.getElementById('tab_settings_ic');
 var textCaptureTab = document.getElementById('tab_settings_tc');
 var customDataCaptureTab = document.getElementById('tab_settings_regex');
-var dataCaptureTab = document.getElementById('tab_settings_mrz');
+var dataCaptureMRZTab = document.getElementById('tab_settings_mrz');
+var dataCaptureBCRTab = document.getElementById('tab_settings_bcr');
 
 var areaOfInterestWidth = new Slider('areaOfInterestWidth', 'widthValue');
 var areaOfInterestHeight = new Slider('areaOfInterestHeight', 'heightValue');
@@ -133,9 +134,9 @@ function imageCapture() {
 		cameraResolution : cameraResolution(), // optional, default=FullHD (HD, FullHD, 4K)
 		isFlashlightButtonVisible : isFlashlightButtonVisibleIC.checked, // optional, default=true
 		isCaptureButtonVisible : isCaptureButtonVisible.checked, // optional, default=false
-		orientation: orientationIC(), // optional, default=default
-		showPreview: showPreviewIC.checked, // optional, default=false
-		maxImagesCount: maxImagesCount(), // optional, default=0
+		orientation : orientationIC(), // optional, default=default
+		showPreview : showPreviewIC.checked, // optional, default=false
+		maxImagesCount : maxImagesCount(), // optional, default=0
 
 		destination : destination(), // optional, captured image will be saved to corresponding file ("file") or returned as encode base64 image string ("base64"). default=file
 		exportType : exportType(), // optional, default=jpg (jpg, png, pdf).
@@ -161,7 +162,7 @@ function textCapture() {
 		stopWhenStable : stopWhenStable.checked,
 		areaOfInterest : (areaOfInterestWidth.current() + " " + areaOfInterestHeight.current()),
 		isStopButtonVisible : isStopButtonVisible.checked,
-		orientation: Orientation(),
+		orientation : Orientation(),
 	});
 }
 
@@ -181,11 +182,11 @@ function customDataCapture() {
 		stopWhenStable : stopWhenStable.checked,
 		areaOfInterest : areaOfInterestWidth.current() + " " + areaOfInterestHeight.current(),
 		isStopButtonVisible : isStopButtonVisible.checked,
-		orientation: Orientation(),
+		orientation : Orientation(),
 	});
 }
 
-function dataCapture() {
+function dataCaptureMRZ() {
 	AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
 		profile : "MRZ",
 
@@ -195,19 +196,36 @@ function dataCapture() {
 		areaOfInterest : areaOfInterestWidth.current() + " " + areaOfInterestHeight.current(),
 		isStopButtonVisible : isStopButtonVisible.checked,
 		orientation: Orientation(),
+		recognitionLanguages : [], // Not supported for this profile
+	});
+}
+
+function dataCaptureBCR() {
+	AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
+		profile : "BusinessCards",
+
+		licenseFileName : "AbbyyRtrSdk.license",
+		isFlashlightVisible : isFlashlightVisible.checked,
+		stopWhenStable : stopWhenStable.checked,
+		areaOfInterest : areaOfInterestWidth.current() + " " + areaOfInterestHeight.current(),
+		isStopButtonVisible : isStopButtonVisible.checked,
+		orientation : Orientation(),
+		recognitionLanguages : ["English"],
 	});
 }
 
 var startCaptureButton = new Button('startCaptureButton', function() {
-	if(imageCaptureTab.checked) {
+	if (imageCaptureTab.checked) {
 		imageCapture();
-	} else if(textCaptureTab.checked) {
+	} else if (textCaptureTab.checked) {
 		textCapture();
-	} else if(customDataCaptureTab.checked) {
+	} else if (customDataCaptureTab.checked) {
 		customDataCapture();
-	} else if(dataCaptureTab.checked) {
-		dataCapture();
-	}
+	} else if (dataCaptureMRZTab.checked) {
+		dataCaptureMRZ();
+	} else if (dataCaptureBCRTab.checked) {
+        dataCaptureBCR();
+    }
 });
 
 app.initialize();
