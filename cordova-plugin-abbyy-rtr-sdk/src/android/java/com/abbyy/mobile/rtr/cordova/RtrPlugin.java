@@ -536,25 +536,25 @@ public class RtrPlugin extends CordovaPlugin {
 	private List<Language> parseLanguages( JSONObject arg ) throws JSONException
 	{
 		HashMap<String, String> extendedSettings = RtrManager.getExtendedSettings();
-		List<Language> languages = parseLanguagesInternal( arg, RTR_SELECTABLE_RECOGNITION_LANGUAGES_KEY );
+		List<Language> languages = parseLanguagesInternal( arg, RTR_SELECTABLE_RECOGNITION_LANGUAGES_KEY, true );
 
 		if( extendedSettings != null ) {
 			if( extendedSettings.containsKey( RTR_CUSTOM_RECOGNITION_LANGUAGES ) ) {
 				RtrManager.setLanguageSelectionEnabled( false );
 			} else {
-				RtrManager.setLanguageSelectionEnabled( languages.size() > 0 );
+				RtrManager.setLanguageSelectionEnabled( !languages.isEmpty() );
 			}
 		} else {
-			RtrManager.setLanguageSelectionEnabled( languages.size() > 0 );
+			RtrManager.setLanguageSelectionEnabled( !languages.isEmpty() );
 		}
 		return languages;
 	}
 
 	private List<Language> parseSelectedLanguage( JSONObject arg ) throws JSONException
 	{
-		List<Language> languages = parseLanguagesInternal( arg, RTR_RECOGNITION_LANGUAGES_KEY );
+		List<Language> languages = parseLanguagesInternal( arg, RTR_RECOGNITION_LANGUAGES_KEY, true );
 
-		if( languages.size() == 0 ) {
+		if( languages.isEmpty() ) {
 			languages.add( Language.English );
 		}
 
@@ -617,7 +617,7 @@ public class RtrPlugin extends CordovaPlugin {
 		throw new IllegalArgumentException( "Unknown language name" );
 	}
 
-	private List<Language> parseLanguagesInternal( JSONObject arg, String key ) throws JSONException
+	private List<Language> parseLanguagesInternal( JSONObject arg, String key, boolean isEnglishByDefault ) throws JSONException
 	{
 		List<Language> languages = new ArrayList<>();
 		if( arg.has( key ) ) {
@@ -625,7 +625,7 @@ public class RtrPlugin extends CordovaPlugin {
 			for( int i = 0; i < array.length(); i++ ) {
 				languages.add( parseLanguageName( array.getString( i ) ) );
 			}
-		} else {
+		} else if( isEnglishByDefault ) {
 			languages.add( Language.English );
 		}
 
@@ -682,6 +682,8 @@ public class RtrPlugin extends CordovaPlugin {
 			customScenario = parseCustomScenario( arg );
 		} else if( arg.has( RTR_DATA_CAPTURE_PROFILE_KEY ) ) {
 			profile = arg.getString( RTR_DATA_CAPTURE_PROFILE_KEY );
+			List<Language> languages = parseLanguagesInternal( arg, RTR_RECOGNITION_LANGUAGES_KEY, false );
+			RtrManager.setLanguages( languages );
 		} else {
 			throw new JSONException( "Invalid Data Capture scenario settings." );
 		}

@@ -226,11 +226,21 @@ public class DataCaptureActivity extends BaseActivity {
 		if( profile != null ) {
 			try {
 				captureService = RtrManager.createDataCaptureService( profile, captureCallback );
+				if( !RtrManager.getLanguages().isEmpty() ) {
+					try {
+						IDataCaptureProfileBuilder profileBuilder = captureService.configureDataCaptureProfile();
+						Language[] languages = new Language[RtrManager.getLanguages().size()];
+						languages = RtrManager.getLanguages().toArray( languages );
+						profileBuilder.setRecognitionLanguage( languages );
+						profileBuilder.checkAndApply();
+					} catch( IDataCaptureProfileBuilder.ProfileCheckException e ) {
+						Log.e( getString( ResourcesUtils.getResId( "string", "app_name", DataCaptureActivity.this ) ), "Cannot set recognition languages" );
+					}
+				}
 			} catch( InitializationException | IllegalArgumentException e ) {
 				onStartupError( e );
 			}
 		} else {
-
 			// Custom data capture scenarios
 			captureService = null;
 			try {
