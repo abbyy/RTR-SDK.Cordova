@@ -43,6 +43,49 @@ public class ImageCaptureActivity extends AppCompatActivity implements MultiPage
 	// This dialog is shown when user wants to leave without saving
 	private AlertDialog discardPagesDialog;
 
+	private BackgroundWorker.Callback<Void, Void> clearPagesCallback = new BackgroundWorker.Callback<Void, Void>() {
+		@Override
+		public Void doWork( Void aVoid, BackgroundWorker<Void, Void> worker ) throws Exception
+		{
+			imageCaptureScenario.getResult().clear();
+			return null;
+		}
+
+		@Override
+		public void onDone( Void result, Exception exception, BackgroundWorker<Void, Void> worker )
+		{
+			if( exception != null ) {
+				exception.printStackTrace();
+				finishWithEmptyResult( exception );
+			} else {
+				captureView.setCaptureScenario( imageCaptureScenario );
+			}
+		}
+	};
+
+	private BackgroundWorker.Callback<Boolean, Boolean> multiPagesProcessorCallback = new BackgroundWorker.Callback<Boolean, Boolean>() {
+		@Override
+		public Boolean doWork( Boolean finishedSuccessfully, BackgroundWorker<Boolean, Boolean> worker )
+		{
+			return ( (MultiPagesProcessor) worker ).processPages( finishedSuccessfully );
+		}
+
+		@Override
+		public void onDone( Boolean shouldConfirmFinish, Exception exception, BackgroundWorker<Boolean, Boolean> worker )
+		{
+			if( exception != null ) {
+				exception.printStackTrace();
+				finishWithEmptyResult( exception );
+			} else {
+				if( shouldConfirmFinish ) {
+					showDiscardPagesDialog( ( (MultiPagesProcessor) worker ).getResult() );
+				} else {
+					finishCaptureResult();
+				}
+			}
+		}
+	};
+
 	public static Intent newImageCaptureIntent( Context context )
 	{
 		return new Intent( context, ImageCaptureActivity.class );
@@ -118,26 +161,6 @@ public class ImageCaptureActivity extends AppCompatActivity implements MultiPage
 		new BackgroundWorker<>( new WeakReference<>( clearPagesCallback ) ).execute();
 	}
 
-	private BackgroundWorker.Callback<Void, Void> clearPagesCallback = new BackgroundWorker.Callback<Void, Void>() {
-		@Override
-		public Void doWork( Void aVoid, BackgroundWorker<Void, Void> worker ) throws Exception
-		{
-			imageCaptureScenario.getResult().clear();
-			return null;
-		}
-
-		@Override
-		public void onDone( Void result, Exception exception, BackgroundWorker<Void, Void> worker )
-		{
-			if( exception != null ) {
-				exception.printStackTrace();
-				finishWithEmptyResult( exception );
-			} else {
-				captureView.setCaptureScenario( imageCaptureScenario );
-			}
-		}
-	};
-
 	private void finishWithEmptyResult( Exception error )
 	{
 		Intent intent = new Intent();
@@ -153,29 +176,6 @@ public class ImageCaptureActivity extends AppCompatActivity implements MultiPage
 	{
 		processMultiPages( result, successfulFinish );
 	}
-
-	private BackgroundWorker.Callback<Boolean, Boolean> multiPagesProcessorCallback = new BackgroundWorker.Callback<Boolean, Boolean>() {
-		@Override
-		public Boolean doWork( Boolean finishedSuccessfully, BackgroundWorker<Boolean, Boolean> worker )
-		{
-			return ( (MultiPagesProcessor) worker ).processPages( finishedSuccessfully );
-		}
-
-		@Override
-		public void onDone( Boolean shouldConfirmFinish, Exception exception, BackgroundWorker<Boolean, Boolean> worker )
-		{
-			if( exception != null ) {
-				exception.printStackTrace();
-				finishWithEmptyResult( exception );
-			} else {
-				if( shouldConfirmFinish ) {
-					showDiscardPagesDialog( ( (MultiPagesProcessor) worker ).getResult() );
-				} else {
-					finishCaptureResult();
-				}
-			}
-		}
-	};
 
 	private void processMultiPages( MultiPageImageCaptureScenario.Result result, boolean successfulFinish )
 	{

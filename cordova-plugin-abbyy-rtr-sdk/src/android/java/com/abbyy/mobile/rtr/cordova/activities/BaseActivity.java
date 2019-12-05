@@ -647,7 +647,6 @@ abstract class BaseActivity extends Activity {
 			getSurfaceViewWithOverlay().getHolder().addCallback( surfaceCallback );
 		}
 		layout.setOnClickListener( clickListener );
-
 	}
 
 	@Override
