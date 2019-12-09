@@ -346,7 +346,7 @@ void performBlockOnMainThread(NSInteger delay, void(^block)())
 	[videoDataOutput setSampleBufferDelegate:self queue:videoDataOutputQueue];
 	[videoDataOutput alwaysDiscardsLateVideoFrames];
 	videoDataOutput.videoSettings = [NSDictionary dictionaryWithObject:
-		[NSNumber numberWithInt:kCVPixelFormatType_32BGRA]
+		[NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarFullRange]
 		forKey:(id)kCVPixelBufferPixelFormatTypeKey];
 	NSAssert([_session canAddOutput:videoDataOutput], @"impossible to add AVCaptureVideoDataOutput");
 	[_session addOutput:videoDataOutput];
