@@ -2,6 +2,7 @@
 /// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
 
 #import "RTRTextCaptureViewController.h"
+#import "UIButton+RecognitionLanguages.h"
 
 @interface RTRTextCaptureViewController () <RTRTextCaptureServiceDelegate>
 
@@ -13,8 +14,7 @@
 {
 	[super viewDidLoad];
 
-	[self.settingsButton setTitle:[self languagesButtonTitle] forState:UIControlStateNormal];
-
+	[self.settingsButton rtr_setTitleWithLanguages:self.selectedRecognitionLanguages forState:UIControlStateNormal];
 	RTRExtendedSettings* extendedSettings = [[RTRExtendedSettings alloc] init];
 	[extendedSettings setValue:self.extendedSettings forKey:@"properties"];
 	self.service = [self.rtrManager textCaptureServiceWithLanguages:self.selectedRecognitionLanguages delegate:self extendedSettings:extendedSettings];
@@ -60,20 +60,6 @@
 	});
 }
 
-- (NSString*)languagesButtonTitle
-{
-	if(_selectedRecognitionLanguages.count == 1) {
-		return _selectedRecognitionLanguages.anyObject;
-	}
-
-	NSMutableString* resultTitle = [@"" mutableCopy];
-	for(NSString* language in _selectedRecognitionLanguages) {
-		[resultTitle appendFormat:@"%@ ", [language substringToIndex:MIN(2, language.length)].uppercaseString];
-	}
-	
-	return resultTitle;
-}
-
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView*)tableView didSelectRowAtIndexPath:(NSIndexPath*)indexPath
@@ -88,7 +74,7 @@
 	
 	// Configure settings button
 	self.settingsButton.enabled = _selectedRecognitionLanguages.count > 0;
-	[self.settingsButton setTitle:[self languagesButtonTitle] forState:UIControlStateNormal];
+	[self.settingsButton rtr_setTitleWithLanguages:self.selectedRecognitionLanguages forState:UIControlStateNormal];
 	
 	[tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }

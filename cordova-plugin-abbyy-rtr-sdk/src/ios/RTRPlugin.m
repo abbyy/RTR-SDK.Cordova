@@ -86,6 +86,12 @@
 	}];
 }
 
+- (BOOL)profileSupportsLanguageCustomization:(NSString*)profile manager:(RTRManager*)manager
+{
+	id<RTRDataCaptureService> service = [manager.engine createDataCaptureServiceWithDelegate:(id)self profile:profile];
+	return [service configureDataCaptureProfile] != nil;
+}
+
 - (void)startDataCapture:(CDVInvokedUrlCommand*)command
 {
 	[self.commandDelegate runInBackground:^{
@@ -118,6 +124,12 @@
 				languages:[NSSet setWithArray:languages] description:description];
 		} else if(params[RTRDataCaptureProfileKey] != nil) {
 			rtrViewController.profile = params[RTRDataCaptureProfileKey];
+			rtrViewController.settingsTableContent = params[RTRRecognitionLanguagesKey];
+			BOOL hasLanguages = rtrViewController.settingsTableContent != nil;
+			BOOL languagesUnsupported = ![self profileSupportsLanguageCustomization:rtrViewController.profile manager:self.rtrManager];
+			if(hasLanguages && languagesUnsupported) {
+				errorDescription = @"Recognition languages for this profile is not customizable";
+			}
 		} else {
 			errorDescription = @"Invalid Data Capture scenario settings. Specify Data Capture profile or params for Custom Data Capture Scenario.";
 		}

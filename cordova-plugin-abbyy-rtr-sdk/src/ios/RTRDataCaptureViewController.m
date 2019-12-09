@@ -3,6 +3,7 @@
 
 #import "RTRDataCaptureViewController.h"
 #import "RTRDataCaptureScenario.h"
+#import "UIButton+RecognitionLanguages.h"
 
 @interface RTRDataCaptureViewController () <RTRDataCaptureServiceDelegate>
 
@@ -22,8 +23,20 @@
 	RTRExtendedSettings* extendedSettings = [[RTRExtendedSettings alloc] init];
 	[extendedSettings setValue:self.extendedSettings forKey:@"properties"];
 	if(self.profile.length != 0) {
-		[self.settingsButton setTitle:self.profile forState:UIControlStateNormal];
 		self.service = [self.rtrManager dataCaptureServiceWithProfile:self.profile delegate:self extendedSettings:extendedSettings];
+		if(self.settingsTableContent != nil) {
+			NSSet* languagesSet = [NSSet setWithArray:self.settingsTableContent];
+			[self.settingsButton rtr_setTitleWithLanguages:languagesSet forState:UIControlStateNormal];
+			self.descriptionLabel.text = self.profile;
+			id<RTRDataCaptureProfileBuilder> builder = [(id<RTRDataCaptureService>)self.service configureDataCaptureProfile];
+			NSError* error = [[builder setRecognitionLanguages:languagesSet] checkAndApply];
+			if(error != nil) {
+				self.errorOccurred = error.localizedDescription;
+				self.onCancel();
+			}
+		} else {
+			[self.settingsButton setTitle:self.profile forState:UIControlStateNormal];
+		}
 	} else {
 		[self.settingsButton setTitle:self.selectedScenario.name forState:UIControlStateNormal];
 		self.service = [self.rtrManager customDataCaptureServiceWithScenario:self.selectedScenario delegate:self extendedSettings:extendedSettings];
