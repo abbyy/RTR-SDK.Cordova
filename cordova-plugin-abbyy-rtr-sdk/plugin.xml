@@ -159,6 +159,9 @@ To get started:
 		<header-file src="src/ios/NSString+RTRPluginLocalization.h" />
 		<source-file src="src/ios/NSString+RTRPluginLocalization.m" />
 
+		<header-file src="src/ios/UIButton+RecognitionLanguages.h" />
+		<source-file src="src/ios/UIButton+RecognitionLanguages.m" />
+
 		<header-file src="src/ios/RTRSelectedAreaView.h" />
 		<source-file src="src/ios/RTRSelectedAreaView.m" />
 
