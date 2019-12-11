@@ -112,27 +112,30 @@
 
 #pragma mark - export
 
-- (void)exportResult:(id<AUIMultiPageImageCaptureResult>)result withCompletion:(void(^)(NSDictionary*))completion
+- (void)exportResult:(id<AUIMultiPageImageCaptureResult>)result withCompletion:(void(^)(NSDictionary*, NSError*))completion
 {
 	NSError* error;
 	NSArray<AUIPageId>* ids = [result pagesWithError:&error];
 	if(ids == nil) {
-		completion(nil);
+		completion(nil, error);
+		return;
 	}
 	NSMutableDictionary* exportDict = @{}.mutableCopy;
 	NSArray* images = [self exportImagesFrom:result error:&error];
 	if(images == nil) {
-		// TODO: error callback
+		completion(nil, error);
+		return;
 	}
 	exportDict[@"images"] = images;
 	if(self.exportType == RTRImageCaptureEncodingTypePdf) {
 		NSDictionary* pdfDict = [self exportAsPdf:result error:&error];
 		if(pdfDict == nil) {
-			// TODO: error callback
+			completion(nil, error);
+			return;
 		}
 		exportDict[@"pdfInfo"] = pdfDict;
 	}
-	completion(exportDict);
+	completion(exportDict, nil);
 }
 
 - (NSString*)exportDirectory

@@ -38,7 +38,8 @@
 	NSError* error;
 	NSArray<AUIPageId>* ids = [result pagesWithError:&error];
 	if(ids == nil) {
-		// TODO: log err
+		self.onError(error);
+		return;
 	}
 	if(ids.count > 0) {
 		UIAlertController* confirmation = [UIAlertController
@@ -54,9 +55,11 @@
 		}];
 		UIAlertAction* ok = [UIAlertAction actionWithTitle:@"Confirm".rtr_localized style:UIAlertActionStyleDestructive handler:^(UIAlertAction* action) {
 			NSError* error;
-			[result clearWithError:&error];
-			// TODO: log err
-			self.onCancel();
+			if(![result clearWithError:&error]) {
+				self.onError(error);
+			} else {
+				self.onCancel();
+			}
 		}];
 		[confirmation addAction:ok];
 		[confirmation addAction:cancel];
@@ -69,8 +72,12 @@
 - (void)captureScenario:(AUIMultiPageImageCaptureScenario*)captureScenario
 	didFinishWithResult:(id<AUIMultiPageImageCaptureResult>)result
 {
-	[self.config exportResult:result withCompletion:^(NSDictionary* dict) {
-		self.onSuccess(YES, dict);
+	[self.config exportResult:result withCompletion:^(NSDictionary* result, NSError* error) {
+		if(result != nil) {
+			self.onSuccess(YES, result);
+		} else {
+			self.onError(error);
+		}
 	}];
 }
 

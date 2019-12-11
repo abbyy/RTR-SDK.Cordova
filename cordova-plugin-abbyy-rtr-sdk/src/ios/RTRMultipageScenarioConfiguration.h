@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (RTREngine*)engine;
 - (AUIMultiPageImageCaptureScenario*)scenario;
-- (void)exportResult:(id<AUIMultiPageImageCaptureResult>)result withCompletion:(void(^)(NSDictionary*))completion;
+- (void)exportResult:(id<AUIMultiPageImageCaptureResult>)result withCompletion:(void(^)(NSDictionary*, NSError*))completion;
 
 @end
 
