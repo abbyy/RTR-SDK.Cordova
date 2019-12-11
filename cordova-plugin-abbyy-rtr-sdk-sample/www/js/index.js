@@ -195,8 +195,7 @@ function dataCaptureMRZ() {
 		stopWhenStable : stopWhenStable.checked,
 		areaOfInterest : areaOfInterestWidth.current() + " " + areaOfInterestHeight.current(),
 		isStopButtonVisible : isStopButtonVisible.checked,
-		orientation: Orientation(),
-		recognitionLanguages : [], // Not supported for this profile
+		orientation: Orientation()
 	});
 }
 
