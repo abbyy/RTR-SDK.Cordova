@@ -276,11 +276,6 @@ public class TextCaptureActivity extends BaseActivity {
 	{
 		surfaceViewWithOverlay = new TextCaptureSurfaceView( this );
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( this );
-		for( Language language : RtrManager.getSelectedLanguages() ) {
-			sharedPreferences.edit().putBoolean( language.name(), true ).apply();
-		}
-
 		super.onCreate( savedInstanceState );
 	}
 

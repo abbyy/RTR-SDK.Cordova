@@ -6,6 +6,7 @@ package com.abbyy.mobile.rtr.cordova;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
@@ -99,7 +100,6 @@ public class RtrPlugin extends CordovaPlugin {
 	public boolean execute( String action, JSONArray args, final CallbackContext callbackContext )
 	{
 		if( "startImageCapture".equals( action ) ) {
-			PreferenceManager.getDefaultSharedPreferences( cordova.getActivity().getApplicationContext() ).edit().clear().apply();
 			if( init( callbackContext, args ) ) {
 				try {
 					if( inputParameters.has( RTR_EXTENDED_SETTINGS ) ) {
@@ -124,6 +124,14 @@ public class RtrPlugin extends CordovaPlugin {
 					}
 					RtrManager.setLanguages( parseLanguages( inputParameters ) );
 					RtrManager.setSelectedLanguages( parseSelectedLanguage( inputParameters ) );
+
+					SharedPreferences.Editor sharedPreferences = PreferenceManager.getDefaultSharedPreferences(
+						cordova.getActivity().getApplicationContext()
+					).edit();
+					for( Language language : RtrManager.getSelectedLanguages() ) {
+						sharedPreferences.putBoolean( language.name(), true );
+					}
+					sharedPreferences.apply();
 					parseUiSettings( inputParameters );
 				} catch( IllegalArgumentException e ) {
 					RtrManager.setLanguages( new ArrayList<Language>() );
