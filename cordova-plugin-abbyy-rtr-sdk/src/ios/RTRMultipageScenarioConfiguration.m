@@ -335,6 +335,7 @@
 	scenario.requiredPageCount = self.maxImagesCount;
 	scenario.isShowPreviewEnabled = self.shouldShowPreview;
 	[scenario.result clearWithError:&error];
+	scenario.active = self.cropEnabled;
 	scenario.captureSettings = self;
 	return scenario;
 }
