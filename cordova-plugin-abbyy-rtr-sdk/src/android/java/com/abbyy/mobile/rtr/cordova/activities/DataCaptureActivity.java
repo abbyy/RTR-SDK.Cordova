@@ -234,7 +234,7 @@ public class DataCaptureActivity extends BaseActivity {
 						profileBuilder.setRecognitionLanguage( languages );
 						profileBuilder.checkAndApply();
 					} catch( IDataCaptureProfileBuilder.ProfileCheckException e ) {
-						Log.e( getString( ResourcesUtils.getResId( "string", "app_name", DataCaptureActivity.this ) ), "Cannot set recognition languages" );
+						onProfileError( e );
 					}
 				}
 			} catch( InitializationException | IllegalArgumentException e ) {
@@ -333,6 +333,22 @@ public class DataCaptureActivity extends BaseActivity {
 	{
 		super.onActivityResult( requestCode, resultCode, data );
 		createCaptureService();
+	}
+
+	private void onProfileError( Throwable e )
+	{
+		Log.e( getString( ResourcesUtils.getResId( "string", "app_name", this ) ), "Cannot set recognition languages" );
+		Intent intent = new Intent();
+
+		HashMap<String, Object> json = new HashMap<>();
+		HashMap<String, String> errorInfo = new HashMap<>();
+		errorInfo.put( "description", "Language customization is not available for this profile" );
+
+		json.put( "error", errorInfo );
+
+		intent.putExtra( "result", json );
+		setResult( RtrPlugin.RESULT_FAIL, intent );
+		finish();
 	}
 
 	public static Intent newDataCaptureIntent( Context context )
