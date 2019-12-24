@@ -17,7 +17,7 @@
     </platform>
     <preference name="BackupWebStorage" value="none" />
     <engine name="android" spec="~8.0.0" />
-    <engine name="ios" spec="~5.0.0" />
+    <engine name="ios" spec="~5.1.0" />
     <plugin name="cordova-plugin-abbyy-rtr-sdk" spec="^1.0.13">
         <variable name="CAMERA_USAGE_DESCRIPTION" value="NSCameraUsageDescription" />
     </plugin>
