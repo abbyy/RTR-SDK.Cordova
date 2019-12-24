@@ -163,7 +163,6 @@ public class RtrManager {
 	public static void setFlashlightVisible( boolean value )
 	{
 		RtrManager.flashlightVisible = value;
-		ImageCaptureSettings.flashlightVisible = value;
 	}
 
 	public static void setManualCaptureVisible( boolean value )

@@ -73,7 +73,8 @@ public class RtrPlugin extends CordovaPlugin {
 	private static final String RTR_DOCUMENT_SIZE_KEY = "documentSize";
 
 	private static final String RTR_AREA_OF_INTEREST_KEY = "areaOfInterest";
-	private static final String RTR_IS_FLASHLIGHT_VISIBLE_KEY = "isFlashlightButtonVisible";
+	private static final String RTR_IS_FLASHLIGHT_VISIBLE_IMAGE_CAPTURE_KEY = "isFlashlightButtonVisible";
+	private static final String RTR_IS_FLASHLIGHT_VISIBLE_KEY = "isFlashlightVisible";
 	private static final String RTR_IS_STOP_BUTTON_VISIBLE_KEY = "isStopButtonVisible";
 	private static final String RTR_ORIENTATION_KEY = "orientation";
 
@@ -487,6 +488,15 @@ public class RtrPlugin extends CordovaPlugin {
 		RtrManager.setStopButtonVisible( stopButtonVisible );
 	}
 
+	private void parseToggleFlashImageCapture( JSONObject arg ) throws JSONException
+	{
+		boolean isFlashlightVisible = ImageCaptureSettings.flashlightVisible;
+		if( arg.has( RTR_IS_FLASHLIGHT_VISIBLE_IMAGE_CAPTURE_KEY ) ) {
+			isFlashlightVisible = arg.getBoolean( RTR_IS_FLASHLIGHT_VISIBLE_IMAGE_CAPTURE_KEY );
+		}
+		ImageCaptureSettings.flashlightVisible = isFlashlightVisible;
+	}
+
 	private void parseToggleFlash( JSONObject arg ) throws JSONException
 	{
 		boolean isFlashlightVisible = RtrManager.isFlashlightVisible();
@@ -577,7 +587,7 @@ public class RtrPlugin extends CordovaPlugin {
 	private void parseImageCaptureSettings( JSONObject arg ) throws JSONException
 	{
 		parseCameraResolution( arg );
-		parseToggleFlash( arg );
+		parseToggleFlashImageCapture( arg );
 		parseToggleManualCapture( arg );
 		parseOrientation( arg );
 		parseShowPreview( arg );
