@@ -116,12 +116,12 @@ public class ImageCaptureActivity extends AppCompatActivity implements MultiPage
 
 	private void initCaptureView() throws Exception
 	{
-		captureView = (CaptureView) findViewById( ResourcesUtils.getResId( "id", "captureView", this ) );
+		captureView = findViewById( ResourcesUtils.getResId( "id", "captureView", this ) );
 		captureView.getUISettings().setCaptureButtonVisible( ImageCaptureSettings.manualCaptureVisible );
 		captureView.getUISettings().setFlashlightButtonVisible( ImageCaptureSettings.flashlightVisible );
 		captureView.getCameraSettings().setResolution( ImageCaptureSettings.cameraResolution );
 
-		startNewCapture();
+		startCapture();
 	}
 
 	@Override
@@ -148,17 +148,19 @@ public class ImageCaptureActivity extends AppCompatActivity implements MultiPage
 		super.onPause();
 	}
 
-	private void startNewCapture() throws Exception
+	private void startCapture() throws Exception
 	{
 		MultiPageImageCaptureScenario scenario = (MultiPageImageCaptureScenario) getLastCustomNonConfigurationInstance();
 		if( scenario != null ) {
 			imageCaptureScenario = scenario;
+			imageCaptureScenario.setCallback( this );
+			captureView.setCaptureScenario( imageCaptureScenario );
 		} else {
 			imageCaptureScenario = RtrManager.getImageCaptureScenario( this );
+			imageCaptureScenario.setCallback( this );
+			// Clearing pages in background
+			new BackgroundWorker<>( new WeakReference<>( clearPagesCallback ) ).execute();
 		}
-		imageCaptureScenario.setCallback( this );
-		// Clearing pages in background
-		new BackgroundWorker<>( new WeakReference<>( clearPagesCallback ) ).execute();
 	}
 
 	private void finishWithEmptyResult( Exception error )
