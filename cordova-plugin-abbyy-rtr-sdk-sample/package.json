@@ -1,7 +1,7 @@
 {
   "name": "cordova-plugin-abbyy-rtr-sdk-sample",
   "description": "ABBYY Mobile Capture SDK Cordova Plugin Example",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "displayName": "RTRCordovaSample",
   "cordova": {
     "id": "cordova-plugin-abbyy-rtr-sdk-sample",
@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "cordova-android": "~8.0.0",
-    "cordova-ios": "~5.0.0",
-    "cordova-plugin-abbyy-rtr-sdk": "^1.0.13"
+    "cordova-ios": "~5.1.0",
+    "cordova-plugin-abbyy-rtr-sdk": "^1.0.14"
   },
   "keywords": [
     "rtr",
