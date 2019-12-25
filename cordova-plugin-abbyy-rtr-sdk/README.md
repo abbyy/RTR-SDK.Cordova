@@ -2,7 +2,7 @@
 
 ABBYY Mobile Capture Cordova Plugin allows to use the Text Capture, Data Capture and Image Capture features of ABBYY Mobile Capture in apps based on the [Apache Cordova](https://cordova.apache.org) framework.
 
-This plugin requires the ABBYY Mobile Capture native library which is available for Android and iOS. You can request ABBYY Mobile Capture trial version on the [ABBYY website](http://www.abbyy.com/mobile-capture-sdk/#request-demo).
+This plugin requires the ABBYY Mobile Capture native libraries which are available for Android and iOS. You can request ABBYY Mobile Capture trial version on the [ABBYY website](http://www.abbyy.com/mobile-capture-sdk/#request-demo).
 
 The native libraries support the following systems:
 
@@ -19,8 +19,8 @@ The native libraries support the following systems:
     ```
 2. Request ABBYY Mobile Capture trial version on the [ABBYY website](http://www.abbyy.com/mobile-capture-sdk/#request-demo) and add it to your project:
     * Create the `www/rtr_assets` subdirectory in the project.
-    * Copy Mobile Capture SDK assets (patterns and dictionaries) and license file (`AbbyyRtrSdk.license`) to `www/rtr_assets`.
-    * Copy the Android library (`abbyy-rtr-sdk-1.0.aar`) to `libs/android`.
+    * Copy Mobile Capture SDK assets and license file (`AbbyyRtrSdk.license`) to `www/rtr_assets`.
+    * Copy Android libraries  (`abbyy-rtr-sdk-1.0.aar` and `abbyy-ui-1.0.aar`) to `libs/android`.
     * Copy iOS frameworks (`AbbyyRtrSDK.framework` and other modules) to `libs/ios`.
     * The `libs/android` and `libs/ios` paths should be added to the linker search paths. This step is performed automatically during the plugin installation.
 3. To build and run your project:
