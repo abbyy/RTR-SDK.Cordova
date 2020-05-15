@@ -3,16 +3,52 @@
 
 #import "RTRManager.h"
 #import "RTRDataCaptureScenario.h"
-
-@interface RTRManager ()
-
-@end
+#import "RTRPluginConstants.h"
 
 @implementation RTRManager
 
 + (instancetype)managerWithLicense:(NSString*)licenseName error:(NSError**)error
 {
 	NSString* licensePath = [NSBundle.mainBundle pathForResource:licenseName.stringByDeletingPathExtension ofType:licenseName.pathExtension];
+
+	if(licensePath == nil) {
+		if(error != nil) {
+			NSDictionary* userInfo;
+
+			NSString* resourcesPath = NSBundle.mainBundle.resourcePath;
+			NSArray* bundleContent = [NSFileManager.defaultManager contentsOfDirectoryAtPath:resourcesPath error:error];
+			if(bundleContent == nil) {
+				userInfo = @{
+					NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Resource path %@ not found.", resourcesPath]
+				};
+			} else {
+				NSPredicate* filterPredicate = [NSPredicate
+					predicateWithBlock:^BOOL(NSString* evaluatedObject, NSDictionary* bindings) {
+
+					return [evaluatedObject containsString:@"license"] || [evaluatedObject containsString:@"License"];
+				}];
+				NSArray* avaliableLicenses = [bundleContent filteredArrayUsingPredicate:filterPredicate];
+				if(avaliableLicenses.count == 0) {
+					userInfo = @{
+						NSLocalizedDescriptionKey: [NSString stringWithFormat:@"License %@ not found.", licenseName]
+					};
+				} else {
+					userInfo = @{
+						NSLocalizedDescriptionKey: [NSString
+							stringWithFormat:@"License %@ not found. Existing licenses: %@",
+								licenseName,
+								avaliableLicenses]
+					};
+				}
+
+			}
+			*error = [NSError
+					  errorWithDomain:RTRCordovaPluginErrorDomain
+					  code:-1
+					  userInfo:userInfo];
+			return nil;
+		}
+	}
 	NSData* licenseData = [NSData dataWithContentsOfFile:licensePath options:0 error:error];
 
 	if(licenseData == nil) {

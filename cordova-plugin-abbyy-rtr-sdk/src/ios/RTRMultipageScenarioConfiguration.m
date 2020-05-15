@@ -14,15 +14,14 @@
 @implementation RTRMultipageScenarioConfiguration
 @synthesize isFlashlightButtonVisible = _isFlashlightButtonVisible;
 @synthesize isCaptureButtonVisible = _isCaptureButtonVisible;
+@synthesize isGalleryButtonVisible = _isGalleryButtonVisible;
 @synthesize shouldShowPreview = _shouldShowPreview;
-@synthesize maxImagesCount = _maxImagesCount;
+@synthesize requiredPageCount = _requiredPageCount;
 @synthesize destination = _destination;
 @synthesize exportType = _exportType;
-@synthesize compressionType = _compressionType;
 @synthesize compressionLevel = _compressionLevel;
 @synthesize minimumDocumentToViewRatio = _minimumDocumentToViewRatio;
 @synthesize documentSize = _documentSize;
-@synthesize cropEnabled = _cropEnabled;
 @synthesize cameraResolution = _cameraResolution;
 @synthesize supportedOrientations = _supportedOrientations;
 
@@ -33,12 +32,13 @@
 		_supportedOrientations = [args rtr_orientationMaskForKey:RTROrientationPolicy];
 		_cameraResolution = [self cameraResolutionFromString:args[RTRICCameraResolutionKey]];
 		_isFlashlightButtonVisible = args[RTRICFlashlightButtonVisibleKey] ? [args[RTRICFlashlightButtonVisibleKey] boolValue] : YES;
+		_isGalleryButtonVisible = args[RTRICGalleryButtonVisibleKey] ? [args[RTRICGalleryButtonVisibleKey] boolValue] : NO;
 		_isCaptureButtonVisible = args[RTRICCaptureButtonVisibleKey] ? [args[RTRICCaptureButtonVisibleKey] boolValue] : NO;
 
 		_shouldShowPreview = args[RTRICShowPreviewKey] ? [args[RTRICShowPreviewKey] boolValue] : NO;
-		_maxImagesCount = args[RTRICImagesCountKey] ? [args[RTRICImagesCountKey] integerValue] : 0;
+		_requiredPageCount = args[RTRICImagesCountKey] ? [args[RTRICImagesCountKey] integerValue] :
+			(args[RTRICRequiredPageCountKey] ? [args[RTRICRequiredPageCountKey] integerValue] : 0);
 		
-		_compressionType = [args rtr_exportCompressionTypeForKey:RTRICCompressionTypeKey];
 		_compressionLevel = [args rtr_exportCompressionLevelForKey:RTRICCompressionLevelKey];
 		_exportType = [args rtr_exportTypeForKey:RTRICExportTypeKey];
 		_destination = [args rtr_destinationTypeForKey:RTRICDestinationKey];
@@ -47,7 +47,6 @@
 
 		_minimumDocumentToViewRatio = icSettings[RTRICMinimumDocumentToViewRatioKey] ? [icSettings[RTRICMinimumDocumentToViewRatioKey] floatValue] : 0.15;
 		_documentSize = [self documentSizeFromString:icSettings[RTRICDocumentSizeKey]];
-		_cropEnabled = icSettings[RTRICCropEnabledKey] ? [icSettings[RTRICCropEnabledKey] boolValue] : YES;
 		
 		self.engine = manager.engine;
 	}
@@ -228,7 +227,6 @@
 	return @{
 		@"filePath": filepath,
 		@"pagesCount": @(ids.count),
-		RTRICCompressionTypeKey: [NSDictionary rtr_exportCompressionTypeToString][@(self.compressionType)],
 		RTRICCompressionLevelKey: [NSDictionary rtr_exportCompressionLevelToString][@(self.compressionLevel)]
 	};
 }
@@ -286,9 +284,6 @@
 
 - (RTRImageCaptureEncodingType)singleImageExportType
 {
-	if(self.exportType == RTRImageCaptureEncodingTypePdf) {
-		return self.compressionType == RTRCoreAPIPdfExportJpgCompression ? RTRImageCaptureEncodingTypeJpg : RTRImageCaptureEncodingTypeJpeg2000;
-	}
 	return self.exportType;
 }
 
@@ -332,10 +327,9 @@
 		initWithEngine:self.engine
 		storagePath:documentsFolder
 		error:&error];
-	scenario.requiredPageCount = self.maxImagesCount;
+	scenario.requiredPageCount = self.requiredPageCount;
 	scenario.isShowPreviewEnabled = self.shouldShowPreview;
 	[scenario.result clearWithError:&error];
-	scenario.active = self.cropEnabled;
 	scenario.captureSettings = self;
 	return scenario;
 }

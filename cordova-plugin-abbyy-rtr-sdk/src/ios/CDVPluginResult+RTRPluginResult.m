@@ -35,7 +35,7 @@ static NSString* stringFromCGRect(CGRect rect)
 	return [NSString stringWithFormat:@"%.lf %.lf %.lf %.lf", CGRectGetMinX(rect), CGRectGetMinY(rect), CGRectGetWidth(rect), CGRectGetHeight(rect)];
 }
 
-static NSString* strinfFromQuadrangle(NSArray* quadrangle)
+static NSString* stringFromQuadrangle(NSArray* quadrangle)
 {
 	if(quadrangle.count == 0) {
 		return @"";
@@ -54,7 +54,7 @@ static NSDictionary* dictionaryFromTextLine(RTRTextLine* textLine)
 	return @{
 		@"text" : textLine.text ?: @"",
 		@"rect" : stringFromCGRect(textLine.rect),
-		@"quadrangle" : strinfFromQuadrangle(textLine.quadrangle),
+		@"quadrangle" : stringFromQuadrangle(textLine.quadrangle),
 	};
 }
 
@@ -78,7 +78,7 @@ static NSDictionary* dictionaryFromDataField(RTRDataField* field)
 		@"id" : field.id ?: @"",
 		@"name" : field.name ?: @"",
 		@"text" : field.text ?: @"",
-		@"quadrangle" : strinfFromQuadrangle(field.quadrangle),
+		@"quadrangle" : stringFromQuadrangle(field.quadrangle),
 		@"components" : arrayFromDataFields(field.components),
 	};
 }
@@ -95,6 +95,22 @@ static NSArray* arrayFromDataFields(NSArray<RTRDataField*>* dataFields)
 	}
 
 	return result;
+}
+
+static NSDictionary* dictionaryFromTextBlock(RTRTextBlock* block)
+{
+	return @{
+		@"textLines": arrayFromTextLines(block.textLines)
+	};
+}
+
+static NSArray* arrayFromTextBlocks(NSArray<RTRTextBlock*>* blocks)
+{
+	NSMutableArray* array = @[].mutableCopy;
+	for(RTRTextBlock* block in blocks) {
+		[array addObject:dictionaryFromTextBlock(block)];
+	}
+	return array;
 }
 
 static NSString* NSStringFromStabilityStatus(RTRResultStabilityStatus stabilityStatus)
@@ -159,6 +175,22 @@ static NSDictionary* resultInfo(RTRViewController* controller, BOOL stoppedByUse
 		@"dataFields" : arrayFromDataFields(dataCaptureController.dataFields),
 	};
 	
+	return [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+}
+
++ (CDVPluginResult*)rtrResultForCoreApiTextCapture:(NSArray<RTRTextBlock*>*)blocks
+{
+	NSDictionary* result = @{
+		RTRCallbackResultInfoKey: arrayFromTextBlocks(blocks)
+	};
+	return [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+}
+
++ (CDVPluginResult*)rtrResultForCoreApiDataCapture:(NSArray<RTRDataField*>*)fields
+{
+	NSDictionary* result = @{
+		RTRCallbackResultInfoKey: arrayFromDataFields(fields)
+	};
 	return [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
 }
 

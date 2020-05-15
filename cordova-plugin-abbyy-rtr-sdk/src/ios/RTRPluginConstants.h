@@ -35,15 +35,21 @@ extern NSString* const RTRCallbackUserActionKey;
 extern NSString* const RTRICCameraResolutionKey;
 extern NSString* const RTRICFlashlightButtonVisibleKey;
 extern NSString* const RTRICCaptureButtonVisibleKey;
+extern NSString* const RTRICGalleryButtonVisibleKey;
 extern NSString* const RTRICShowPreviewKey;
 extern NSString* const RTRICImagesCountKey;
-extern NSString* const RTRICCompressionTypeKey;
+extern NSString* const RTRICRequiredPageCountKey;
 extern NSString* const RTRICCompressionLevelKey;
 extern NSString* const RTRICExportTypeKey;
 extern NSString* const RTRICDestinationKey;
 extern NSString* const RTRICDefaultImageSettingsKey;
 extern NSString* const RTRICDocumentSizeKey;
-extern NSString* const RTRICCropEnabledKey;
 extern NSString* const RTRICMinimumDocumentToViewRatioKey;
+
+#pragma mark - core api constangs
+
+extern NSString* const RTRCAProgressPercentage;
+extern NSString* const RTRCAProgressWarning;
+extern NSString* const RTRCAEnableTextOrientationDetection;
 
 NS_ASSUME_NONNULL_END

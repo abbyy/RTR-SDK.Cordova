@@ -23,6 +23,7 @@
 	[super viewWillAppear:animated];
 	self.flashButton.hidden = !self.config.isFlashlightButtonVisible;
 	self.captureButton.hidden = !self.config.isCaptureButtonVisible;
+	self.galleryButton.hidden = !self.config.isGalleryButtonVisible;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations

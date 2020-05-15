@@ -15,4 +15,7 @@
 + (CDVPluginResult*)rtrResultForDataCapture:(RTRDataCaptureViewController*)dataCaptureController
 	stoppedByUser:(BOOL)stoppedByUser;
 
++ (CDVPluginResult*)rtrResultForCoreApiTextCapture:(NSArray<RTRTextBlock*>*)blocks;
++ (CDVPluginResult*)rtrResultForCoreApiDataCapture:(NSArray<RTRDataField*>*)fields;
+
 @end

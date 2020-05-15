@@ -7,6 +7,7 @@
 #import "RTRDataCaptureViewController.h"
 #import "RTRDataCaptureScenario.h"
 #import "NSDictionary+RTRSettings.h"
+#import "RTRTextCaptureExtensions.h"
 
 #import <AbbyyRtrSDK/AbbyyRtrSDK.h>
 #import <AbbyyUI/AbbyyUI.h>
@@ -17,7 +18,6 @@
 @interface RTRImageCaptureOptions : NSObject
 
 @property (nonatomic, assign) CGSize documentSize;
-@property (nonatomic, assign) BOOL cropEnabled;
 @property (nonatomic, assign) CGFloat minimumDocumentToViewRatio;
 
 @property (nonatomic, assign) RTRImageCaptureDestintationType destination;
@@ -128,7 +128,7 @@
 			BOOL hasLanguages = rtrViewController.settingsTableContent != nil;
 			BOOL languagesUnsupported = ![self profileSupportsLanguageCustomization:rtrViewController.profile manager:self.rtrManager];
 			if(hasLanguages && languagesUnsupported) {
-				errorDescription = @"Recognition languages for this profile is not customizable";
+				errorDescription = @"Language customization is not available for this profile.";
 			}
 		} else {
 			errorDescription = @"Invalid Data Capture scenario settings. Specify Data Capture profile or params for Custom Data Capture Scenario.";
@@ -212,6 +212,90 @@
 	}];
 }
 
+- (void)recognizeText:(CDVInvokedUrlCommand*)command
+{
+	[self.commandDelegate runInBackground:^{
+		if(![self initializeRtrManager:command]) {
+			return;
+		}
+		id<RTRCoreAPI> coreApi = [self.rtrManager.engine createCoreAPI];
+
+		NSArray* args = command.arguments;
+		NSDictionary* settings = args.firstObject;
+		NSString* base64Image = args[1];
+
+		NSData* imageData = [[NSData alloc] initWithBase64EncodedString:base64Image options:0];
+		UIImage* image = [UIImage imageWithData:imageData];
+
+		__weak RTRPlugin* weakSelf = self;
+		RTRProgressCallbackBlock onProgress = ^BOOL(NSInteger percentage, RTRCallbackWarningCode warning) {
+			[weakSelf.commandDelegate evalJs:[NSString
+				stringWithFormat:@"AbbyyRtrSdk.events.onProgress({ %@: %@ })", RTRCAProgressPercentage, @(percentage)]];
+			return YES;
+		};
+
+		NSError* error;
+		NSArray* languages = settings[RTRRecognitionLanguagesKey] ?: @[RTRLanguageNameEnglish];
+		[coreApi.textRecognitionSettings
+			setRecognitionLanguages:[NSSet setWithArray:languages]];
+		if(settings[RTRCAEnableTextOrientationDetection] != nil) {
+			coreApi.textRecognitionSettings.textOrientationDetectionEnabled = [settings[RTRCAEnableTextOrientationDetection] boolValue];
+		}
+
+		NSArray<RTRTextBlock*>* result = [coreApi
+			recognizeTextOnImage:image
+			onProgress:onProgress
+			onTextOrientationDetected:nil
+			error:&error];
+		[self.commandDelegate
+			sendPluginResult:[CDVPluginResult rtrResultForCoreApiTextCapture:result]
+			callbackId:command.callbackId];
+	}];
+}
+
+- (void)extractData:(CDVInvokedUrlCommand*)command
+{
+	[self.commandDelegate runInBackground:^{
+		if(![self initializeRtrManager:command]) {
+			return;
+		}
+		id<RTRCoreAPI> coreApi = [self.rtrManager.engine createCoreAPI];
+
+		NSArray* args = command.arguments;
+		NSDictionary* settings = args.firstObject;
+		NSString* base64Image = args[1];
+
+		NSData* imageData = [[NSData alloc] initWithBase64EncodedString:base64Image options:0];
+		UIImage* image = [UIImage imageWithData:imageData];
+
+		coreApi.dataCaptureSettings.profile = settings[RTRDataCaptureProfileKey];
+		NSArray* languages = settings[RTRRecognitionLanguagesKey] ?: @[RTRLanguageNameEnglish];
+		[[coreApi.dataCaptureSettings configureDataCaptureProfile] setRecognitionLanguages:[NSSet setWithArray:languages]];
+		if(settings[RTRCAEnableTextOrientationDetection] != nil) {
+			coreApi.textRecognitionSettings.textOrientationDetectionEnabled = [settings[RTRCAEnableTextOrientationDetection] boolValue];
+		}
+
+		__weak RTRPlugin* weakSelf = self;
+		RTRProgressCallbackBlock onProgress = ^BOOL(NSInteger percentage, RTRCallbackWarningCode warning) {
+			[weakSelf.commandDelegate evalJs:[NSString
+				stringWithFormat:@"AbbyyRtrSdk.events.onProgress({ %@: %@ })", RTRCAProgressPercentage, @(percentage)]];
+			return YES;
+		};
+
+		NSError* error;
+		NSArray<RTRDataField*>* result = [coreApi
+			extractDataFromImage:image
+			onProgress:onProgress
+			onTextOrientationDetected:nil
+			error:&error];
+		[self.commandDelegate
+			sendPluginResult:[CDVPluginResult rtrResultForCoreApiDataCapture:result]
+			callbackId:command.callbackId];
+	}];
+
+
+}
+
 #pragma mark - Helpers
 
 - (void)presentCaptureViewController:(RTRViewController*)rtrViewController command:(CDVInvokedUrlCommand*)command
@@ -268,7 +352,7 @@
 
 - (BOOL)initializeRtrManager:(CDVInvokedUrlCommand*)command
 {
-	NSString* licenseName = command.arguments.firstObject[RTRLicenseFileNameKey] ?: @"AbbyyRtrSdk.license";
+	NSString* licenseName = command.arguments.firstObject[RTRLicenseFileNameKey] ?: @"AbbyyRtrSdk.License";
 	NSError* error = nil;
 	self.rtrManager = [RTRManager managerWithLicense:licenseName error:&error];
 
