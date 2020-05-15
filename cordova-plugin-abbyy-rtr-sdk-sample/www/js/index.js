@@ -76,8 +76,8 @@ function angle() {
 }
 
 function imageFromGalleryMaxSize() {
-	element = document.getElementById('imageFromGalleryMaxSize')
-	return parseInt(element.value)
+    element = document.getElementById('imageFromGalleryMaxSize')
+    return parseInt(element.value)
 }
 
 
@@ -120,6 +120,221 @@ function changeScenario() {
 
 var areaOfInterestWidth = new Slider('areaOfInterestWidth', 'widthValue');
 var areaOfInterestHeight = new Slider('areaOfInterestHeight', 'heightValue');
+
+function imageCapture() {
+    AbbyyRtrSdk.startImageCapture(abbyyRtrSdkPluginImageCaptureCallback, {
+        licenseFileName : 'MobileCapture.License', // optional, default=MobileCapture.License
+
+        cameraResolution : cameraResolution(), // optional, default=FullHD (HD, FullHD, 4K)
+        isFlashlightButtonVisible : isFlashlightVisible.checked, // optional, default=true
+        isCaptureButtonVisible : isCaptureButtonVisible.checked, // optional, default=false
+        isGalleryButtonVisible : isGalleryButtonVisible.checked, // optional, default=false
+        orientation : orientation(), // optional, default=default
+        showPreview : showPreview.checked, // optional, default=false
+        requiredPageCount : requiredPageCount(), // optional, default=0
+
+        destination : destination(), // optional, captured image will be saved to corresponding file ('file') or returned as encode base64 image string ('base64'). default=file
+        exportType : exportType(), // optional, default=jpg (jpg, png, pdf).
+        compressionLevel : compressionLevel(), // optional, default=Normal (Low, Normal, High, ExtraHigh)
+
+		defaultImageSettings : {
+			aspectRatioMin : aspectRatioMin.current(), // optional, minimum aspect ratio of the document. Default 0.
+			aspectRatioMax : aspectRatioMax.current(), // optional, maximum aspect ratio of the document. Default 0.
+			minimumDocumentToViewRatio : minimumDocumentToViewRatio.current(), // optional, minimum document area relative to frame area - 0...1. Default 0.15.
+			documentSize : documentSize(), // optional, document size in millimeters. default=Any.
+			imageFromGalleryMaxSize : imageFromGalleryMaxSize(), // optional, default=4096
+		},
+	});
+}
+
+function textCapture() {
+    AbbyyRtrSdk.startTextCapture(abbyyRtrSdkPluginCallback, {
+        selectableRecognitionLanguages : ['English', 'French', 'German', 'Italian', 'Polish', 'PortugueseBrazilian',
+            'Russian', 'ChineseSimplified', 'ChineseTraditional', 'Japanese', 'Korean', 'Spanish'],
+        recognitionLanguages : ['English'],
+
+        licenseFileName : 'MobileCapture.License',
+        isFlashlightVisible : isFlashlightButtonVisible.checked,
+        stopWhenStable : stopWhenStable.checked,
+        areaOfInterest : (areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current()),
+        isStopButtonVisible : isStopButtonVisible.checked,
+        orientation : orientation(),
+    });
+}
+
+function customDataCapture() {
+    AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
+        customDataCaptureScenario : {
+            name : 'Code',
+            description : 'Mix of digits with letters:  X6YZ64  32VPA  zyy777',
+            recognitionLanguages : ['English'],
+            fields : [ {
+                regEx : '([a-zA-Z]+[0-9]+|[0-9]+[a-zA-Z]+)[0-9a-zA-Z]*'
+            } ]
+        },
+
+        licenseFileName : 'MobileCapture.License',
+        isFlashlightVisible : isFlashlightButtonVisible.checked,
+        stopWhenStable : stopWhenStable.checked,
+        areaOfInterest : areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current(),
+        isStopButtonVisible : isStopButtonVisible.checked,
+        orientation : orientation(),
+    });
+}
+
+function dataCaptureMRZ() {
+    AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
+        profile : 'MRZ',
+
+        licenseFileName : 'MobileCapture.License',
+        isFlashlightVisible : isFlashlightButtonVisible.checked,
+        stopWhenStable : stopWhenStable.checked,
+        areaOfInterest : areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current(),
+        isStopButtonVisible : isStopButtonVisible.checked,
+        orientation: orientation()
+    });
+}
+
+function dataCaptureBCR() {
+    AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
+        profile : 'BusinessCards',
+
+        licenseFileName : 'MobileCapture.License',
+        isFlashlightVisible : isFlashlightButtonVisible.checked,
+        stopWhenStable : stopWhenStable.checked,
+        areaOfInterest : areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current(),
+        isStopButtonVisible : isStopButtonVisible.checked,
+        orientation : orientation(),
+        recognitionLanguages : ['English'],
+    });
+}
+
+function coreAPI() {
+    if (imgCoreApiTab.checked) {
+        var selectedOperationType = SelectedOperationType();
+        if (selectedOperationType.localeCompare('exportPDF') === 0) {
+            AbbyyRtrSdk.startImageCapture(function(result) {
+                if (!result.images) {
+                    abbyyRtrSdkPluginCallback(result);
+                }
+                var images = result.images.map(image => {
+                    return {
+                        imageUri: result.resultInfo.uriPrefix + image.filePath
+                    };
+                });
+                AbbyyRtrSdk.exportImagesToPdf({
+                    images: images,
+                }, abbyyRtrSdkPluginExportPDFCallback, abbyyRtrSdkPluginCallback);
+            }, {
+                destination : 'file',
+				isCaptureButtonVisible : true,
+				isGalleryButtonVisible : true
+            });
+            return;
+        }
+    }
+    AbbyyRtrSdk.startImageCapture(function(result) {
+        if (!result.images) {
+            abbyyRtrSdkPluginCallback(result);
+        }
+		var imageUri = result.resultInfo.uriPrefix + result.images[0].base64;
+        if (coreApiTab.checked) {
+            var recognitionLanguages = getSelectValues(languagesSelect);
+            var selectedRecognitionType = SelectedRecognitionType();
+            var isTextOrientationDetectionEnabled = document.getElementById('isTextOrientationDetectionEnabled').checked;
+
+            if (selectedRecognitionType.localeCompare('text') === 0) {
+                AbbyyRtrSdk.recognizeText({
+                    imageUri: imageUri,
+                    recognitionLanguages: recognitionLanguages,
+                    isTextOrientationDetectionEnabled: isTextOrientationDetectionEnabled
+                }, (result) => {
+                    abbyyRtrSdkRecognizeTextPluginCallback({
+                        result: result,
+                        imageUri: imageUri
+                    });
+                }, abbyyRtrSdkPluginCallback);
+            } else if (selectedRecognitionType.localeCompare('bcr') === 0) {
+                AbbyyRtrSdk.extractData({
+                    imageUri: imageUri,
+                    profile: 'BusinessCards',
+                    recognitionLanguages: recognitionLanguages,
+                    isTextOrientationDetectionEnabled: isTextOrientationDetectionEnabled
+                }, (result) => {
+                    abbyyRtrSdkExtractDataPluginCallback({
+                        result: result,
+                        imageUri: imageUri
+                    });
+                }, abbyyRtrSdkPluginCallback);
+            }
+        } else if (imgCoreApiTab.checked) {
+            var selectedOperationType = SelectedOperationType();
+
+            if (selectedOperationType.localeCompare('crop') === 0) {
+                AbbyyRtrSdk.detectDocumentBoundary({
+                    imageUri: imageUri
+                }, result => {
+                    if (result.documentBoundary) {
+                        AbbyyRtrSdk.cropImage({
+                            imageUri: imageUri,
+                            result: {
+                                destination : destination(),
+                                exportType : exportType(),
+                                compressionLevel : compressionLevel(),
+                            },
+                            documentBoundary: result.documentBoundary,
+                            documentSize: result.documentSize,
+                        }, abbyyRtrSdkPluginExportCallback, abbyyRtrSdkPluginCallback);
+                    } else {
+                        abbyyRtrSdkPluginCallback(result);
+                    }
+                }, abbyyRtrSdkPluginCallback);
+            } else if (selectedOperationType.localeCompare('rotate') === 0) {
+                AbbyyRtrSdk.rotateImage({
+                    imageUri: imageUri,
+                    angle: angle(),
+                    result: {
+                        destination : destination(),
+                        exportType : exportType(),
+                        compressionLevel : compressionLevel(),
+                    },
+                }, abbyyRtrSdkPluginExportCallback, abbyyRtrSdkPluginCallback);
+            } else if (selectedOperationType.localeCompare('export') === 0) {
+                AbbyyRtrSdk.exportImage({
+                    imageUri: imageUri,
+                    result: {
+                        destination : destination(),
+                        exportType : exportType(),
+                        compressionLevel : compressionLevel(),
+                    },
+                }, abbyyRtrSdkPluginExportCallback, abbyyRtrSdkPluginCallback);
+            } else if (selectedOperationType.localeCompare('detect_boundary') === 0) {
+                AbbyyRtrSdk.detectDocumentBoundary({
+                    imageUri: imageUri
+                }, (result) => {
+                    abbyyRtrSdkDetectBoundaryPluginCallback({
+                        result: result,
+                        imageUri: imageUri
+                    });
+                }, abbyyRtrSdkPluginCallback);
+            } else if (selectedOperationType.localeCompare('assess_quality') === 0) {
+                AbbyyRtrSdk.assessQualityForOcr({
+                    imageUri: imageUri
+                }, (result) => {
+                   abbyyRtrSdkAssessQualityPluginCallback({
+                       result: result,
+                       imageUri: imageUri
+                   });
+               }, abbyyRtrSdkPluginCallback);
+            }
+        }
+    }, {
+		requiredPageCount : 1,
+		destination : 'base64',
+		isCaptureButtonVisible : true,
+		isGalleryButtonVisible : true
+    });
+}
 
 function ShowICSettings() {
     document.getElementById('setting_orientation').style.display = 'block';
@@ -191,7 +406,7 @@ function ShowCoreAPISettings() {
     document.getElementById('setting_text_orientation_detection_enabled').style.display = 'block';
     document.getElementById('setting_operation_type').style.display = 'none';
     document.getElementById('setting_pick_image').style.display = 'block';
-    document.getElementById('setting_share').style.display = 'block';
+    document.getElementById('setting_share').style.display = 'none';
     document.getElementById('setting_start_capture').style.display = 'none';
     document.getElementById('setting_angle').style.display = 'none';
 }
@@ -250,29 +465,46 @@ const truncateBase64String = dict => {
     return dict;
 };
 
+function showImageView(show) {
+    var imageView = document.getElementById('AbbyyRtrSdkPluginCapturedImage');
+    var canvas = document.getElementById('AbbyyRtrSdkPluginCapturedImageCanvas');
+    if (show === 'image') {
+        imageView.style.display = 'block';
+        canvas.style.display = 'none';
+        return imageView;
+    } else if (show === 'canvas') {
+        imageView.style.display = 'none';
+        canvas.style.display = 'block';
+        return canvas;
+    } else {
+        return null;
+    }
+}
+
 var abbyyRtrSdkPluginImageCaptureCallback = function(result) {
-	document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(truncateBase64String(result), null, 2);
-    var imageView = document.getElementById('AbbyyRtrSdkPluginCapturedImage')
+    document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(truncateBase64String(result), null, 2);
     if (result.images && result.images[0]) {
+        var imageView = showImageView('image');
         if (result.images[0].base64) {
-            imageView.style.display = 'block';
-            imageView.src = 'data:image/jpeg;base64,' + result.images[0].base64;
+            imageView.src = result.resultInfo.uriPrefix + result.images[0].base64;
         } else {
-            imageView.style.display = 'block';
-            imageView.src = 'file://'+result.images[0].filePath;
+            imageView.src = result.resultInfo.uriPrefix + result.images[0].filePath;
         }
+    } else {
+        showImageView('none');
     }
 }
 
 var abbyyRtrSdkPluginCallback = function(result) {
-	document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(truncateBase64String(result), null, 2);
+    document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(truncateBase64String(result), null, 2);
+	showImageView('none');
 }
 
 var abbyyRtrSdkDetectBoundaryPluginCallback = function(res) {
     var result = res.result;
     document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(result, null, 2);
     if (res.imageUri) {
-        var canvas = document.getElementById('AbbyyRtrSdkPluginCapturedImageCanvas');
+        var canvas = showImageView('canvas');
         var ctx = canvas.getContext("2d");
         var img = new Image;
         if (result.documentBoundary) {
@@ -290,14 +522,16 @@ var abbyyRtrSdkDetectBoundaryPluginCallback = function(res) {
             };
         }
         img.src = res.imageUri;
+    } else {
+        showImageView('none');
     }
 };
 
 var abbyyRtrSdkAssessQualityPluginCallback = function(res) {
     var result = res.result;
-	document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(result, null, 2);
-	if (res.imageUri) {
-        var canvas = document.getElementById('AbbyyRtrSdkPluginCapturedImageCanvas');
+    document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(result, null, 2);
+    if (res.imageUri) {
+        var canvas = showImageView('canvas');
         var ctx = canvas.getContext("2d");
         var img = new Image;
         if (result.qualityAssessmentForOcrBlocks) {
@@ -314,6 +548,8 @@ var abbyyRtrSdkAssessQualityPluginCallback = function(res) {
             };
         }
         img.src = res.imageUri;
+    } else {
+        showImageView('none');
     }
 };
 
@@ -349,9 +585,9 @@ function drawRotatedImage(img, ctx, canvas, orientation) {
 
 var abbyyRtrSdkRecognizeTextPluginCallback = function(res) {
     var result = res.result;
-	document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(result, null, 2);
-	if (res.imageUri) {
-        var canvas = document.getElementById('AbbyyRtrSdkPluginCapturedImageCanvas');
+    document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(result, null, 2);
+    if (res.imageUri) {
+        var canvas = showImageView('canvas');
         var ctx = canvas.getContext("2d");
         var img = new Image;
         var orientation = result.orientation;
@@ -374,14 +610,16 @@ var abbyyRtrSdkRecognizeTextPluginCallback = function(res) {
             };
         }
         img.src = res.imageUri;
+    } else {
+        showImageView('none');
     }
 };
 
 var abbyyRtrSdkExtractDataPluginCallback = function(res) {
     var result = res.result;
-	document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(result, null, 2);
-	if (res.imageUri) {
-        var canvas = document.getElementById('AbbyyRtrSdkPluginCapturedImageCanvas');
+    document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(result, null, 2);
+    if (res.imageUri) {
+        var canvas = showImageView('canvas');
         var ctx = canvas.getContext("2d");
         var img = new Image;
         var orientation = result.orientation;
@@ -401,6 +639,8 @@ var abbyyRtrSdkExtractDataPluginCallback = function(res) {
             };
         }
         img.src = res.imageUri;
+    } else {
+        showImageView('none');
     }
 };
 
@@ -408,107 +648,21 @@ var shareFileUri = '';
 
 var abbyyRtrSdkPluginExportCallback = function(result) {
 	document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(truncateBase64String(result), null, 2);
-	var imageView = document.getElementById('AbbyyRtrSdkPluginCapturedImage');
 	if (result.imageUri) {
-		imageView.style.display = 'block';
+		var imageView = showImageView('image');
 		imageView.src = result.imageUri;
 		shareFileUri = result.imageUri;
+	} else {
+	    showImageView('none');
 	}
 }
 
 var abbyyRtrSdkPluginExportPDFCallback = function(result) {
 	document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(truncateBase64String(result), null, 2);
+	showImageView('none');
 	if (result.pdfUri) {
 		shareFileUri = result.pdfUri;
 	}
-}
-
-function imageCapture() {
-    AbbyyRtrSdk.startImageCapture(abbyyRtrSdkPluginImageCaptureCallback, {
-        licenseFileName : 'AbbyyRtrSdk.License', // optional, default=AbbyyRtrSdk.License
-
-        cameraResolution : cameraResolution(), // optional, default=FullHD (HD, FullHD, 4K)
-        isFlashlightButtonVisible : isFlashlightVisible.checked, // optional, default=true
-        isCaptureButtonVisible : isCaptureButtonVisible.checked, // optional, default=false
-        isGalleryButtonVisible : isGalleryButtonVisible.checked, // optional, default=false
-        orientation : orientation(), // optional, default=default
-        showPreview : showPreview.checked, // optional, default=false
-        requiredPageCount : requiredPageCount(), // optional, default=0
-
-        destination : destination(), // optional, captured image will be saved to corresponding file ('file') or returned as encode base64 image string ('base64'). default=file
-        exportType : exportType(), // optional, default=jpg (jpg, png, pdf).
-        compressionLevel : compressionLevel(), // optional, default=Normal (Low, Normal, High, ExtraHigh)
-
-		defaultImageSettings : {
-			aspectRatioMin : aspectRatioMin.current(), // optional, minimum aspect ratio of the document. Default 0.
-			aspectRatioMax : aspectRatioMax.current(), // optional, maximum aspect ratio of the document. Default 0.
-			minimumDocumentToViewRatio : minimumDocumentToViewRatio.current(), // optional, minimum document area relative to frame area - 0...1. Default 0.15.
-			documentSize : documentSize(), // optional, document size in millimeters. default=Any.
-			imageFromGalleryMaxSize : imageFromGalleryMaxSize(), // optional, default=4096
-		},
-	});
-}
-
-function textCapture() {
-    AbbyyRtrSdk.startTextCapture(abbyyRtrSdkPluginCallback, {
-        selectableRecognitionLanguages : ['English', 'French', 'German', 'Italian', 'Polish', 'PortugueseBrazilian',
-            'Russian', 'ChineseSimplified', 'ChineseTraditional', 'Japanese', 'Korean', 'Spanish'],
-        recognitionLanguages : ['English'],
-
-        licenseFileName : 'AbbyyRtrSdk.License',
-        isFlashlightVisible : isFlashlightButtonVisible.checked,
-        stopWhenStable : stopWhenStable.checked,
-        areaOfInterest : (areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current()),
-        isStopButtonVisible : isStopButtonVisible.checked,
-        orientation : orientation(),
-    });
-}
-
-function customDataCapture() {
-    AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
-        customDataCaptureScenario : {
-            name : 'Code',
-            description : 'Mix of digits with letters:  X6YZ64  32VPA  zyy777',
-            recognitionLanguages : ['English'],
-            fields : [ {
-                regEx : '([a-zA-Z]+[0-9]+|[0-9]+[a-zA-Z]+)[0-9a-zA-Z]*'
-            } ]
-        },
-
-        licenseFileName : 'AbbyyRtrSdk.License',
-        isFlashlightVisible : isFlashlightButtonVisible.checked,
-        stopWhenStable : stopWhenStable.checked,
-        areaOfInterest : areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current(),
-        isStopButtonVisible : isStopButtonVisible.checked,
-        orientation : orientation(),
-    });
-}
-
-function dataCaptureMRZ() {
-    AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
-        profile : 'MRZ',
-
-        licenseFileName : 'AbbyyRtrSdk.License',
-        isFlashlightVisible : isFlashlightButtonVisible.checked,
-        stopWhenStable : stopWhenStable.checked,
-        areaOfInterest : areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current(),
-        isStopButtonVisible : isStopButtonVisible.checked,
-        orientation: orientation()
-    });
-}
-
-function dataCaptureBCR() {
-    AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
-        profile : 'BusinessCards',
-
-        licenseFileName : 'AbbyyRtrSdk.License',
-        isFlashlightVisible : isFlashlightButtonVisible.checked,
-        stopWhenStable : stopWhenStable.checked,
-        areaOfInterest : areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current(),
-        isStopButtonVisible : isStopButtonVisible.checked,
-        orientation : orientation(),
-        recognitionLanguages : ['English'],
-    });
 }
 
 var startCaptureButton = new Button('startCaptureButton', function() {
@@ -577,136 +731,15 @@ var shareButton = new Button('shareButton', function() {
     var onSuccess = function(result) {
        console.log("Share completed " + result.completed); // On Android apps mostly return false even while it's true
        console.log("Shared to app: " + result.app); // On Android result.app is currently empty. On iOS it's empty when sharing is cancelled (result.completed=false)
-     }
+    };
 
-     var onError = function(msg) {
+    var onError = function(msg) {
        console.log("Sharing failed with message: " + msg);
-     }
+    };
 
      window.plugins.socialsharing.shareWithOptions(options, onSuccess, onError);
 });
 
-var pickImageButton = new Button('pickImageButton', function() {
-    if (imgCoreApiTab.checked) {
-        var selectedOperationType = SelectedOperationType();
-        if (selectedOperationType.localeCompare('exportPDF') === 0) {
-            AbbyyRtrSdk.startImageCapture(function(result) {
-                if (!result.images) {
-                    abbyyRtrSdkPluginCallback(result);
-                }
-                var images = result.images.map(image => {
-                    return {
-                        imageUri: 'file://'+image.filePath
-                    };
-                });
-                AbbyyRtrSdk.exportImagesToPdf({
-                    images: images,
-                }, abbyyRtrSdkPluginExportPDFCallback, abbyyRtrSdkPluginCallback);
-            }, {
-                destination : 'file'
-            });
-            return;
-        }
-    }
-    AbbyyRtrSdk.startImageCapture(function(result) {
-        if (!result.images) {
-            abbyyRtrSdkPluginCallback(result);
-        }
-		var imageUri = result.resultInfo.uriPrefix + result.images[0].base64;
-        if (coreApiTab.checked) {
-            var recognitionLanguages = getSelectValues(languagesSelect);
-            var selectedRecognitionType = SelectedRecognitionType();
-            var textOrientationDetectionEnabled = document.getElementById('textOrientationDetectionEnabled').checked;
-
-            if (selectedRecognitionType.localeCompare('text') === 0) {
-                AbbyyRtrSdk.recognizeText({
-                    imageUri: imageUri,
-                    recognitionLanguages: recognitionLanguages,
-                    textOrientationDetectionEnabled: textOrientationDetectionEnabled
-                }, (result) => {
-                    abbyyRtrSdkRecognizeTextPluginCallback({
-                        result: result,
-                        imageUri: imageUri
-                    });
-                }, abbyyRtrSdkPluginCallback);
-            } else if (selectedRecognitionType.localeCompare('bcr') === 0) {
-                AbbyyRtrSdk.extractData({
-                    imageUri: imageUri,
-                    profile: 'BusinessCards',
-                    recognitionLanguages: recognitionLanguages,
-                    textOrientationDetectionEnabled: textOrientationDetectionEnabled
-                }, (result) => {
-                    abbyyRtrSdkExtractDataPluginCallback({
-                        result: result,
-                        imageUri: imageUri
-                    });
-                }, abbyyRtrSdkPluginCallback);
-            }
-        } else if (imgCoreApiTab.checked) {
-            var selectedOperationType = SelectedOperationType();
-
-            if (selectedOperationType.localeCompare('crop') === 0) {
-                AbbyyRtrSdk.detectDocumentBoundary({
-                    imageUri: imageUri
-                }, result => {
-                    if (result.documentBoundary) {
-                        AbbyyRtrSdk.cropImage({
-                            imageUri: imageUri,
-                            result: {
-                                destination : destination(),
-                                exportType : exportType(),
-                                compressionLevel : compressionLevel(),
-                            },
-                            documentBoundary: result.documentBoundary,
-                            documentSize: result.documentSize,
-                        }, abbyyRtrSdkPluginExportCallback, abbyyRtrSdkPluginCallback);
-                    } else {
-                        abbyyRtrSdkPluginCallback(result);
-                    }
-                }, abbyyRtrSdkPluginCallback);
-            } else if (selectedOperationType.localeCompare('rotate') === 0) {
-                AbbyyRtrSdk.rotateImage({
-                    imageUri: imageUri,
-                    angle: angle(),
-                    result: {
-                        destination : destination(),
-                        exportType : exportType(),
-                        compressionLevel : compressionLevel(),
-                    },
-                }, abbyyRtrSdkPluginExportCallback, abbyyRtrSdkPluginCallback);
-            } else if (selectedOperationType.localeCompare('export') === 0) {
-                AbbyyRtrSdk.exportImage({
-                    imageUri: imageUri,
-                    result: {
-                        destination : destination(),
-                        exportType : exportType(),
-                        compressionLevel : compressionLevel(),
-                    },
-                }, abbyyRtrSdkPluginExportCallback, abbyyRtrSdkPluginCallback);
-            } else if (selectedOperationType.localeCompare('detect_boundary') === 0) {
-                AbbyyRtrSdk.detectDocumentBoundary({
-                    imageUri: imageUri
-                }, (result) => {
-                    abbyyRtrSdkDetectBoundaryPluginCallback({
-                        result: result,
-                        imageUri: imageUri
-                    });
-                }, abbyyRtrSdkPluginCallback);
-            } else if (selectedOperationType.localeCompare('assess_quality') === 0) {
-                AbbyyRtrSdk.assessQualityForOcr({
-                    imageUri: imageUri
-                }, (result) => {
-                   abbyyRtrSdkAssessQualityPluginCallback({
-                       result: result,
-                       imageUri: imageUri
-                   });
-               }, abbyyRtrSdkPluginCallback);
-            }
-        }
-    }, {
-		requiredPageCount : 1,
-		destination : 'base64'
-    });
-});
+var pickImageButton = new Button('pickImageButton', () => coreAPI());
 
 app.initialize();
