@@ -4,6 +4,10 @@
 var app = {
 	initialize: function() {
 		document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
+
+		document.addEventListener('coreApiOnProgress', function(event) {
+			console.log(event.detail);
+		}, false);
 	},
 
 	onDeviceReady: function() {
@@ -45,13 +49,13 @@ function Button(buttonId, action) {
 	this.element.addEventListener('touchstart', this.onTouch.bind(this));
 }
 
-function Orientation() {
+function orientation() {
 	element = document.getElementById('orientation')
 	return element.options[element.selectedIndex].text
 }
 
-function maxImagesCount() {
-	element = document.getElementById('maxImagesCount')
+function requiredPageCount() {
+	element = document.getElementById('requiredPageCount')
 	return element.value
 }
 
@@ -75,11 +79,6 @@ function compressionLevel() {
 	return element.options[element.selectedIndex].text
 }
 
-function pdfCompressionType() {
-	element = document.getElementById('pdfCompressionType')
-	return element.options[element.selectedIndex].text
-}
-
 function documentSize() {
 	element = document.getElementById('documentSize')
 	return element.options[element.selectedIndex].text
@@ -90,10 +89,12 @@ function destination() {
 	return element.options[element.selectedIndex].text
 }
 
+
+
 var isFlashlightButtonVisibleIC = document.getElementById('isFlashlightButtonVisibleIC');
 var showPreviewIC = document.getElementById('showPreviewIC');
 var isCaptureButtonVisible = document.getElementById('isCaptureButtonVisible');
-var cropEnabled = document.getElementById('cropEnabled');
+var isGalleryButtonVisible = document.getElementById('isGalleryButtonVisible');
 var minimumDocumentToViewRatio = new Slider('minimumDocumentToViewRatio', 'minimumDocumentToViewRatioValue');
 
 var isFlashlightVisible = document.getElementById('isFlashlightVisible');
@@ -114,10 +115,10 @@ var abbyyRtrSdkPluginImageCaptureCallback = function(result) {
 	document.getElementById('AbbyyRtrSdkPluginResult').innerText = JSON.stringify(result, null, 2);
 	var imageView = document.getElementById('AbbyyRtrSdkPluginCapturedImage')
 	if(result.images && result.images[0] && result.images[0].base64) {
-		imageView.style.display = "block";
-		imageView.src = "data:image/jpeg;base64," + result.images[0].base64;
+		imageView.style.display = 'block';
+		imageView.src = 'data:image/jpeg;base64,' + result.images[0].base64;
 	} else {
-		imageView.style.display = "none";
+		imageView.style.display = 'none';
 		imageView.src = null;
 	}
 }
@@ -129,87 +130,86 @@ var abbyyRtrSdkPluginCallback = function(result) {
 
 function imageCapture() {
 	AbbyyRtrSdk.startImageCapture(abbyyRtrSdkPluginImageCaptureCallback, {
-		licenseFileName : "AbbyyRtrSdk.license", // optional, default=AbbyyRtrSdk.license
+		licenseFileName : 'AbbyyRtrSdk.License', // optional, default=AbbyyRtrSdk.License
 
 		cameraResolution : cameraResolution(), // optional, default=FullHD (HD, FullHD, 4K)
 		isFlashlightButtonVisible : isFlashlightButtonVisibleIC.checked, // optional, default=true
 		isCaptureButtonVisible : isCaptureButtonVisible.checked, // optional, default=false
+		isGalleryButtonVisible : isGalleryButtonVisible.checked, // optional, default=false
 		orientation : orientationIC(), // optional, default=default
 		showPreview : showPreviewIC.checked, // optional, default=false
-		maxImagesCount : maxImagesCount(), // optional, default=0
+		requiredPageCount : requiredPageCount(), // optional, default=0
 
-		destination : destination(), // optional, captured image will be saved to corresponding file ("file") or returned as encode base64 image string ("base64"). default=file
+		destination : destination(), // optional, captured image will be saved to corresponding file ('file') or returned as encode base64 image string ('base64'). default=file
 		exportType : exportType(), // optional, default=jpg (jpg, png, pdf).
-		pdfCompressionType : pdfCompressionType(), // optional, default=jpg (jpg)
 		compressionLevel : compressionLevel(), // optional, default=Normal (Low, Normal, High, ExtraHigh)
 
 		defaultImageSettings : {
 			minimumDocumentToViewRatio : minimumDocumentToViewRatio.current(), // optional, minimum document area relative to frame area - 0...1. Default 0.15.
 			documentSize : documentSize(), // optional, document size in millimeters. default=Any.
-			cropEnabled : cropEnabled.checked, // optional, default=true
 		},
 	});
 }
 
 function textCapture() {
 	AbbyyRtrSdk.startTextCapture(abbyyRtrSdkPluginCallback, {
-		selectableRecognitionLanguages : ["English", "French", "German", "Italian", "Polish", "PortugueseBrazilian",
-			"Russian", "ChineseSimplified", "ChineseTraditional", "Japanese", "Korean", "Spanish"],
-		recognitionLanguages : ["English"],
+		selectableRecognitionLanguages : ['English', 'French', 'German', 'Italian', 'Polish', 'PortugueseBrazilian',
+			'Russian', 'ChineseSimplified', 'ChineseTraditional', 'Japanese', 'Korean', 'Spanish'],
+		recognitionLanguages : ['English'],
 
-		licenseFileName : "AbbyyRtrSdk.license",
+		licenseFileName : 'AbbyyRtrSdk.License',
 		isFlashlightVisible : isFlashlightVisible.checked,
 		stopWhenStable : stopWhenStable.checked,
-		areaOfInterest : (areaOfInterestWidth.current() + " " + areaOfInterestHeight.current()),
+		areaOfInterest : (areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current()),
 		isStopButtonVisible : isStopButtonVisible.checked,
-		orientation : Orientation(),
+		orientation : orientation(),
 	});
 }
 
 function customDataCapture() {
 	AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
 		customDataCaptureScenario : {
-			name : "Code",
-			description : "Mix of digits with letters:  X6YZ64  32VPA  zyy777",
-			recognitionLanguages : ["English"],
+			name : 'Code',
+			description : 'Mix of digits with letters:  X6YZ64  32VPA  zyy777',
+			recognitionLanguages : ['English'],
 			fields : [ {
-				regEx : "([a-zA-Z]+[0-9]+|[0-9]+[a-zA-Z]+)[0-9a-zA-Z]*"
+				regEx : '([a-zA-Z]+[0-9]+|[0-9]+[a-zA-Z]+)[0-9a-zA-Z]*'
 			} ]
 		},
 
-		licenseFileName : "AbbyyRtrSdk.license",
+		licenseFileName : 'AbbyyRtrSdk.License',
 		isFlashlightVisible : isFlashlightVisible.checked,
 		stopWhenStable : stopWhenStable.checked,
-		areaOfInterest : areaOfInterestWidth.current() + " " + areaOfInterestHeight.current(),
+		areaOfInterest : areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current(),
 		isStopButtonVisible : isStopButtonVisible.checked,
-		orientation : Orientation(),
+		orientation : orientation(),
 	});
 }
 
 function dataCaptureMRZ() {
 	AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
-		profile : "MRZ",
+		profile : 'MRZ',
 
-		licenseFileName : "AbbyyRtrSdk.license",
+		licenseFileName : 'AbbyyRtrSdk.License',
 		isFlashlightVisible : isFlashlightVisible.checked,
 		stopWhenStable : stopWhenStable.checked,
-		areaOfInterest : areaOfInterestWidth.current() + " " + areaOfInterestHeight.current(),
+		areaOfInterest : areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current(),
 		isStopButtonVisible : isStopButtonVisible.checked,
-		orientation: Orientation()
+		orientation: orientation()
 	});
 }
 
 function dataCaptureBCR() {
 	AbbyyRtrSdk.startDataCapture(abbyyRtrSdkPluginCallback, {
-		profile : "BusinessCards",
+		profile : 'BusinessCards',
 
-		licenseFileName : "AbbyyRtrSdk.license",
+		licenseFileName : 'AbbyyRtrSdk.License',
 		isFlashlightVisible : isFlashlightVisible.checked,
 		stopWhenStable : stopWhenStable.checked,
-		areaOfInterest : areaOfInterestWidth.current() + " " + areaOfInterestHeight.current(),
+		areaOfInterest : areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current(),
 		isStopButtonVisible : isStopButtonVisible.checked,
-		orientation : Orientation(),
-		recognitionLanguages : ["English"],
+		orientation : orientation(),
+		recognitionLanguages : ['English'],
 	});
 }
 
@@ -223,8 +223,62 @@ var startCaptureButton = new Button('startCaptureButton', function() {
 	} else if (dataCaptureMRZTab.checked) {
 		dataCaptureMRZ();
 	} else if (dataCaptureBCRTab.checked) {
-        dataCaptureBCR();
-    }
+		dataCaptureBCR();
+	}
+});
+
+select = document.getElementById('coreApiLanguagesSelect');
+select.addEventListener('change', (event) => {
+	document.getElementById('selectedLanguagesValue').innerText = getSelectValues(select).map(value => {
+		return value.substring(0, 2);
+	}).join(',');
+});
+
+function SelectedRecognitionType() {
+	element = document.getElementById('recognitionType')
+	return element.options[element.selectedIndex].value
+}
+
+function getSelectValues(select) {
+	var result = [];
+	var options = select && select.options;
+	var opt;
+
+	for (var i = 0; i < options.length; i++) {
+		opt = options[i];
+
+		if (opt.selected) {
+			result.push(opt.value || opt.text);
+		}
+	}
+	return result;
+}
+
+var pickImageButton = new Button('pickImageButton', function() {
+
+	AbbyyRtrSdk.startImageCapture(function(result) {
+		if(!result.images) {
+			abbyyRtrSdkPluginImageCaptureCallback(result);
+		}
+		var image = result.images[0].base64;
+
+		if (SelectedRecognitionType().localeCompare('text') === 0) {
+			AbbyyRtrSdk.recognizeText(image, {
+				recognitionLanguages: getSelectValues(select),
+				textOrientationDetectionEnabled: document.getElementById('textOrientationDetectionEnabled').checked
+			}, abbyyRtrSdkPluginCallback, abbyyRtrSdkPluginCallback)
+		}
+		if (SelectedRecognitionType().localeCompare('bcr') === 0) {
+			AbbyyRtrSdk.extractData(image, {
+				recognitionLanguages: getSelectValues(select),
+				profile: 'BusinessCards',
+				textOrientationDetectionEnabled: document.getElementById('textOrientationDetectionEnabled').checked
+			}, abbyyRtrSdkPluginCallback, abbyyRtrSdkPluginCallback)
+		}
+	}, {
+		maxImagesCount : 1,
+		destination : 'base64'
+	});
 });
 
 app.initialize();

@@ -109,6 +109,7 @@ h1 {
 #tab_settings_regex:checked ~ #settings { display: block; }
 #tab_settings_mrz:checked ~ #settings { display: block; }
 #tab_settings_bcr:checked ~ #settings { display: block; }
+#tab_settings_coreapi:checked ~ #settings_coreapi { display: block; }
 
 .settings {
 	font-size: 16px;
