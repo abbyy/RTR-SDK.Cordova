@@ -3,9 +3,13 @@
 
 package com.abbyy.mobile.rtr.cordova.text;
 
+import android.graphics.Rect;
+
 import com.abbyy.mobile.rtr.Language;
 
 public class TextRecognitionSettings {
+	public String imageUri;
+	public Rect areaOfInterest;
 	public Language[] recognitionLanguages;
 	public boolean isTextOrientationDetectionEnabled = true;
 

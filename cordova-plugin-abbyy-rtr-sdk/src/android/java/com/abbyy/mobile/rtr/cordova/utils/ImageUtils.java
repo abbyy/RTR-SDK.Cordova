@@ -9,8 +9,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Base64;
 
-import com.abbyy.mobile.rtr.cordova.ImageType;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,44 +19,16 @@ import java.io.InputStream;
  */
 public class ImageUtils {
 
-	public static String convertFileToBase64( File file ) throws IOException
+	public static Bitmap getBitmap( String imageUri, Context context ) throws IOException
 	{
-		try( FileInputStream fis = new FileInputStream( file ) ) {
-			byte[] bytes = new byte[(int) file.length()];
-
-			int offset = 0;
-			int bytesRead = 0;
-			while( offset < bytes.length && bytesRead >= 0 ) {
-				bytesRead = fis.read( bytes, offset, bytes.length - offset );
-				offset += bytesRead;
+		Uri uri = Uri.parse( imageUri );
+		try( InputStream inputStream = context.getContentResolver().openInputStream( uri ) ) {
+			Bitmap bitmap = BitmapFactory.decodeStream( inputStream );
+			if( bitmap == null ) {
+				throw new IOException( "Could not load image from URI: " + uri );
 			}
-			return Base64.encodeToString( bytes, Base64.DEFAULT );
+			return bitmap;
 		}
-	}
-
-	public static Bitmap getBitmap( String image, ImageType imageType, Context context ) throws IOException
-	{
-		switch( imageType ) {
-			case Base64:
-				byte[] decodedString = Base64.decode( image, Base64.DEFAULT );
-				return BitmapFactory.decodeByteArray( decodedString, 0, decodedString.length );
-			case URI:
-				Uri uri = Uri.parse( image );
-				try( InputStream inputStream = context.getContentResolver().openInputStream( uri ) ) {
-					Bitmap bitmap = BitmapFactory.decodeStream( inputStream );
-					if( bitmap == null ) {
-						throw new IOException( "Could not load image from URI: " + uri );
-					}
-					return bitmap;
-				}
-			case FilePath:
-				Bitmap bitmap = BitmapFactory.decodeFile( image );
-				if( bitmap == null ) {
-					throw new IOException( "Could not load image from file: " + image );
-				}
-				return bitmap;
-		}
-		return null;
 	}
 
 	public static File getCaptureSessionPdfFile( Context context )

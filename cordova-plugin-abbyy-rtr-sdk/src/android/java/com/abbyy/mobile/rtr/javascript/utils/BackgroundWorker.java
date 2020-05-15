@@ -1,12 +1,13 @@
 // ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
 // ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
 
-package com.abbyy.mobile.rtr.cordova.utils;
+package com.abbyy.mobile.rtr.javascript.utils;
 
 import android.os.AsyncTask;
-import android.support.annotation.UiThread;
 
 import java.lang.ref.WeakReference;
+
+import androidx.annotation.UiThread;
 
 /**
  * Utility class for handling work in background
@@ -31,7 +32,8 @@ public class BackgroundWorker<Args, T> extends AsyncTask<Args, Void, T> {
 		this.callbackRef = callback;
 	}
 
-	@SafeVarargs @Override
+	@SafeVarargs
+	@Override
 	protected final T doInBackground( Args... args )
 	{
 		Callback<Args, T> callback = callbackRef.get();

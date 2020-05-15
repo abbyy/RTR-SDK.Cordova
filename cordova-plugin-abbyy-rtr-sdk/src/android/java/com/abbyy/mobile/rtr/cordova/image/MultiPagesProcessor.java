@@ -7,15 +7,13 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.util.Size;
 
 import com.abbyy.mobile.rtr.IImagingCoreAPI;
 import com.abbyy.mobile.rtr.IImagingCoreAPI.ExportOperation.CompressionType;
-import com.abbyy.mobile.rtr.cordova.SharedEngine;
-import com.abbyy.mobile.rtr.cordova.utils.BackgroundWorker;
+import com.abbyy.mobile.rtr.javascript.SharedEngine;
+import com.abbyy.mobile.rtr.javascript.utils.BackgroundWorker;
 import com.abbyy.mobile.uicomponents.scenario.MultiPageImageCaptureScenario;
 
 import java.io.File;
@@ -24,6 +22,8 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.UUID;
+
+import androidx.annotation.NonNull;
 
 /**
  * Utility class to save the result of the multipage image capture scenario to files
@@ -54,7 +54,7 @@ public class MultiPagesProcessor extends BackgroundWorker<Void, ImageCaptureResu
 		ImageCaptureResult imageCaptureResult = new ImageCaptureResult();
 		imageCaptureResult.setPages( new Page[pages.size()] );
 
-		if( imageCaptureSettings.exportType == ImageCaptureSettings.ExportType.PDF ) {
+		if( imageCaptureSettings.exportType == ExportType.PDF ) {
 			File pdfFile = exportPagesToPdf( pages, imageCaptureResult );
 			imageCaptureResult.setPdfFile( pdfFile );
 		} else {
@@ -166,7 +166,7 @@ public class MultiPagesProcessor extends BackgroundWorker<Void, ImageCaptureResu
 		@NonNull IImagingCoreAPI api
 	) throws Exception
 	{
-		if( imageCaptureSettings.exportType == ImageCaptureSettings.ExportType.PNG ) {
+		if( imageCaptureSettings.exportType == ExportType.PNG ) {
 			try( IImagingCoreAPI.ExportToPngOperation operation = api.createExportToPngOperation( fos ) ) {
 				operation.addPage( image );
 			}
@@ -187,10 +187,8 @@ public class MultiPagesProcessor extends BackgroundWorker<Void, ImageCaptureResu
 		Bitmap pageImage = scenarioResult.loadImage( pageId );
 		Page page = new Page();
 		if( pageImage != null ) {
-			page.setFrameSize( new Size( pageImage.getWidth(), pageImage.getHeight() ) );
+			page.setImageSize( new Size( pageImage.getWidth(), pageImage.getHeight() ) );
 		}
-		Point[] documentBoundary = scenarioResult.loadBoundary( pageId );
-		page.setDocumentBoundary( documentBoundary );
 		imageCaptureResult.getPages()[pageNumber] = page;
 		return new Pair<>( page, pageImage );
 	}

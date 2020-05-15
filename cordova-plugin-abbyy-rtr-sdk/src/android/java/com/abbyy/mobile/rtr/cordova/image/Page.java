@@ -3,7 +3,6 @@
 
 package com.abbyy.mobile.rtr.cordova.image;
 
-import android.graphics.Point;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Size;
@@ -13,22 +12,17 @@ import java.io.File;
 public class Page implements Parcelable {
 
 	private File file;
-	private Size frameSize;
-	private Point[] documentBoundary;
+	private Size imageSize;
 
 	public Page() {}
 
 	private Page( Parcel source )
 	{
 		file = (File) source.readSerializable();
-		frameSize = source.readSize();
+		imageSize = source.readSize();
 
 		int[] boundary = new int[8];
 		source.readIntArray( boundary );
-		documentBoundary = new Point[4];
-		for( int i = 0; i < 4; i++ ) {
-			documentBoundary[i] = new Point( boundary[i * 2], boundary[i * 2 + 1] );
-		}
 	}
 
 	public void setFile( File file )
@@ -41,24 +35,14 @@ public class Page implements Parcelable {
 		return file;
 	}
 
-	public Size getFrameSize()
+	public Size getImageSize()
 	{
-		return frameSize;
+		return imageSize;
 	}
 
-	public void setFrameSize( Size frameSize )
+	public void setImageSize(Size imageSize)
 	{
-		this.frameSize = frameSize;
-	}
-
-	public void setDocumentBoundary( Point[] documentBoundary )
-	{
-		this.documentBoundary = documentBoundary;
-	}
-
-	public Point[] getDocumentBoundary()
-	{
-		return documentBoundary;
+		this.imageSize = imageSize;
 	}
 
 	@Override
@@ -71,19 +55,11 @@ public class Page implements Parcelable {
 	public void writeToParcel( Parcel dest, int flags )
 	{
 		dest.writeSerializable( file );
-		if (frameSize != null) {
-			dest.writeSize( frameSize );
+		if (imageSize != null) {
+			dest.writeSize(imageSize);
 		} else {
 			dest.writeSize( new Size(0, 0) );
 		}
-		int[] boundary = new int[8];
-		if( documentBoundary != null ) {
-			for( int i = 0; i < 4; i++ ) {
-				boundary[2 * i] = documentBoundary[i].x;
-				boundary[2 * i + 1] = documentBoundary[i].y;
-			}
-		}
-		dest.writeIntArray( boundary );
 	}
 
 	public static final Creator<Page> CREATOR = new Creator<Page>() {

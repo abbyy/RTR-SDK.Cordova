@@ -13,9 +13,9 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Pair;
 import android.view.View;
 import android.view.Window;
@@ -24,16 +24,18 @@ import android.view.WindowManager;
 import com.abbyy.mobile.rtr.Engine;
 import com.abbyy.mobile.rtr.cordova.ResourcesUtils;
 import com.abbyy.mobile.rtr.cordova.RtrPlugin;
-import com.abbyy.mobile.rtr.cordova.SharedEngine;
 import com.abbyy.mobile.rtr.cordova.image.ImageCaptureResult;
 import com.abbyy.mobile.rtr.cordova.image.ImageCaptureSettings;
+import com.abbyy.mobile.rtr.cordova.image.MultiCaptureResult;
 import com.abbyy.mobile.rtr.cordova.image.MultiPagesProcessor;
-import com.abbyy.mobile.rtr.cordova.utils.BackgroundWorker;
+import com.abbyy.mobile.rtr.javascript.SharedEngine;
+import com.abbyy.mobile.rtr.javascript.utils.BackgroundWorker;
 import com.abbyy.mobile.uicomponents.CaptureView;
 import com.abbyy.mobile.uicomponents.scenario.MultiPageImageCaptureScenario;
 import com.abbyy.mobile.uicomponents.scenario.MultiPageImageCaptureScenario.Result;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -245,17 +247,19 @@ public class ImageCaptureActivity extends AppCompatActivity implements MultiPage
 	private void exitWithException( @NonNull Exception exception )
 	{
 		Intent intent = new Intent();
+		HashMap<String, Object> errorJson = MultiCaptureResult.getErrorJsonResult(
+			"Capture error: " + exception.getClass().getSimpleName() + " " + exception.getMessage() );
 		intent.putExtra(
-			ERROR_DESCRIPTION_RESULT_KEY,
-			"Capture error: " + exception.getClass().getSimpleName() + " " + exception.getMessage()
+			ERROR_DESCRIPTION_RESULT_KEY, errorJson
 		);
-		setResult( Activity.RESULT_CANCELED, intent );
+		setResult( RtrPlugin.RESULT_FAIL, intent );
 		finish();
 	}
 
 	private void exitWithCancelledEvent()
 	{
-		setResult( Activity.RESULT_CANCELED, null );
+		Intent data = new Intent();
+		setResult( RtrPlugin.RESULT_OK, data );
 		finish();
 	}
 

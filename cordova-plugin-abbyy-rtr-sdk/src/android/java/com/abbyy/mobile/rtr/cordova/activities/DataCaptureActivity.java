@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 
@@ -19,7 +19,6 @@ import com.abbyy.mobile.rtr.cordova.DataCaptureScenario;
 import com.abbyy.mobile.rtr.cordova.ResourcesUtils;
 import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.RtrPlugin;
-import com.abbyy.mobile.rtr.cordova.exceptions.InitializationException;
 import com.abbyy.mobile.rtr.cordova.surfaces.BaseSurfaceView;
 import com.abbyy.mobile.rtr.cordova.surfaces.DataCaptureSurfaceView;
 import com.abbyy.mobile.rtr.cordova.utils.DataUtils;
@@ -117,7 +116,7 @@ public class DataCaptureActivity extends BaseActivity {
 
 				ArrayList<HashMap<String, Object>> fieldList = new ArrayList<>();
 				if( fields != null ) {
-					fieldList = DataUtils.toJsonDataFields(fields);
+					fieldList = DataUtils.toJsonDataFields( fields );
 				}
 
 				HashMap<String, String> dataSchemeInfo = new HashMap<>();
@@ -131,7 +130,7 @@ public class DataCaptureActivity extends BaseActivity {
 
 				putErrorIfEssential( json );
 
-				intent.putExtra( "result", json );
+				intent.putExtra( RtrPlugin.INTENT_RESULT_KEY, json );
 				DataCaptureActivity.this.setResult( RtrPlugin.RESULT_OK, intent );
 				DataCaptureActivity.this.finish();
 			}
@@ -170,13 +169,13 @@ public class DataCaptureActivity extends BaseActivity {
 				captureService = RtrManager.createDataCaptureService( profile, captureCallback );
 				if( !RtrManager.getLanguages().isEmpty() ) {
 					try {
-						IDataCaptureProfileBuilder profileBuilder = captureService.configureDataCaptureProfile();
 						Language[] languages = new Language[RtrManager.getLanguages().size()];
 						languages = RtrManager.getLanguages().toArray( languages );
-						profileBuilder.setRecognitionLanguage( languages );
+						IDataCaptureProfileBuilder profileBuilder = captureService.configureDataCaptureProfile()
+							.setRecognitionLanguage( languages );
 						profileBuilder.checkAndApply();
 					} catch( IDataCaptureProfileBuilder.ProfileCheckException e ) {
-						onProfileError( e );
+						onProfileError();
 					}
 				}
 			} catch( Exception e ) {
@@ -187,14 +186,14 @@ public class DataCaptureActivity extends BaseActivity {
 			captureService = null;
 			try {
 				captureService = RtrManager.createDataCaptureService( null, captureCallback );
-				IDataCaptureProfileBuilder profileBuilder = captureService.configureDataCaptureProfile();
-				IDataCaptureProfileBuilder.IFieldBuilder field = profileBuilder.addScheme( currentScenario.name ).addField( currentScenario.name );
-
 				Language[] languages = new Language[currentScenario.languages.size()];
 				for( int i = 0; i < languages.length; i++ ) {
 					languages[i] = currentScenario.languages.get( i );
 				}
-				profileBuilder.setRecognitionLanguage( languages );
+				IDataCaptureProfileBuilder profileBuilder = captureService.configureDataCaptureProfile()
+					.setRecognitionLanguage( languages );
+				IDataCaptureProfileBuilder.IFieldBuilder field = profileBuilder.addScheme( currentScenario.name ).addField( currentScenario.name );
+
 				field.setRegEx( currentScenario.regEx );
 
 				profileBuilder.checkAndApply();
@@ -277,7 +276,7 @@ public class DataCaptureActivity extends BaseActivity {
 		createCaptureService();
 	}
 
-	private void onProfileError( Throwable e )
+	private void onProfileError()
 	{
 		Log.e( getString( ResourcesUtils.getResId( "string", "app_name", this ) ), "Cannot set recognition languages" );
 		Intent intent = new Intent();
@@ -288,7 +287,7 @@ public class DataCaptureActivity extends BaseActivity {
 
 		json.put( "error", errorInfo );
 
-		intent.putExtra( "result", json );
+		intent.putExtra( RtrPlugin.INTENT_RESULT_KEY, json );
 		setResult( RtrPlugin.RESULT_FAIL, intent );
 		finish();
 	}

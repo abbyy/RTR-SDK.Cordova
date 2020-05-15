@@ -8,7 +8,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.abbyy.mobile.rtr.IImagingCoreAPI.ExportOperation.Compression;
-import com.abbyy.mobile.rtr.IImagingCoreAPI.ExportOperation.CompressionType;
+import com.abbyy.mobile.rtr.javascript.image.Destination;
 import com.abbyy.mobile.uicomponents.CaptureView.CameraSettings.Resolution;
 import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario.DocumentSize;
 
@@ -16,21 +16,13 @@ import java.util.Objects;
 
 public class ImageCaptureSettings implements Parcelable {
 
-	public enum Destination {
-		BASE64, FILE
-	}
-
-	public enum ExportType {
-		JPG, PNG, PDF
-	}
-
 	public boolean isFlashlightButtonVisible = true;
 	public boolean isCaptureButtonVisible = true;
 	public boolean isShowPreviewEnabled = false;
 	public boolean isGalleryButtonVisible = true;
 	public Resolution cameraResolution = Resolution.FULL_HD;
 	public int requiredPageCount = 0;
-	public Destination destination = Destination.FILE;
+	public Destination destination = Destination.File;
 	public ExportType exportType = ExportType.JPG;
 	public Compression compressionLevel = Compression.Low;
 	public float minimumDocumentToViewRatio = 0.15f;

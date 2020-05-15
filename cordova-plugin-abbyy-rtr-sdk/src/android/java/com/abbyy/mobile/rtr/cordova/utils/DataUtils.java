@@ -1,22 +1,9 @@
 package com.abbyy.mobile.rtr.cordova.utils;
 
-import com.abbyy.mobile.rtr.IDataCaptureCoreAPI;
 import com.abbyy.mobile.rtr.IDataCaptureService;
-import com.abbyy.mobile.rtr.IRecognitionCoreAPI;
-import com.abbyy.mobile.rtr.ITextCaptureService;
-import com.abbyy.mobile.rtr.Language;
-import com.abbyy.mobile.rtr.cordova.RtrPlugin;
-import com.abbyy.mobile.rtr.cordova.data.DataCaptureSettings;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import static com.abbyy.mobile.rtr.cordova.utils.TextUtils.parseLanguagesInternal;
 
 public class DataUtils {
 
@@ -84,50 +71,5 @@ public class DataUtils {
 			fieldList.add( fieldInfo );
 		}
 		return fieldList;
-	}
-
-	private static JSONObject toJsonDataField( IDataCaptureCoreAPI.DataField field ) throws JSONException
-	{
-		JSONObject jsonField = new JSONObject();
-		jsonField.put( "id", field.Id );
-		jsonField.put( "name", field.Name );
-		jsonField.put( "text", field.Text );
-		jsonField.put( "quadrangle", TextUtils.convertQuadrangleToString( field.Quadrangle ) );
-		JSONArray jsonComponents = new JSONArray();
-		for( IDataCaptureCoreAPI.DataField component : field.Components ) {
-			jsonComponents.put( toJsonDataField( component ) );
-		}
-		jsonField.put( "components", jsonComponents );
-		return jsonField;
-	}
-
-	public static JSONObject toDataCaptureResult( IDataCaptureCoreAPI.DataField[] fields, Integer orientation ) throws JSONException
-	{
-		JSONObject json = new JSONObject();
-		JSONArray jsonFields = new JSONArray();
-		for( IDataCaptureCoreAPI.DataField field : fields ) {
-			jsonFields.put( toJsonDataField( field ) );
-		}
-
-		json.put( "resultInfo", jsonFields );
-		if( orientation != null ) {
-			json.put( "orientation", orientation.intValue() );
-		}
-		return json;
-	}
-
-	public static DataCaptureSettings parseDataCaptureSettings( JSONObject arg ) throws JSONException
-	{
-		DataCaptureSettings dataCaptureSettings = new DataCaptureSettings();
-		List<Language> languages = parseLanguagesInternal( arg, RtrPlugin.RTR_RECOGNITION_LANGUAGES_KEY, false );
-		dataCaptureSettings.recognitionLanguages = languages.toArray( new Language[0] );
-		if( arg.has( RtrPlugin.RTR_IS_TEXT_ORIENTATION_DETECTION_ENABLED_KEY ) ) {
-			dataCaptureSettings.isTextOrientationDetectionEnabled = arg.getBoolean( RtrPlugin.RTR_IS_TEXT_ORIENTATION_DETECTION_ENABLED_KEY );
-		}
-		if( arg.has( RtrPlugin.RTR_DATA_CAPTURE_PROFILE_KEY ) ) {
-			dataCaptureSettings.profile = arg.getString( RtrPlugin.RTR_DATA_CAPTURE_PROFILE_KEY );
-		}
-
-		return dataCaptureSettings;
 	}
 }

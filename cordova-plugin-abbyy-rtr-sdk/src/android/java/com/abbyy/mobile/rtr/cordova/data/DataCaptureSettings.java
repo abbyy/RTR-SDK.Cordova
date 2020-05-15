@@ -6,6 +6,7 @@ package com.abbyy.mobile.rtr.cordova.data;
 import com.abbyy.mobile.rtr.Language;
 
 public class DataCaptureSettings {
+	public String imageUri;
 	public Language[] recognitionLanguages;
 	public boolean isTextOrientationDetectionEnabled = true;
 	public String profile;

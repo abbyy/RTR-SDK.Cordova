@@ -12,10 +12,8 @@ import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.display.DisplayManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -33,12 +31,14 @@ import com.abbyy.mobile.rtr.cordova.ResourcesUtils;
 import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.RtrPlugin;
 import com.abbyy.mobile.rtr.cordova.surfaces.BaseSurfaceView;
-import com.abbyy.mobile.rtr.cordova.utils.BackgroundWorker;
+import com.abbyy.mobile.rtr.javascript.utils.BackgroundWorker;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import androidx.annotation.Nullable;
 
 @SuppressWarnings( "deprecation" )
 abstract class BaseActivity extends Activity {
@@ -525,7 +525,7 @@ abstract class BaseActivity extends Activity {
 
 				putErrorIfEssential( json );
 
-				intent.putExtra( "result", json );
+				intent.putExtra( RtrPlugin.INTENT_RESULT_KEY, json );
 				BaseActivity.this.setResult( RtrPlugin.RESULT_OK, intent );
 				BaseActivity.this.finish();
 			}
@@ -541,7 +541,7 @@ abstract class BaseActivity extends Activity {
 		HashMap<String, Object> json = new HashMap<>();
 		putErrorIfEssential( json );
 
-		intent.putExtra( "result", json );
+		intent.putExtra( RtrPlugin.INTENT_RESULT_KEY, json );
 		setResult( RtrPlugin.RESULT_FAIL, intent );
 		finish();
 	}
@@ -616,12 +616,12 @@ abstract class BaseActivity extends Activity {
 		setContentView( ResourcesUtils.getResId( "layout", "activity_capture", this ) );
 
 		// Retrieve some ui components
-		warningTextView = (TextView) findViewById( ResourcesUtils.getResId( "id", "warningText", this ) );
-		errorTextView = (TextView) findViewById( ResourcesUtils.getResId( "id", "errorText", this ) );
-		startButton = (Button) findViewById( ResourcesUtils.getResId( "id", "startButton", this ) );
-		preferenceButton = (Button) findViewById( ResourcesUtils.getResId( "id", "preferenceButton", this ) );
-		flashButton = (ImageButton) findViewById( ResourcesUtils.getResId( "id", "flashButton", this ) );
-		scenarioDescription = (TextView) findViewById( ResourcesUtils.getResId( "id", "scenarioDescription", this ) );
+		warningTextView = findViewById( ResourcesUtils.getResId( "id", "warningText", this ) );
+		errorTextView = findViewById( ResourcesUtils.getResId( "id", "errorText", this ) );
+		startButton = findViewById( ResourcesUtils.getResId( "id", "startButton", this ) );
+		preferenceButton = findViewById( ResourcesUtils.getResId( "id", "preferenceButton", this ) );
+		flashButton = findViewById( ResourcesUtils.getResId( "id", "flashButton", this ) );
+		scenarioDescription = findViewById( ResourcesUtils.getResId( "id", "scenarioDescription", this ) );
 
 		configureUi();
 

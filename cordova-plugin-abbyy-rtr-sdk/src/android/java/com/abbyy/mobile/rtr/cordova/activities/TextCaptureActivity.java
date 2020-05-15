@@ -10,7 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 
@@ -235,7 +235,7 @@ public class TextCaptureActivity extends BaseActivity {
 			tempList.add( RtrManager.getLanguages().get( 0 ) );
 			sharedPreferences.edit().putBoolean( RtrManager.getLanguages().get( 0 ).name(), true ).apply();
 		}
-		currentLanguages = tempList.toArray( new Language[tempList.size()] );
+		currentLanguages = tempList.toArray( new Language[0] );
 
 		if( captureService != null ) {
 			captureService.setRecognitionLanguage( currentLanguages );

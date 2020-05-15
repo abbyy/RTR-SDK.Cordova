@@ -10,27 +10,24 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.abbyy.mobile.rtr.Engine;
-import com.abbyy.mobile.rtr.IDataCaptureCoreAPI;
 import com.abbyy.mobile.rtr.IImagingCoreAPI;
-import com.abbyy.mobile.rtr.IRecognitionCoreAPI;
 import com.abbyy.mobile.rtr.Language;
 import com.abbyy.mobile.rtr.cordova.activities.DataCaptureActivity;
 import com.abbyy.mobile.rtr.cordova.activities.ImageCaptureActivity;
 import com.abbyy.mobile.rtr.cordova.activities.TextCaptureActivity;
-import com.abbyy.mobile.rtr.cordova.data.DataCaptureSettings;
 import com.abbyy.mobile.rtr.cordova.image.ImageCaptureResult;
 import com.abbyy.mobile.rtr.cordova.image.ImageCaptureSettings;
 import com.abbyy.mobile.rtr.cordova.image.MultiCaptureResult;
-import com.abbyy.mobile.rtr.cordova.text.TextRecognitionSettings;
-import com.abbyy.mobile.rtr.cordova.utils.DataUtils;
-import com.abbyy.mobile.rtr.cordova.utils.TextUtils;
+import com.abbyy.mobile.rtr.javascript.JSCallback;
+import com.abbyy.mobile.rtr.javascript.SharedEngine;
+import com.abbyy.mobile.rtr.javascript.data.DataCapture;
+import com.abbyy.mobile.rtr.javascript.image.Destination;
+import com.abbyy.mobile.rtr.javascript.image.ExportType;
+import com.abbyy.mobile.rtr.javascript.image.ImagingCore;
+import com.abbyy.mobile.rtr.javascript.text.TextRecognition;
 import com.abbyy.mobile.uicomponents.CaptureView;
 import com.abbyy.mobile.uicomponents.scenario.ImageCaptureScenario;
 
@@ -46,10 +43,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.abbyy.mobile.rtr.cordova.utils.DataUtils.toDataCaptureResult;
-import static com.abbyy.mobile.rtr.cordova.utils.ImageUtils.getBitmap;
+import androidx.annotation.NonNull;
+
 import static com.abbyy.mobile.rtr.cordova.utils.TextUtils.parseLanguagesInternal;
-import static com.abbyy.mobile.rtr.cordova.utils.TextUtils.toTextRecognitionResult;
 
 public class RtrPlugin extends CordovaPlugin {
 
@@ -84,10 +80,13 @@ public class RtrPlugin extends CordovaPlugin {
 	private static final String RTR_IS_GALLERY_BUTTON_VISIBLE_KEY = "isGalleryButtonVisible";
 	private static final String RTR_COMPRESSION_LEVEL_KEY = "compressionLevel";
 	private static final String RTR_DEFAULT_IMAGE_SETTINGS_KEY = "defaultImageSettings";
+	private static final String RTR_ASPECT_RATIO_MIN_KEY = "aspectRatioMin";
+	private static final String RTR_ASPECT_RATIO_MAX_KEY = "aspectRatioMax";
 	private static final String RTR_DOCUMENT_TO_VIEW_RATIO_KEY = "minimumDocumentToViewRatio";
 	private static final String RTR_DOCUMENT_SIZE_KEY = "documentSize";
+	private static final String RTR_IMAGE_FROM_GALLERY_MAX_SIZE_KEY = "imageFromGalleryMaxSize";
 
-	private static final String RTR_AREA_OF_INTEREST_KEY = "areaOfInterest";
+	public static final String RTR_AREA_OF_INTEREST_KEY = "areaOfInterest";
 	private static final String RTR_IS_FLASHLIGHT_VISIBLE_IMAGE_CAPTURE_KEY = "isFlashlightButtonVisible";
 	private static final String RTR_IS_FLASHLIGHT_VISIBLE_KEY = "isFlashlightVisible";
 	private static final String RTR_IS_STOP_BUTTON_VISIBLE_KEY = "isStopButtonVisible";
@@ -103,9 +102,6 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private static final String RTR_STOP_WHEN_STABLE_KEY = "stopWhenStable";
 
-	public static final String RTR_IS_TEXT_ORIENTATION_DETECTION_ENABLED_KEY = "textOrientationDetectionEnabled";
-	private static final String RTR_IMAGE_TYPE_KEY = "exportType";
-
 	public static final String INTENT_RESULT_KEY = "result";
 
 	//endregion constants for parsing
@@ -118,139 +114,316 @@ public class RtrPlugin extends CordovaPlugin {
 	@Override
 	public boolean execute( String action, JSONArray args, final CallbackContext callbackContext )
 	{
-		Boolean finished = checkImageCapture( action, args, callbackContext );
-		if( finished != null ) { return finished; }
-
-		finished = checkTextCapture( action, args, callbackContext );
-		if( finished != null ) { return finished; }
-
-		finished = checkDataCapture( action, args, callbackContext );
-		if( finished != null ) { return finished; }
-
-		finished = checkRecognizeText( action, args, callbackContext );
-		if( finished != null ) { return finished; }
-
-		finished = checkExtractData( action, args, callbackContext );
-		if( finished != null ) { return finished; }
+		switch( action ) {
+			case "startImageCapture":
+				return performImageCapture( args, callbackContext );
+			case "startTextCapture":
+				return performTextCapture( args, callbackContext );
+			case "startDataCapture":
+				return performDataCapture( args, callbackContext );
+			case "recognizeText":
+				return performTextRecognition( args, callbackContext );
+			case "extractData":
+				return performDataExtraction( args, callbackContext );
+			case "assessQualityForOcr":
+				return performQualityAssessmentForOcr( args, callbackContext );
+			case "detectDocumentBoundary":
+				return performBoundaryDetection( args, callbackContext );
+			case "cropImage":
+				return performImageCrop( args, callbackContext );
+			case "rotateImage":
+				return performImageRotation( args, callbackContext );
+			case "exportImage":
+				return performImageExport( args, callbackContext );
+			case "exportImagesToPdf":
+				return performImageExportToPdf( args, callbackContext );
+		}
 
 		return false;
 	}
 
-	@Nullable
-	private Boolean checkRecognizeText( String action, JSONArray args, CallbackContext callbackContext )
+	private boolean performTextRecognition( JSONArray args, CallbackContext callbackContext )
 	{
-		if( "recognizeText".equals( action ) ) {
-			if( init( callbackContext, args ) ) {
-				try {
-					TextRecognitionSettings settings = TextUtils.parseTextRecognitionSettings( inputParameters );
-					ImageType imageType = parseImageType( inputParameters );
-					String image = args.getString( 1 );
-					startTextRecognition( settings, image, imageType );
-				} catch( JSONException e ) {
-					onError( e.getMessage() );
-					return false;
-				}
-				return true;
-			}
+		if( !initApi( callbackContext, args ) ) {
+			return false;
 		}
-		return null;
-	}
-
-	@Nullable
-	private Boolean checkExtractData( String action, JSONArray args, CallbackContext callbackContext )
-	{
-		if( "extractData".equals( action ) ) {
-			if( init( callbackContext, args ) ) {
-				try {
-					DataCaptureSettings settings = DataUtils.parseDataCaptureSettings( inputParameters );
-					ImageType imageType = parseImageType( inputParameters );
-					String image = args.getString( 1 );
-					startDataExtraction( settings, image, imageType );
-				} catch( JSONException e ) {
-					onError( e.getMessage() );
-					return false;
-				}
-				return true;
-			}
-		}
-		return null;
-	}
-
-	@Nullable
-	private Boolean checkDataCapture( String action, JSONArray args, CallbackContext callbackContext )
-	{
-		if( "startDataCapture".equals( action ) ) {
-			if( init( callbackContext, args ) ) {
-				RtrManager.setLanguageSelectionEnabled( true );
-				try {
-					parseScenario( inputParameters );
-					parseUiSettings( inputParameters );
-				} catch( IllegalArgumentException | JSONException e ) {
-					onError( e.getMessage() );
-					return false;
-				}
-				checkPermissionAndStartDataCapture();
-				return true;
-			}
-		}
-		return null;
-	}
-
-	@Nullable
-	private Boolean checkTextCapture( String action, JSONArray args, CallbackContext callbackContext )
-	{
-		if( "startTextCapture".equals( action ) ) {
-			PreferenceManager.getDefaultSharedPreferences( cordova.getActivity().getApplicationContext() ).edit().clear().apply();
-			if( init( callbackContext, args ) ) {
-				try {
-					if( inputParameters.has( RTR_EXTENDED_SETTINGS ) ) {
-						RtrManager.setExtendedSettings( parseExtendedSettings( inputParameters ) );
+		cordova.getThreadPool().execute( new Runnable() {
+			@Override
+			public void run()
+			{
+				TextRecognition.recognizeTextSync( cordova.getActivity().getApplication(), inputParameters, new JSCallback() {
+					@Override
+					public void onSuccess( JSONObject result )
+					{
+						RtrPlugin.this.onSuccess( result, true );
 					}
-					RtrManager.setLanguages( parseLanguages( inputParameters ) );
-					RtrManager.setSelectedLanguages( parseSelectedLanguage( inputParameters ) );
 
-					SharedPreferences.Editor sharedPreferences = PreferenceManager.getDefaultSharedPreferences(
-						cordova.getActivity().getApplicationContext()
-					).edit();
-					for( Language language : RtrManager.getSelectedLanguages() ) {
-						sharedPreferences.putBoolean( language.name(), true );
+					@Override
+					public void onError( String errorCode, String message, Throwable exception )
+					{
+						RtrPlugin.this.onError( message, true );
 					}
-					sharedPreferences.apply();
-					parseUiSettings( inputParameters );
-				} catch( IllegalArgumentException e ) {
-					RtrManager.setLanguages( new ArrayList<Language>() );
-					onError( e.getMessage() );
-					return false;
-				} catch( JSONException e ) {
-					onError( e.getMessage() );
-					return false;
-				}
-				checkPermissionAndStartTextCapture();
-				return true;
+				} );
 			}
-		}
-		return null;
+		} );
+		return true;
 	}
 
-	@Nullable
-	private Boolean checkImageCapture( String action, JSONArray args, CallbackContext callbackContext )
+	private boolean performDataExtraction( JSONArray args, CallbackContext callbackContext )
 	{
-		if( "startImageCapture".equals( action ) ) {
-			if( init( callbackContext, args ) ) {
-				try {
-					if( inputParameters.has( RTR_EXTENDED_SETTINGS ) ) {
-						RtrManager.setExtendedSettings( parseExtendedSettings( inputParameters ) );
-					}
-					parseImageCaptureSettings( inputParameters );
-				} catch( IllegalArgumentException | JSONException e ) {
-					onError( e.getMessage() );
-					return false;
-				}
-				checkPermissionAndStartImageCapture();
-				return true;
-			}
+		if( !initApi( callbackContext, args ) ) {
+			return false;
 		}
-		return null;
+		cordova.getThreadPool().execute( new Runnable() {
+			@Override
+			public void run()
+			{
+				DataCapture.extractDataSync( cordova.getActivity().getApplication(), inputParameters, new JSCallback() {
+					@Override
+					public void onSuccess( JSONObject result )
+					{
+						RtrPlugin.this.onSuccess( result, true );
+					}
+
+					@Override
+					public void onError( String errorCode, String message, Throwable exception )
+					{
+						RtrPlugin.this.onError( message, true );
+					}
+				} );
+			}
+		} );
+		return true;
+	}
+
+	private boolean performBoundaryDetection( JSONArray args, CallbackContext callbackContext )
+	{
+		if( !initApi( callbackContext, args ) ) {
+			return false;
+		}
+		cordova.getThreadPool().execute( new Runnable() {
+			@Override
+			public void run()
+			{
+				ImagingCore.detectDocumentBoundarySync( cordova.getActivity().getApplication(), inputParameters, new JSCallback() {
+					@Override
+					public void onSuccess( JSONObject result )
+					{
+						RtrPlugin.this.onSuccess( result, true );
+					}
+
+					@Override
+					public void onError( String errorCode, String message, Throwable exception )
+					{
+						RtrPlugin.this.onError( message, true );
+					}
+				} );
+			}
+		} );
+		return true;
+	}
+
+	private boolean performQualityAssessmentForOcr( JSONArray args, CallbackContext callbackContext )
+	{
+		if( !initApi( callbackContext, args ) ) {
+			return false;
+		}
+		cordova.getThreadPool().execute( new Runnable() {
+			@Override
+			public void run()
+			{
+				ImagingCore.assessQualityForOcrSync( cordova.getActivity().getApplication(), inputParameters, new JSCallback() {
+					@Override
+					public void onSuccess( JSONObject result )
+					{
+						RtrPlugin.this.onSuccess( result, true );
+					}
+
+					@Override
+					public void onError( String errorCode, String message, Throwable exception )
+					{
+						RtrPlugin.this.onError( message, true );
+					}
+				} );
+			}
+		} );
+		return true;
+	}
+
+	private boolean performImageCrop( JSONArray args, CallbackContext callbackContext )
+	{
+		if( !initApi( callbackContext, args ) ) {
+			return false;
+		}
+		cordova.getThreadPool().execute( new Runnable() {
+			@Override
+			public void run()
+			{
+				ImagingCore.cropImageSync( cordova.getActivity().getApplication(), inputParameters, new JSCallback() {
+					@Override
+					public void onSuccess( JSONObject result )
+					{
+						RtrPlugin.this.onSuccess( result, true );
+					}
+
+					@Override
+					public void onError( String errorCode, String message, Throwable exception )
+					{
+						RtrPlugin.this.onError( message, true );
+					}
+				} );
+			}
+		} );
+		return true;
+	}
+
+	private boolean performImageRotation( JSONArray args, CallbackContext callbackContext )
+	{
+		if( !initApi( callbackContext, args ) ) {
+			return false;
+		}
+		cordova.getThreadPool().execute( new Runnable() {
+			@Override
+			public void run()
+			{
+				ImagingCore.rotateImageSync( cordova.getActivity().getApplication(), inputParameters, new JSCallback() {
+					@Override
+					public void onSuccess( JSONObject result )
+					{
+						RtrPlugin.this.onSuccess( result, true );
+					}
+
+					@Override
+					public void onError( String errorCode, String message, Throwable exception )
+					{
+						RtrPlugin.this.onError( message, true );
+					}
+				} );
+			}
+		} );
+		return true;
+	}
+
+	private boolean performImageExport( JSONArray args, CallbackContext callbackContext )
+	{
+		if( !initApi( callbackContext, args ) ) {
+			return false;
+		}
+		cordova.getThreadPool().execute( new Runnable() {
+			@Override
+			public void run()
+			{
+				ImagingCore.exportImageSync( cordova.getActivity().getApplication(), inputParameters, new JSCallback() {
+					@Override
+					public void onSuccess( JSONObject result )
+					{
+						RtrPlugin.this.onSuccess( result, true );
+					}
+
+					@Override
+					public void onError( String errorCode, String message, Throwable exception )
+					{
+						RtrPlugin.this.onError( message, true );
+					}
+				} );
+			}
+		} );
+		return true;
+	}
+
+	private boolean performImageExportToPdf( JSONArray args, CallbackContext callbackContext )
+	{
+		if( !initApi( callbackContext, args ) ) {
+			return false;
+		}
+		cordova.getThreadPool().execute( new Runnable() {
+			@Override
+			public void run()
+			{
+				ImagingCore.exportImagesToPdfSync( cordova.getActivity().getApplication(), inputParameters, new JSCallback() {
+					@Override
+					public void onSuccess( JSONObject result )
+					{
+						RtrPlugin.this.onSuccess( result, true );
+					}
+
+					@Override
+					public void onError( String errorCode, String message, Throwable exception )
+					{
+						RtrPlugin.this.onError( message, true );
+					}
+				} );
+			}
+		} );
+		return true;
+	}
+
+	private boolean performDataCapture( JSONArray args, CallbackContext callbackContext )
+	{
+		if( !init( callbackContext, args ) ) {
+			return false;
+		}
+		RtrManager.setLanguageSelectionEnabled( true );
+		try {
+			parseScenario( inputParameters );
+			parseUiSettings( inputParameters );
+		} catch( IllegalArgumentException | JSONException e ) {
+			onError( e.getMessage() );
+			return false;
+		}
+		checkPermissionAndStartDataCapture();
+		return true;
+	}
+
+	private boolean performTextCapture( JSONArray args, CallbackContext callbackContext )
+	{
+		PreferenceManager.getDefaultSharedPreferences( cordova.getActivity().getApplicationContext() ).edit().clear().apply();
+		if( !init( callbackContext, args ) ) {
+			return false;
+		}
+		try {
+			if( inputParameters.has( RTR_EXTENDED_SETTINGS ) ) {
+				RtrManager.setExtendedSettings( parseExtendedSettings( inputParameters ) );
+			}
+			RtrManager.setLanguages( parseLanguages( inputParameters ) );
+			RtrManager.setSelectedLanguages( parseSelectedLanguage( inputParameters ) );
+
+			SharedPreferences.Editor sharedPreferences = PreferenceManager.getDefaultSharedPreferences(
+				cordova.getActivity().getApplicationContext()
+			).edit();
+			for( Language language : RtrManager.getSelectedLanguages() ) {
+				sharedPreferences.putBoolean( language.name(), true );
+			}
+			sharedPreferences.apply();
+			parseUiSettings( inputParameters );
+		} catch( IllegalArgumentException e ) {
+			RtrManager.setLanguages( new ArrayList<Language>() );
+			onError( e.getMessage() );
+			return false;
+		} catch( JSONException e ) {
+			onError( e.getMessage() );
+			return false;
+		}
+		checkPermissionAndStartTextCapture();
+		return true;
+	}
+
+	private boolean performImageCapture( JSONArray args, CallbackContext callbackContext )
+	{
+		if( !init( callbackContext, args ) ) {
+			return false;
+		}
+		try {
+			if( inputParameters.has( RTR_EXTENDED_SETTINGS ) ) {
+				RtrManager.setExtendedSettings( parseExtendedSettings( inputParameters ) );
+			}
+			parseImageCaptureSettings( inputParameters );
+		} catch( IllegalArgumentException | JSONException e ) {
+			onError( e.getMessage() );
+			return false;
+		}
+		checkPermissionAndStartImageCapture();
+		return true;
 	}
 
 	private boolean init( final CallbackContext callbackContext, JSONArray args )
@@ -261,25 +434,43 @@ public class RtrPlugin extends CordovaPlugin {
 			onError( "The argument array has an invalid value." );
 			return false;
 		}
-
+		String licenseName;
 		try {
 			inputParameters = args.getJSONObject( 0 );
-			String licenseName = parseLicenseName( inputParameters );
-			Context applicationContext = this.cordova.getActivity().getApplicationContext();
-			SharedEngine.initialize( (Application) applicationContext, licenseName );
-		} catch( IOException e ) {
-			Log.e( cordova.getActivity().getString( ResourcesUtils.getResId( "string", "app_name", cordova.getActivity() ) ), "Error loading ABBYY RTR SDK:", e );
-			onError( "Could not load some required resource files. Make sure to configure " +
-				"'assets' directory in your application and specify correct 'license file name'. See logcat for details." );
+			licenseName = parseLicenseName( inputParameters );
+		} catch( JSONException e ) {
+			onError( "JSON parse for license name failed" );
 			return false;
-		} catch( Engine.LicenseException e ) {
-			Log.e( cordova.getActivity().getString( ResourcesUtils.getResId( "string", "app_name", cordova.getActivity() ) ), "Error loading ABBYY RTR SDK:", e );
-			onError( "License not valid. Make sure you have a valid license file in the " +
-				"'assets' directory and specify correct 'license file name' and 'application id'. See logcat for details." );
+		}
+		Context applicationContext = this.cordova.getActivity().getApplicationContext();
+		return SharedEngine.initializeEngineIfNeeded( (Application) applicationContext, licenseName, new JSCallback() {
+			@Override
+			public void onSuccess( JSONObject result )
+			{
+			}
+
+			@Override
+			public void onError( String errorCode, String message, Throwable exception )
+			{
+				if( exception instanceof IOException ) {
+					RtrPlugin.this.onError( message );
+				}
+			}
+		} );
+	}
+
+	private boolean initApi( final CallbackContext callbackContext, JSONArray args )
+	{
+		callback = callbackContext;
+
+		if( args.length() <= 0 ) {
+			onError( "The argument array has an invalid value." );
 			return false;
-		} catch( Throwable e ) {
-			Log.e( cordova.getActivity().getString( ResourcesUtils.getResId( "string", "app_name", cordova.getActivity() ) ), "Error loading ABBYY RTR SDK:", e );
-			onError( "Unspecified error while loading the engine. See logcat for details." );
+		}
+		try {
+			inputParameters = args.getJSONObject( 0 );
+		} catch( JSONException e ) {
+			onError( "JSON parse for license name failed" );
 			return false;
 		}
 		return true;
@@ -335,107 +526,6 @@ public class RtrPlugin extends CordovaPlugin {
 		this.cordova.startActivityForResult( this, intent, REQUEST_CODE_DATA_CAPTURE );
 	}
 
-	private void startTextRecognition( final TextRecognitionSettings settings, final String image, final ImageType imageType )
-	{
-		cordova.getThreadPool().execute( new Runnable() {
-			@Override
-			public void run()
-			{
-				Bitmap bitmap;
-				try {
-					bitmap = getBitmap( image, imageType, cordova.getContext() );
-					recognizeText( bitmap, settings );
-				} catch( IOException e ) {
-					onError( e.getLocalizedMessage() );
-				}
-			}
-		} );
-	}
-
-	private void recognizeText( Bitmap bitmap, final TextRecognitionSettings settings )
-	{
-		IRecognitionCoreAPI recognitionCoreAPI = SharedEngine.get().createRecognitionCoreAPI();
-		final Integer[] detectedOrientation = { null };
-		IRecognitionCoreAPI.TextBlock[] blocks = recognitionCoreAPI.recognizeText( bitmap, new IRecognitionCoreAPI.TextRecognitionCallback() {
-			@Override
-			public boolean onProgress( int progress, IRecognitionCoreAPI.Warning warning )
-			{
-				return false;
-			}
-
-			@Override
-			public void onTextOrientationDetected( int orientation )
-			{
-				if( settings.isTextOrientationDetectionEnabled ) {
-					detectedOrientation[0] = orientation;
-				}
-			}
-
-			@Override
-			public void onError( Exception e )
-			{
-				RtrPlugin.this.onError( e.getLocalizedMessage() );
-			}
-		} );
-		try {
-			JSONObject result = toTextRecognitionResult( blocks, detectedOrientation[0] );
-			callback.success( result );
-		} catch( JSONException e ) {
-			onError( e.getMessage() );
-		}
-	}
-
-	private void extractData( Bitmap bitmap, final DataCaptureSettings settings )
-	{
-		IDataCaptureCoreAPI dataCaptureCoreAPI = SharedEngine.get().createDataCaptureCoreAPI();
-		final Integer[] detectedOrientation = { null };
-		IDataCaptureCoreAPI.DataField[] fields = dataCaptureCoreAPI.extractDataFromImage( bitmap, new IDataCaptureCoreAPI.Callback() {
-
-			@Override public boolean onProgress( int i, IDataCaptureCoreAPI.Warning warning )
-			{
-				return false;
-			}
-
-			@Override
-			public void onTextOrientationDetected( int orientation )
-			{
-				if( settings.isTextOrientationDetectionEnabled ) {
-					detectedOrientation[0] = orientation;
-				}
-			}
-
-			@Override
-			public void onError( Exception e )
-			{
-				RtrPlugin.this.onError( e.getLocalizedMessage() );
-			}
-		} );
-		try {
-			JSONObject result = toDataCaptureResult( fields, detectedOrientation[0] );
-			callback.success( result );
-		} catch( JSONException e ) {
-			onError( e.getMessage() );
-		}
-	}
-
-	private void startDataExtraction( final DataCaptureSettings settings, final String image, final ImageType imageType )
-	{
-		cordova.getThreadPool().execute( new Runnable() {
-			@Override
-			public void run()
-			{
-				Bitmap bitmap;
-				try {
-					bitmap = getBitmap( image, imageType, cordova.getContext() );
-					extractData( bitmap, settings );
-				} catch( IOException e ) {
-					onError( e.getLocalizedMessage() );
-				}
-			}
-		} );
-	}
-
-
 	@Override
 	public void onRequestPermissionResult( int requestCode, String[] permissions,
 		int[] grantResults )
@@ -470,36 +560,79 @@ public class RtrPlugin extends CordovaPlugin {
 				case RESULT_OK:
 					HashMap<String, Object> result;
 					if( requestCode == REQUEST_CODE_IMAGE_CAPTURE ) {
-						final ImageCaptureResult imageCaptureResult = intent.getParcelableExtra( ImageCaptureActivity.IMAGE_CAPTURE_RESULT_KEY );
-						// For image capture we constuct successful result json right before passing to JS
-						result = MultiCaptureResult.getJsonResult( imageCaptureResult, imageCaptureSettings, cordova.getContext() );
+						if (intent.hasExtra( ImageCaptureActivity.IMAGE_CAPTURE_RESULT_KEY )) {
+							final ImageCaptureResult imageCaptureResult = intent.getParcelableExtra( ImageCaptureActivity.IMAGE_CAPTURE_RESULT_KEY );
+							// For image capture we constuct successful result json right before passing to JS
+							result = MultiCaptureResult.getJsonResult( imageCaptureResult, imageCaptureSettings, cordova.getContext() );
+						} else {
+							result = MultiCaptureResult.getCanceledJsonResult();
+						}
 					} else {
 						result = (HashMap<String, Object>) intent.getSerializableExtra( INTENT_RESULT_KEY );
 					}
-					callback.success( new JSONObject( result ) );
+					onSuccess( new JSONObject( result ) );
 					break;
 				case RESULT_FAIL:
-					result = (HashMap<String, Object>) intent.getSerializableExtra( INTENT_RESULT_KEY );
+					if( requestCode == REQUEST_CODE_IMAGE_CAPTURE ) {
+						result = (HashMap<String, Object>) intent.getSerializableExtra( ImageCaptureActivity.ERROR_DESCRIPTION_RESULT_KEY );
+					} else {
+						result = (HashMap<String, Object>) intent.getSerializableExtra( INTENT_RESULT_KEY );
+					}
 					callback.error( new JSONObject( result ) );
 					break;
 			}
 		}
 	}
 
+	private void onSuccess( final JSONObject result )
+	{
+		onSuccess( result, false );
+	}
+
+	private void onSuccess( final JSONObject result, boolean routeToMainThread )
+	{
+		if( routeToMainThread ) {
+			cordova.getActivity().runOnUiThread( new Runnable() {
+				@Override
+				public void run()
+				{
+					callback.success( result );
+				}
+			} );
+		} else {
+			callback.success( result );
+		}
+	}
+
 	private void onError( String description )
+	{
+		onError( description, false );
+	}
+
+	private void onError( String description, boolean routeToMainThread )
 	{
 		HashMap<String, String> info = new HashMap<>();
 		info.put( "description", description );
 
-		HashMap<String, Object> result = new HashMap<>();
+		final HashMap<String, Object> result = new HashMap<>();
 		result.put( "error", info );
 
-		callback.error( new JSONObject( result ) );
+		if( routeToMainThread ) {
+			cordova.getActivity().runOnUiThread( new Runnable() {
+				@Override
+				public void run()
+				{
+					callback.error( new JSONObject( result ) );
+				}
+			} );
+		} else {
+			callback.error( new JSONObject( result ) );
+		}
 	}
 
 	private String parseLicenseName( JSONObject arg ) throws JSONException
 	{
-		String licenseFileName = "AbbyyRtrSdk.license";
+		String licenseFileName = "AbbyyRtrSdk.License";
 		if( arg.has( RTR_LICENSE_FILE_NAME_KEY ) ) {
 			licenseFileName = arg.getString( RTR_LICENSE_FILE_NAME_KEY );
 		}
@@ -551,51 +684,31 @@ public class RtrPlugin extends CordovaPlugin {
 	private void parseDestination( JSONObject arg ) throws JSONException
 	{
 		if( arg.has( RTR_DESTINATION_KEY ) ) {
-			ImageCaptureSettings.Destination destination = imageCaptureSettings.destination;
+			Destination destination = imageCaptureSettings.destination;
 			String value = arg.getString( RTR_DESTINATION_KEY );
 			if( value.equals( "base64" ) ) {
-				destination = ImageCaptureSettings.Destination.BASE64;
+				destination = Destination.Base64;
 			} else if( value.equals( "file" ) ) {
-				destination = ImageCaptureSettings.Destination.FILE;
+				destination = Destination.File;
 			}
 			imageCaptureSettings.destination = destination;
 		}
 	}
 
-	private ImageType parseImageType( JSONObject arg ) throws JSONException
-	{
-		ImageType imageType = ImageType.Base64;
-		if( arg.has( RTR_IMAGE_TYPE_KEY ) ) {
-			String value = arg.getString( RTR_IMAGE_TYPE_KEY );
-			switch( value ) {
-				case "base64":
-					imageType = ImageType.Base64;
-					break;
-				case "filePath":
-					imageType = ImageType.FilePath;
-					break;
-				case "uri":
-					imageType = ImageType.URI;
-					break;
-			}
-		}
-		return imageType;
-	}
-
 	private void parseExportType( JSONObject arg ) throws JSONException
 	{
 		if( arg.has( RTR_EXPORT_TYPE_KEY ) ) {
-			ImageCaptureSettings.ExportType exportType = imageCaptureSettings.exportType;
+			com.abbyy.mobile.rtr.cordova.image.ExportType exportType = imageCaptureSettings.exportType;
 			String value = arg.getString( RTR_EXPORT_TYPE_KEY );
 			switch( value ) {
 				case "jpg":
-					exportType = ImageCaptureSettings.ExportType.JPG;
+					exportType = com.abbyy.mobile.rtr.cordova.image.ExportType.JPG;
 					break;
 				case "png":
-					exportType = ImageCaptureSettings.ExportType.PNG;
+					exportType = com.abbyy.mobile.rtr.cordova.image.ExportType.PNG;
 					break;
 				case "pdf":
-					exportType = ImageCaptureSettings.ExportType.PDF;
+					exportType = com.abbyy.mobile.rtr.cordova.image.ExportType.PDF;
 					break;
 			}
 			imageCaptureSettings.exportType = exportType;
@@ -629,8 +742,11 @@ public class RtrPlugin extends CordovaPlugin {
 	{
 		if( arg.has( RTR_DEFAULT_IMAGE_SETTINGS_KEY ) ) {
 			JSONObject settings = arg.getJSONObject( RTR_DEFAULT_IMAGE_SETTINGS_KEY );
+			parseAspectRatioMin( settings );
+			parseAspectRatioMax( settings );
 			parseMinimumDocumentToViewRatio( settings );
 			parseDocumentSize( settings );
+			parseImageFromGalleryMaxSize( settings );
 		}
 	}
 
@@ -638,6 +754,27 @@ public class RtrPlugin extends CordovaPlugin {
 	{
 		if( settings.has( RTR_DOCUMENT_TO_VIEW_RATIO_KEY ) ) {
 			imageCaptureSettings.minimumDocumentToViewRatio = Float.parseFloat( settings.getString( RTR_DOCUMENT_TO_VIEW_RATIO_KEY ) );
+		}
+	}
+
+	private void parseAspectRatioMin( JSONObject settings ) throws JSONException
+	{
+		if( settings.has( RTR_ASPECT_RATIO_MIN_KEY ) ) {
+			imageCaptureSettings.aspectRatioMin = Float.parseFloat( settings.getString( RTR_ASPECT_RATIO_MIN_KEY ) );
+		}
+	}
+
+	private void parseAspectRatioMax( JSONObject settings ) throws JSONException
+	{
+		if( settings.has( RTR_ASPECT_RATIO_MAX_KEY ) ) {
+			imageCaptureSettings.aspectRatioMax = Float.parseFloat( settings.getString( RTR_ASPECT_RATIO_MAX_KEY ) );
+		}
+	}
+
+	private void parseImageFromGalleryMaxSize( JSONObject settings ) throws JSONException
+	{
+		if( settings.has( RTR_IMAGE_FROM_GALLERY_MAX_SIZE_KEY ) ) {
+			imageCaptureSettings.imageFromGalleryMaxSize = Integer.parseInt( settings.getString( RTR_IMAGE_FROM_GALLERY_MAX_SIZE_KEY ) );
 		}
 	}
 
@@ -756,6 +893,7 @@ public class RtrPlugin extends CordovaPlugin {
 		return languages;
 	}
 
+	@NonNull
 	private List<Language> parseSelectedLanguage( JSONObject arg ) throws JSONException
 	{
 		List<Language> languages = parseLanguagesInternal( arg, RTR_RECOGNITION_LANGUAGES_KEY, true );

@@ -6,6 +6,7 @@ package com.abbyy.mobile.rtr.cordova;
 import com.abbyy.mobile.rtr.IDataCaptureService;
 import com.abbyy.mobile.rtr.ITextCaptureService;
 import com.abbyy.mobile.rtr.Language;
+import com.abbyy.mobile.rtr.javascript.SharedEngine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
