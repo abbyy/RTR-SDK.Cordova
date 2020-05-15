@@ -19,7 +19,7 @@ The native libraries support the following systems:
     ```
 2. Request ABBYY Mobile Capture trial version on the [ABBYY website](http://www.abbyy.com/mobile-capture-sdk/#request-demo) and add it to your project:
     * Create the `www/rtr_assets` subdirectory in the project.
-    * Copy Mobile Capture SDK assets and license file (`AbbyyRtrSdk.license`) to `www/rtr_assets`.
+    * Copy Mobile Capture SDK assets and license file (`AbbyyRtrSdk.License`) to `www/rtr_assets`.
     * Copy Android libraries  (`abbyy-rtr-sdk-1.0.aar` and `abbyy-ui-1.0.aar`) to `libs/android`.
     * Copy iOS frameworks (`AbbyyRtrSDK.framework` and other modules) to `libs/ios`.
     * The `libs/android` and `libs/ios` paths should be added to the linker search paths. This step is performed automatically during the plugin installation.
@@ -55,7 +55,7 @@ The native libraries support the following systems:
     ```
     You should see `android` and `ios` in platforms and `cordova-plugin-abbyy-rtr-sdk` in plugins.
 5. Request ABBYY Mobile Capture trial version on the [ABBYY website](http://www.abbyy.com/mobile-capture-sdk/#request-demo) and add it to the example:
-    * Copy RTR SDK assets (patterns and dictionaries) and your license file (`AbbyyRtrSdk.license`) to `www/rtr_assets`.
+    * Copy RTR SDK assets (patterns and dictionaries) and your license file (`AbbyyRtrSdk.License`) to `www/rtr_assets`.
     * Copy the Android library (`abbyy-rtr-sdk-1.0.aar`) to `libs/android`.
     * Copy iOS frameworks (`AbbyyRtrSDK.framework` and other modules) to `libs/ios`.
     These paths already exist in the example project.
