@@ -20,19 +20,35 @@ module.exports = {
 		exec(callback, callback, "AbbyyRtrSdk", "startImageCapture", [options]);
 	},
 
-	recognizeText: function (image, options, successCallback, errorCallback, progressCallback) {
-		exec(successCallback, errorCallback, "AbbyyRtrSdk", "recognizeText", [options, image]);
+	recognizeText: function (options, successCallback, errorCallback) {
+		exec(successCallback, errorCallback, "AbbyyRtrSdk", "recognizeText", [options]);
 	},
 
-	extractData: function (image, options, successCallback, errorCallback) {
-		exec(successCallback, errorCallback, "AbbyyRtrSdk", "extractData", [options, image]);
+	extractData: function (options, successCallback, errorCallback) {
+		exec(successCallback, errorCallback, "AbbyyRtrSdk", "extractData", [options]);
 	},
 
-	events: {
-		onProgress: function(args) {
-			return document.dispatchEvent(new CustomEvent("coreApiOnProgress", {
-				detail: args
-			}));
-		}
-	}
+	assessQualityForOcr: function (options, successCallback, errorCallback) {
+		exec(successCallback, errorCallback, "AbbyyRtrSdk", "assessQualityForOcr", [options]);
+	},
+
+	detectDocumentBoundary: function (options, successCallback, errorCallback) {
+		exec(successCallback, errorCallback, "AbbyyRtrSdk", "detectDocumentBoundary", [options]);
+	},
+
+	cropImage: function (options, successCallback, errorCallback) {
+		exec(successCallback, errorCallback, "AbbyyRtrSdk", "cropImage", [options]);
+	},
+
+	rotateImage: function (options, successCallback, errorCallback) {
+		exec(successCallback, errorCallback, "AbbyyRtrSdk", "rotateImage", [options]);
+	},
+
+	exportImage: function (options, successCallback, errorCallback) {
+		exec(successCallback, errorCallback, "AbbyyRtrSdk", "exportImage", [options]);
+	},
+
+	exportImagesToPdf: function (options, successCallback, errorCallback) {
+        exec(successCallback, errorCallback, "AbbyyRtrSdk", "exportImagesToPdf", [options]);
+    },
 }
