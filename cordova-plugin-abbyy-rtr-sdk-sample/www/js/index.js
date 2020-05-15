@@ -42,7 +42,7 @@ function orientation() {
 
 function requiredPageCount() {
     element = document.getElementById('requiredPageCount')
-    return element.value
+    return parseInt(element.value)
 }
 
 function cameraResolution() {
@@ -77,7 +77,7 @@ function angle() {
 
 function imageFromGalleryMaxSize() {
 	element = document.getElementById('imageFromGalleryMaxSize')
-	return element.value
+	return parseInt(element.value)
 }
 
 
@@ -88,7 +88,7 @@ var aspectRatioMin = new Slider('aspectRatioMin', 'aspectRatioMinValue');
 var aspectRatioMax = new Slider('aspectRatioMax', 'aspectRatioMaxValue');
 var minimumDocumentToViewRatio = new Slider('minimumDocumentToViewRatio', 'minimumDocumentToViewRatioValue');
 
-var isFlashlightVisible = document.getElementById('isFlashlightVisible');
+var isFlashlightVisible = document.getElementById('isFlashlightButtonVisible');
 var isStopButtonVisible = document.getElementById('isStopButtonVisible');
 var stopWhenStable = document.getElementById('stopWhenStable');
 
@@ -147,8 +147,8 @@ function ShowICSettings() {
 }
 
 function ShowSettings() {
-    document.getElementById('setting_orientation').style.display = 'none';
-    document.getElementById('setting_flashlight_visible').style.display = 'none';
+    document.getElementById('setting_orientation').style.display = 'block';
+    document.getElementById('setting_flashlight_visible').style.display = 'block';
     document.getElementById('setting_show_preview').style.display = 'none';
     document.getElementById('setting_capture_visible').style.display = 'none';
     document.getElementById('setting_gallery_visible').style.display = 'none';
@@ -161,7 +161,7 @@ function ShowSettings() {
     document.getElementById('setting_stop_visible').style.display = 'block';
     document.getElementById('setting_stop_when_stable').style.display = 'block';
     document.getElementById('setting_area_of_interest').style.display = 'block';
-    document.getElementById('setting_recognition_type').style.display = 'block';
+    document.getElementById('setting_recognition_type').style.display = 'none';
     document.getElementById('setting_languages').style.display = 'block';
     document.getElementById('setting_text_orientation_detection_enabled').style.display = 'none';
     document.getElementById('setting_operation_type').style.display = 'none';
@@ -428,7 +428,7 @@ function imageCapture() {
         licenseFileName : 'AbbyyRtrSdk.License', // optional, default=AbbyyRtrSdk.License
 
         cameraResolution : cameraResolution(), // optional, default=FullHD (HD, FullHD, 4K)
-        isFlashlightButtonVisible : isFlashlightButtonVisible.checked, // optional, default=true
+        isFlashlightButtonVisible : isFlashlightVisible.checked, // optional, default=true
         isCaptureButtonVisible : isCaptureButtonVisible.checked, // optional, default=false
         isGalleryButtonVisible : isGalleryButtonVisible.checked, // optional, default=false
         orientation : orientation(), // optional, default=default
@@ -456,7 +456,7 @@ function textCapture() {
         recognitionLanguages : ['English'],
 
         licenseFileName : 'AbbyyRtrSdk.License',
-        isFlashlightVisible : isFlashlightVisible.checked,
+        isFlashlightVisible : isFlashlightButtonVisible.checked,
         stopWhenStable : stopWhenStable.checked,
         areaOfInterest : (areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current()),
         isStopButtonVisible : isStopButtonVisible.checked,
@@ -476,7 +476,7 @@ function customDataCapture() {
         },
 
         licenseFileName : 'AbbyyRtrSdk.License',
-        isFlashlightVisible : isFlashlightVisible.checked,
+        isFlashlightVisible : isFlashlightButtonVisible.checked,
         stopWhenStable : stopWhenStable.checked,
         areaOfInterest : areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current(),
         isStopButtonVisible : isStopButtonVisible.checked,
@@ -489,7 +489,7 @@ function dataCaptureMRZ() {
         profile : 'MRZ',
 
         licenseFileName : 'AbbyyRtrSdk.License',
-        isFlashlightVisible : isFlashlightVisible.checked,
+        isFlashlightVisible : isFlashlightButtonVisible.checked,
         stopWhenStable : stopWhenStable.checked,
         areaOfInterest : areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current(),
         isStopButtonVisible : isStopButtonVisible.checked,
@@ -502,7 +502,7 @@ function dataCaptureBCR() {
         profile : 'BusinessCards',
 
         licenseFileName : 'AbbyyRtrSdk.License',
-        isFlashlightVisible : isFlashlightVisible.checked,
+        isFlashlightVisible : isFlashlightButtonVisible.checked,
         stopWhenStable : stopWhenStable.checked,
         areaOfInterest : areaOfInterestWidth.current() + ' ' + areaOfInterestHeight.current(),
         isStopButtonVisible : isStopButtonVisible.checked,
