@@ -43,7 +43,7 @@
 
 - (void)startTextCapture:(CDVInvokedUrlCommand*)command
 {
-	[self.commandDelegate runInBackground:^{
+	dispatch_async(dispatch_get_main_queue(), ^{
 		if(![self initializeRtrManager:command]) {
 			return;
 		}
@@ -72,6 +72,7 @@
 				callbackId:command.callbackId];
 			return;
 		}
+		rtrViewController.modalPresentationStyle = UIModalPresentationFullScreen;
 		rtrViewController.supportedInterfaceOrientations = enumValue;
 		rtrViewController.settingsTableContent = languages;
 		rtrViewController.selectedRecognitionLanguages = [selectedLanguages mutableCopy];
@@ -88,7 +89,7 @@
 		rtrViewController.extendedSettings = extendedSettings;
 
 		[self presentCaptureViewController:rtrViewController command:command];
-	}];
+	});
 }
 
 - (BOOL)profileSupportsLanguageCustomization:(NSString*)profile manager:(RTRManager*)manager
@@ -99,7 +100,7 @@
 
 - (void)startDataCapture:(CDVInvokedUrlCommand*)command
 {
-	[self.commandDelegate runInBackground:^{
+	dispatch_async(dispatch_get_main_queue(), ^{
 		if(![self initializeRtrManager:command]) {
 			return;
 		}
@@ -117,6 +118,7 @@
 			return;
 		}
 		rtrViewController.supportedInterfaceOrientations = enumValue;
+		rtrViewController.modalPresentationStyle = UIModalPresentationFullScreen;
 
 		NSString* errorDescription = nil;
 
@@ -168,7 +170,7 @@
 		rtrViewController.extendedSettings = params[RTRExtendedSettingsKey];
 
 		[self presentCaptureViewController:rtrViewController command:command];
-	}];
+	});
 }
 
 - (void)startImageCapture:(CDVInvokedUrlCommand*)command
@@ -461,7 +463,7 @@
 
 - (BOOL)initializeRtrManager:(CDVInvokedUrlCommand*)command
 {
-	NSString* licenseName = command.arguments.firstObject[RTRLicenseFileNameKey] ?: @"AbbyyRtrSdk.License";
+	NSString* licenseName = command.arguments.firstObject[RTRLicenseFileNameKey] ?: @"MobileCapture.License";
 	NSError* error = nil;
 	self.rtrManager = [RTRManager managerWithLicense:licenseName error:&error];
 

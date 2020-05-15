@@ -392,6 +392,12 @@
 			if(![icSettings rtr_parseDocumentSize:RTRICDocumentSizeKey defaultValue:AUIDocumentSizeAny outValue:&_documentSize error:error]) {
 				return nil;
 			}
+		} else {
+			_minimumDocumentToViewRatio = 0.15;
+			_imageFromGalleryMaxSize = 4096;
+			_documentSize = AUIDocumentSizeAny;
+			_aspectRatioMin = 0;
+			_aspectRatioMax = 0;
 		}
 	}
 	return self;

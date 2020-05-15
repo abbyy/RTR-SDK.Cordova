@@ -533,6 +533,17 @@
 	}
 }
 
+- (NSArray*)rtr_parseArray:(NSString*)key defaultValue:(NSArray*)defaultValue error:(NSError**)error
+{
+    if(self[key] == nil) {
+        return defaultValue;
+    }
+    if(![self checkValueForKey:key isKindOfClass:NSArray.class error:error]) {
+        return nil;
+    }
+    return self[key];
+}
+
 @end
 
 @implementation NSString (rtr_Mapping)
@@ -637,7 +648,17 @@
 		return nil;
 	}
 	return [self rtr_tryMap:^id(NSDictionary* pointDict, NSError** error) {
-
+        if(![pointDict isKindOfClass:NSDictionary.class]) {
+            if(error != nil) {
+				*error = [NSError
+					errorWithDomain:RTRPluginErrorDomain
+					code:-1
+					userInfo:@{
+						NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Point dictionary must be NSDictionary. Found %@ instead", pointDict.class]
+					}];
+			}
+            return nil;
+        }
 		NSNumber* x = pointDict[@"x"];
 		NSNumber* y = pointDict[@"y"];
 		if(x == nil || y == nil) {

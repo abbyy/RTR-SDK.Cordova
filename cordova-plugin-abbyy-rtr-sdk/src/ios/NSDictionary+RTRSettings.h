@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)rtr_parseFloat:(NSString*)key defaultValue:(CGFloat)defaultValue outValue:(CGFloat*)outValue error:(NSError**)error;
 - (BOOL)rtr_parseEnum:(NSString*)key defaultValue:(NSInteger)defaultValue variants:(NSDictionary<NSString*, NSNumber*>*)variants outValue:(NSInteger*)outValue error:(NSError**)error;
 - (BOOL)rtr_parseDocumentSize:(NSString*)key defaultValue:(AUIDocumentSize)defaultValue outValue:(AUIDocumentSize*)outValue error:(NSError**)error;
+- (nullable NSArray*)rtr_parseArray:(NSString*)key defaultValue:(nullable NSArray*)defaultValue error:(NSError**)error;
 
 // ctors
 + (instancetype)rtr_dictionaryFromRect:(CGRect)areaOfInterest;
