@@ -35,4 +35,25 @@ module.exports = function (context) {
 	} else {
 		throw new Error('Unable to find build.gradle: ' + error);
 	}
+	
+	var propertiesFile = path.join(platformRoot, 'gradle.properties');
+
+	if(fs.existsSync(propertiesFile)) {
+		fs.readFile(propertiesFile, 'utf8', function (error, data) {
+			if(error) {
+				throw new Error('Unable to find gradle.properties: ' + error);
+			}
+			
+			if(data.indexOf("useAndroidX") == -1) {
+				var result = data+"\nandroid.useAndroidX=true\nandroid.enableJetifier=true";
+				fs.writeFile(propertiesFile, result, 'utf8', function (error) {
+					if(error) {
+						throw new Error('Unable to write into gradle.properties: ' + error);
+					}
+				});
+			}
+		});
+	} else {
+		throw new Error('Unable to find gradle.properties: ' + error);
+	}
 };
