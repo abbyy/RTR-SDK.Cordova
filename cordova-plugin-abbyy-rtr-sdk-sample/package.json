@@ -11,7 +11,8 @@
     ],
     "plugins": {
       "cordova-plugin-abbyy-rtr-sdk": {
-        "CAMERA_USAGE_DESCRIPTION": "NSCameraUsageDescription"
+        "CAMERA_USAGE_DESCRIPTION": "NSCameraUsageDescription",
+        "PHOTOLIBRARY_USAGE_DESCRIPTION": "NSPhotoLibraryUsageDescription"
       }
     }
   },
@@ -21,8 +22,8 @@
   },
   "dependencies": {
     "cordova-android": "~8.0.0",
-    "cordova-ios": "~5.1.0",
-    "cordova-plugin-abbyy-rtr-sdk": "^1.0.14"
+    "cordova-ios": "^5.1.1",
+    "cordova-plugin-abbyy-rtr-sdk": "file:../cordova-plugin-abbyy-rtr-sdk"
   },
   "keywords": [
     "rtr",
