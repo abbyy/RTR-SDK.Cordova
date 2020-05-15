@@ -63,16 +63,45 @@ To get started:
 		<hook type="after_plugin_add" src="scripts/android_gradle_libs_patch.js" />
 
 		<!-- plugin source code -->
+		
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/SharedEngine.java" target-dir="src/com/abbyy/mobile/rtr/javascript"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/JSCallback.java" target-dir="src/com/abbyy/mobile/rtr/javascript"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/JSConstants.java" target-dir="src/com/abbyy/mobile/rtr/javascript"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/JsonResult.java" target-dir="src/com/abbyy/mobile/rtr/javascript"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/data/DataCapture.java" target-dir="src/com/abbyy/mobile/rtr/javascript/data"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/data/DataCaptureResult.java" target-dir="src/com/abbyy/mobile/rtr/javascript/data"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/data/Settings.java" target-dir="src/com/abbyy/mobile/rtr/javascript/data"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/data/SettingsParser.java" target-dir="src/com/abbyy/mobile/rtr/javascript/data"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/image/CropSettings.java" target-dir="src/com/abbyy/mobile/rtr/javascript/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/image/Destination.java" target-dir="src/com/abbyy/mobile/rtr/javascript/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/image/DetectDocumentBoundarySettings.java" target-dir="src/com/abbyy/mobile/rtr/javascript/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/image/ExportSettings.java" target-dir="src/com/abbyy/mobile/rtr/javascript/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/image/ExportType.java" target-dir="src/com/abbyy/mobile/rtr/javascript/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/image/ImagingCore.java" target-dir="src/com/abbyy/mobile/rtr/javascript/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/image/ImagingResult.java" target-dir="src/com/abbyy/mobile/rtr/javascript/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/image/PdfSettings.java" target-dir="src/com/abbyy/mobile/rtr/javascript/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/image/QualityAssessmentForOcrSettings.java" target-dir="src/com/abbyy/mobile/rtr/javascript/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/image/RotateSettings.java" target-dir="src/com/abbyy/mobile/rtr/javascript/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/image/SettingsParser.java" target-dir="src/com/abbyy/mobile/rtr/javascript/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/text/TextRecognition.java" target-dir="src/com/abbyy/mobile/rtr/javascript/text"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/text/TextRecognitionResult.java" target-dir="src/com/abbyy/mobile/rtr/javascript/text"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/text/Settings.java" target-dir="src/com/abbyy/mobile/rtr/javascript/text"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/text/SettingsParser.java" target-dir="src/com/abbyy/mobile/rtr/javascript/text"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/utils/BackgroundWorker.java" target-dir="src/com/abbyy/mobile/rtr/javascript/utils"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/utils/FileUtils.java" target-dir="src/com/abbyy/mobile/rtr/javascript/utils"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/utils/RectUtils.java" target-dir="src/com/abbyy/mobile/rtr/javascript/utils"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/utils/ImageUri.java" target-dir="src/com/abbyy/mobile/rtr/javascript/utils"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/utils/UriScheme.java" target-dir="src/com/abbyy/mobile/rtr/javascript/utils"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/javascript/utils/SettingsParserUtils.java" target-dir="src/com/abbyy/mobile/rtr/javascript/utils"/>
 
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/RtrPlugin.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/RtrManager.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/ResourcesUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/DataCaptureScenario.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
-		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/SharedEngine.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
-		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/ImageType.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
 
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/exceptions/InitializationException.java" target-dir="src/com/abbyy/mobile/rtr/cordova/exceptions"/>
 
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/image/ExportType.java" target-dir="src/com/abbyy/mobile/rtr/cordova/image"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/image/Page.java" target-dir="src/com/abbyy/mobile/rtr/cordova/image"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/image/MultiPagesProcessor.java" target-dir="src/com/abbyy/mobile/rtr/cordova/image"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/image/MultiCaptureResult.java" target-dir="src/com/abbyy/mobile/rtr/cordova/image"/>
@@ -86,7 +115,6 @@ To get started:
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/ImageUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/TextUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/DataUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
-		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/BackgroundWorker.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
 
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/ImageCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/DataCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities"/>
@@ -131,7 +159,7 @@ To get started:
 
 	<!-- ios -->
 	<platform name="ios">
-				<info>Thank you for choosing ABBYY Mobile Capture SDK.
+		<info>Thank you for choosing ABBYY Mobile Capture SDK.
 To get started:
 	* Request ABBYY Mobile Capture trial version on the ABBYY website: https://www.abbyy.com/mobile-capture-sdk/#request-demo. 
 	* Copy assets and the license file (`AbbyyRtrSdk.License`) to `www/rtr_assets` in your project.
@@ -177,8 +205,8 @@ To get started:
 		<source-file src="src/ios/RTRProgressView.m" />
 		<resource-file src="src/ios/RTRProgressView.xib" />
 
-		<header-file src="src/ios/RTRTextCaptureExtensions.h" />
-		<source-file src="src/ios/RTRTextCaptureExtensions.m" />
+		<header-file src="src/ios/RTRExportUtilities.h" />
+		<source-file src="src/ios/RTRExportUtilities.m" />
 
 		<header-file src="src/ios/RTRTextCaptureViewController.h" />
 		<source-file src="src/ios/RTRTextCaptureViewController.m" />
@@ -193,12 +221,13 @@ To get started:
 		<header-file src="src/ios/NSDictionary+RTRSettings.h" />
 		<source-file src="src/ios/NSDictionary+RTRSettings.m" />
 
-		<header-file src="src/ios/RTRMultipageScenarioConfiguration.h" />
-		<source-file src="src/ios/RTRMultipageScenarioConfiguration.m" />
+		<header-file src="src/ios/RTRCoreApiPluginAdapter.h" />
+		<source-file src="src/ios/RTRCoreApiPluginAdapter.m" />
+
+		<header-file src="src/ios/RTRImageCapturePluginAdapter.h" />
+		<source-file src="src/ios/RTRImageCapturePluginAdapter.m" />
 
 		<resource-file src="src/ios/RTRViewController.xib" />
-
-		<resource-file src="src/ios/Main.storyboard" />
 
 		<!-- Localization -->
 		<resource-file src="src/ios/strings/rtr_localizable_en.json" target="rtr_localizable_en.json"/>
