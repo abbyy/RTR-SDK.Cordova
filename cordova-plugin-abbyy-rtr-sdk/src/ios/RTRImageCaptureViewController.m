@@ -31,6 +31,7 @@
 			return nil;
 		}
 		_settings = settings;
+		_localizer = localizer;
 		scenario.isShowPreviewEnabled = settings.shouldShowPreview;
 		scenario.requiredPageCount = settings.requiredPageCount;
 		if(![scenario.result clearWithError:error]) {

@@ -349,7 +349,7 @@
 		if(![dict rtr_parseBool:RTRICShowPreviewKey defaultValue:NO outValue:&_shouldShowPreview error:error]) {
 			return nil;
 		}
-		if(![dict rtr_parseInteger:RTRICImagesCountKey defaultValue:0 outValue:&_requiredPageCount error:error]) {
+		if(![dict rtr_parseInteger:RTRICRequiredPageCountKey defaultValue:0 outValue:&_requiredPageCount error:error]) {
 			return nil;
 		}
 
@@ -362,6 +362,10 @@
 			return nil;
 		}
 		_compressionLevel = enumValue;
+		if(![dict rtr_parseEnum:RTRICCameraResolutionKey defaultValue:AUICameraResolutionFullHD variants:NSDictionary.rtr_stringToCameraResolution outValue:&enumValue error:error]) {
+			return nil;
+		}
+		_cameraResolution = enumValue;
 		if(![dict rtr_parseEnum:RTRICExportTypeKey defaultValue:RTRImageCaptureEncodingTypeJpg variants:NSDictionary.rtr_stringToExportType outValue:&enumValue error:error]) {
 			return nil;
 		}
@@ -372,20 +376,22 @@
 		_destination = enumValue;
 
 		NSDictionary* icSettings = dict[RTRICDefaultImageSettingsKey];
-		if(![icSettings rtr_parseFloat:RTRICMinimumDocumentToViewRatioKey defaultValue:0.15 outValue:&_minimumDocumentToViewRatio error:error]) {
-			return nil;
-		}
-		if(![icSettings rtr_parseInteger:RTRICImageFromGalleryMaxSize defaultValue:4096 outValue:&_imageFromGalleryMaxSize error:error]) {
-			return nil;
-		}
-		if(![icSettings rtr_parseFloat:RTRICAspectRatioMin defaultValue:0 outValue:&_aspectRatioMin error:error]) {
-			return nil;
-		}
-		if(![icSettings rtr_parseFloat:RTRICAspectRatioMax defaultValue:0 outValue:&_aspectRatioMax error:error]) {
-			return nil;
-		}
-		if(![icSettings rtr_parseDocumentSize:RTRICDocumentSizeKey defaultValue:AUIDocumentSizeAny outValue:&_documentSize error:error]) {
-			return nil;
+		if(icSettings != nil) {
+			if(![icSettings rtr_parseFloat:RTRICMinimumDocumentToViewRatioKey defaultValue:0.15 outValue:&_minimumDocumentToViewRatio error:error]) {
+				return nil;
+			}
+			if(![icSettings rtr_parseInteger:RTRICImageFromGalleryMaxSize defaultValue:4096 outValue:&_imageFromGalleryMaxSize error:error]) {
+				return nil;
+			}
+			if(![icSettings rtr_parseFloat:RTRICAspectRatioMin defaultValue:0 outValue:&_aspectRatioMin error:error]) {
+				return nil;
+			}
+			if(![icSettings rtr_parseFloat:RTRICAspectRatioMax defaultValue:0 outValue:&_aspectRatioMax error:error]) {
+				return nil;
+			}
+			if(![icSettings rtr_parseDocumentSize:RTRICDocumentSizeKey defaultValue:AUIDocumentSizeAny outValue:&_documentSize error:error]) {
+				return nil;
+			}
 		}
 	}
 	return self;

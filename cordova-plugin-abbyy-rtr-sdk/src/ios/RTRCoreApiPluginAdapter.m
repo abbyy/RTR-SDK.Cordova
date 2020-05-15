@@ -647,7 +647,7 @@
 			RTRICDestinationKey: @"base64"
 		};
 	}
-	NSString* destinationTypeString = [settings[RTRICDestinationKey] lowercaseString];
+    NSString* destinationTypeString = [settings[RTRICDestinationKey] lowercaseString] ?: @"base64";
 	if(destinationTypeString == nil) {
 		if(onError != nil) {
 			onError([NSError rtr_missingKeyError:RTRICDestinationKey]);

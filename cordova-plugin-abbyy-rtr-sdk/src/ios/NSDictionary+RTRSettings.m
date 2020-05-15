@@ -252,7 +252,7 @@
 + (instancetype)rtr_dictionaryFromTextBlock:(RTRTextBlock*)textBlock
 {
 	return @{
-		@"text": textBlock.rtr_text ?: @"",
+//		@"text": textBlock.rtr_text ?: @"",
 		@"textLines": [textBlock.textLines rtr_map:^id(RTRTextLine* line) {
 			return [NSDictionary rtr_dictionaryFromTextLine:line];
 		}] ?: @[]
@@ -388,7 +388,7 @@
 	CGFloat right = [self[@"right"] floatValue];
 	CGFloat top = [self[@"top"] floatValue];
 	CGFloat bottom = [self[@"bottom"] floatValue];
-	*outRect = CGRectMake(bottom, left, top - bottom, right - left);
+	*outRect = CGRectMake(left, top, right - left, bottom - top);
 	return YES;
 }
 
