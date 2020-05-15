@@ -5,47 +5,21 @@ package com.abbyy.mobile.rtr.cordova.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Base64;
 
-import com.abbyy.mobile.rtr.cordova.ImageCaptureSettings;
+import com.abbyy.mobile.rtr.cordova.ImageType;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Utility class for handling & storing images
  */
 public class ImageUtils {
-
-	// Synchronously save bitmap to file
-	public static void saveBitmap( Bitmap image, File file ) throws IOException
-	{
-		try( FileOutputStream fos = new FileOutputStream( file ) ) {
-			if( ImageCaptureSettings.exportType == ImageCaptureSettings.ExportType.PNG ) {
-				image.compress( Bitmap.CompressFormat.PNG, 0, fos );
-			} else {
-				int quality = 0;
-				switch( ImageCaptureSettings.compressionLevel ) {
-					case Low:
-						quality = 100;
-						break;
-					case Normal:
-						quality = 66;
-						break;
-					case High:
-						quality = 33;
-						break;
-					case ExtraHigh:
-						quality = 0;
-						break;
-				}
-				image.compress( Bitmap.CompressFormat.JPEG, quality, fos );
-			}
-			fos.flush();
-		}
-	}
 
 	public static String convertFileToBase64( File file ) throws IOException
 	{
@@ -62,25 +36,29 @@ public class ImageUtils {
 		}
 	}
 
-	public static File getCaptureSessionPageFile( int pageIndex, Context context )
+	public static Bitmap getBitmap( String image, ImageType imageType, Context context ) throws IOException
 	{
-		File captureSessionDir = getCaptureSessionDir( context );
-		if( !captureSessionDir.exists() ) {
-			captureSessionDir.mkdir();
+		switch( imageType ) {
+			case Base64:
+				byte[] decodedString = Base64.decode( image, Base64.DEFAULT );
+				return BitmapFactory.decodeByteArray( decodedString, 0, decodedString.length );
+			case URI:
+				Uri uri = Uri.parse( image );
+				try( InputStream inputStream = context.getContentResolver().openInputStream( uri ) ) {
+					Bitmap bitmap = BitmapFactory.decodeStream( inputStream );
+					if( bitmap == null ) {
+						throw new IOException( "Could not load image from URI: " + uri );
+					}
+					return bitmap;
+				}
+			case FilePath:
+				Bitmap bitmap = BitmapFactory.decodeFile( image );
+				if( bitmap == null ) {
+					throw new IOException( "Could not load image from file: " + image );
+				}
+				return bitmap;
 		}
-		return new File( captureSessionDir, "page_" + ( pageIndex + 1 ) + "." + getFileExtension() );
-	}
-
-	private static String getFileExtension()
-	{
-		switch( ImageCaptureSettings.exportType ) {
-			case JPG:
-			case PDF:
-				return "jpg";
-			case PNG:
-				return "png";
-		}
-		return "jpg";
+		return null;
 	}
 
 	public static File getCaptureSessionPdfFile( Context context )

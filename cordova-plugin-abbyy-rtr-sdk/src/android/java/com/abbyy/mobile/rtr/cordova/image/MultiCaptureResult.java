@@ -1,17 +1,20 @@
 // ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
 // ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
 
-package com.abbyy.mobile.rtr.cordova.multipage;
+package com.abbyy.mobile.rtr.cordova.image;
 
 import android.content.Context;
 import android.graphics.Point;
 import android.util.SparseArray;
 
-import com.abbyy.mobile.rtr.cordova.ImageCaptureSettings;
 import com.abbyy.mobile.rtr.cordova.ResourcesUtils;
+import com.abbyy.mobile.rtr.cordova.image.ImageCaptureResult;
+import com.abbyy.mobile.rtr.cordova.image.ImageCaptureSettings;
+import com.abbyy.mobile.rtr.cordova.image.Page;
 import com.abbyy.mobile.rtr.cordova.utils.ImageUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,20 +24,20 @@ import java.util.List;
  */
 public class MultiCaptureResult {
 
-	public static HashMap<String, Object> getJsonResult( SparseArray<PageHolder> pages, Context context )
+	public static HashMap<String, Object> getJsonResult( ImageCaptureResult result, ImageCaptureSettings settings, Context context )
 	{
 		HashMap<String, Object> json = new HashMap<>();
-		int pageCount = pages.size();
+		int pageCount = result.getPages().length;
 
 		List<HashMap<String, Object>> pagesPaths = new ArrayList<>();
 		for( int i = 0; i < pageCount; ++i ) {
-			PageHolder pageHolder = pages.valueAt( i );
-			HashMap<String, Object> pageJson = getPageInfoJson( pageHolder );
+			Page pageHolder = result.getPages()[i];
+			HashMap<String, Object> pageJson = getPageInfoJson( pageHolder, settings );
 			pagesPaths.add( pageJson );
 		}
 		json.put( "images", pagesPaths );
-		if( ImageCaptureSettings.exportType == ImageCaptureSettings.ExportType.PDF ) {
-			HashMap<String, Object> pdfInfo = getPdfInfoJson( context, pageCount );
+		if( settings.exportType == ImageCaptureSettings.ExportType.PDF ) {
+			HashMap<String, Object> pdfInfo = getPdfInfoJson( context, settings );
 			json.put( "pdfInfo", pdfInfo );
 		}
 		HashMap<String, Object> resultInfo = new HashMap<>();
@@ -42,15 +45,19 @@ public class MultiCaptureResult {
 		return json;
 	}
 
-	private static HashMap<String, Object> getPageInfoJson( PageHolder pageHolder )
+	private static HashMap<String, Object> getPageInfoJson( Page pageHolder, ImageCaptureSettings imageCaptureSettings )
 	{
 		HashMap<String, Object> pageJson = new HashMap<>();
-		if( pageHolder.getBase64() != null ) {
-			pageJson.put( "base64", pageHolder.getBase64() );
+		if( shouldReturnBase64( imageCaptureSettings ) ) {
+			try {
+				pageJson.put( "base64", ImageUtils.convertFileToBase64( pageHolder.getFile() ) );
+			} catch( IOException e ) {
+				e.printStackTrace();
+			}
 		}
-		pageJson.put( "filePath", pageHolder.getPageFile().getPath() );
+		pageJson.put( "filePath", pageHolder.getFile().getPath() );
 		HashMap<String, Object> pageResultJson = new HashMap<>();
-		pageResultJson.put( "exportType", ImageCaptureSettings.exportType.toString() );
+		pageResultJson.put( "exportType", imageCaptureSettings.exportType.toString() );
 		if( pageHolder.getDocumentBoundary() != null ) {
 			StringBuilder boundary = new StringBuilder();
 			for( Point p : pageHolder.getDocumentBoundary() ) {
@@ -62,28 +69,27 @@ public class MultiCaptureResult {
 			pageResultJson.put( "documentBoundary", boundary.toString() );
 		}
 		if( pageHolder.getFrameSize() != null ) {
-			String frameSize = pageHolder.getFrameSize().x + " " + pageHolder.getFrameSize().y;
+			String frameSize = pageHolder.getFrameSize().getWidth() + " " + pageHolder.getFrameSize().getHeight();
 			pageResultJson.put( "frameSize", frameSize );
 		}
 		pageJson.put( "resultInfo", pageResultJson );
 		return pageJson;
 	}
 
-	private static HashMap<String, Object> getPdfInfoJson( Context context, int pageCount )
+	private static HashMap<String, Object> getPdfInfoJson( Context context, ImageCaptureSettings imageCaptureSettings )
 	{
 		File pdfFile = ImageUtils.getCaptureSessionPdfFile( context );
 		HashMap<String, Object> pdfInfo = new HashMap<>();
 		pdfInfo.put( "filePath", pdfFile.getPath() );
-		pdfInfo.put( "pagesCount", pageCount );
-		pdfInfo.put( "pdfCompressionType", ImageCaptureSettings.pdfCompressionType.toString() );
-		pdfInfo.put( "compressionLevel", ImageCaptureSettings.compressionLevel.toString() );
+		pdfInfo.put( "pagesCount", imageCaptureSettings.requiredPageCount );
+		pdfInfo.put( "compressionLevel", imageCaptureSettings.compressionLevel.toString() );
 		return pdfInfo;
 	}
 
-	public static boolean shouldReturnBase64()
+	public static boolean shouldReturnBase64( ImageCaptureSettings imageCaptureSettings )
 	{
-		return ImageCaptureSettings.destination == ImageCaptureSettings.Destination.BASE64 &&
-			ImageCaptureSettings.exportType != ImageCaptureSettings.ExportType.PDF;
+		return imageCaptureSettings.destination == ImageCaptureSettings.Destination.BASE64 &&
+			imageCaptureSettings.exportType != ImageCaptureSettings.ExportType.PDF;
 	}
 
 	public static HashMap<String, Object> getErrorJsonResult( Exception exception, Context context )

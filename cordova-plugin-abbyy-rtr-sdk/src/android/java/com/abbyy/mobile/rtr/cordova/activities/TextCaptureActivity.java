@@ -20,10 +20,10 @@ import com.abbyy.mobile.rtr.Language;
 import com.abbyy.mobile.rtr.cordova.ResourcesUtils;
 import com.abbyy.mobile.rtr.cordova.RtrManager;
 import com.abbyy.mobile.rtr.cordova.RtrPlugin;
-import com.abbyy.mobile.rtr.cordova.exceptions.InitializationException;
 import com.abbyy.mobile.rtr.cordova.settings.LanguagesSettingActivity;
 import com.abbyy.mobile.rtr.cordova.surfaces.BaseSurfaceView;
 import com.abbyy.mobile.rtr.cordova.surfaces.TextCaptureSurfaceView;
+import com.abbyy.mobile.rtr.cordova.utils.TextUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,7 +96,6 @@ public class TextCaptureActivity extends BaseActivity {
 			errorTextView.setText( message );
 			errorOccurred = e.getMessage();
 		}
-
 	};
 
 	private void dispatchResults( final ITextCaptureService.TextLine[] lines, final IRecognitionService.ResultStabilityStatus resultStatus, final boolean wasStoppedByUser )
@@ -129,23 +128,11 @@ public class TextCaptureActivity extends BaseActivity {
 					resultInfo.put( "userAction", "Manually Stopped" );
 				}
 
-				ArrayList<HashMap<String, String>> lineList = new ArrayList<>();
+				ArrayList<HashMap<String, String>> lineList;
 				if( lines != null ) {
-					for( ITextCaptureService.TextLine line : lines ) {
-						HashMap<String, String> lineInfo = new HashMap<>();
-						lineInfo.put( "text", line.Text );
-						StringBuilder builder = new StringBuilder();
-						for( int i = 0; i < line.Quadrangle.length; i++ ) {
-							builder.append( line.Quadrangle[i].x );
-							builder.append( ' ' );
-							builder.append( line.Quadrangle[i].y );
-							if( i != line.Quadrangle.length - 1 ) {
-								builder.append( ' ' );
-							}
-						}
-						lineInfo.put( "quadrangle", builder.toString() );
-						lineList.add( lineInfo );
-					}
+					lineList = TextUtils.toJsonTextLines(lines);
+				} else {
+					lineList = new ArrayList<>();
 				}
 
 				HashMap<String, Object> json = new HashMap<>();
@@ -179,7 +166,7 @@ public class TextCaptureActivity extends BaseActivity {
 				}
 			}
 			return true;
-		} catch( InitializationException e ) {
+		} catch( Exception e ) {
 			e.printStackTrace();
 			return false;
 		}
