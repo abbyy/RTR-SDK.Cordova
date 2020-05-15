@@ -5,9 +5,21 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSUInteger, RTRImageDestinationType) {
+	RTRImageDestinationTypeBase64,
+	RTRImageDestinationTypeFile,
+};
+
+typedef NS_ENUM(NSUInteger, RTRImageCaptureEncodingType) {
+	RTRImageCaptureEncodingTypeJpeg2000,
+	RTRImageCaptureEncodingTypeJpg,
+	RTRImageCaptureEncodingTypePng,
+	RTRImageCaptureEncodingTypePdf,
+};
+
 #pragma mark - common constants
 
-extern NSString* const RTRCordovaPluginErrorDomain;
+extern NSString* const RTRPluginErrorDomain;
 extern NSString* const RTRRecognitionLanguagesKey;
 extern NSString* const RTRSelectableRecognitionLanguagesKey;
 extern NSString* const RTRLicenseFileNameKey;
@@ -36,6 +48,9 @@ extern NSString* const RTRICCameraResolutionKey;
 extern NSString* const RTRICFlashlightButtonVisibleKey;
 extern NSString* const RTRICCaptureButtonVisibleKey;
 extern NSString* const RTRICGalleryButtonVisibleKey;
+extern NSString* const RTRICImageFromGalleryMaxSize;
+extern NSString* const RTRICAspectRatioMin;
+extern NSString* const RTRICAspectRatioMax;
 extern NSString* const RTRICShowPreviewKey;
 extern NSString* const RTRICImagesCountKey;
 extern NSString* const RTRICRequiredPageCountKey;
@@ -51,5 +66,15 @@ extern NSString* const RTRICMinimumDocumentToViewRatioKey;
 extern NSString* const RTRCAProgressPercentage;
 extern NSString* const RTRCAProgressWarning;
 extern NSString* const RTRCAEnableTextOrientationDetection;
+extern NSString* const RTRCAImageUri;
+extern NSString* const RTRCAImageSize;
+extern NSString* const RTRCARotationAngleDegrees;
+extern NSString* const RTRCADocumentBoundary;
+extern NSString* const RTRCAImageResolution;
+extern NSString* const RTRCABoundaryDetectionMode;
+extern NSString* const RTRCAExportResultOptions;
+extern NSString* const RTRCAExportFilePath;
+extern NSString* const RTRCAExportPdfImages;
+extern NSString* const RTRCAPdfUri;
 
 NS_ASSUME_NONNULL_END

@@ -43,7 +43,7 @@
 
 			}
 			*error = [NSError
-					  errorWithDomain:RTRCordovaPluginErrorDomain
+					  errorWithDomain:RTRPluginErrorDomain
 					  code:-1
 					  userInfo:userInfo];
 			return nil;

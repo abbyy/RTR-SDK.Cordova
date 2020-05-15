@@ -7,26 +7,25 @@
 #import "RTRDataCaptureViewController.h"
 #import "RTRDataCaptureScenario.h"
 #import "NSDictionary+RTRSettings.h"
-#import "RTRTextCaptureExtensions.h"
 
+#import "RTRCoreApiPluginAdapter.h"
+#import "RTRImageCapturePluginAdapter.h"
 #import <AbbyyRtrSDK/AbbyyRtrSDK.h>
 #import <AbbyyUI/AbbyyUI.h>
 
-#import "RTRImageCaptureViewController.h"
+#import "NSString+RTRPluginLocalization.h"
 #import "RTRPluginConstants.h"
 
-@interface RTRImageCaptureOptions : NSObject
-
-@property (nonatomic, assign) CGSize documentSize;
-@property (nonatomic, assign) CGFloat minimumDocumentToViewRatio;
-
-@property (nonatomic, assign) RTRImageCaptureDestintationType destination;
-@property (nonatomic, assign) RTRImageCaptureEncodingType encodingType;
-@property (nonatomic, assign) RTRCoreAPIExportCompressionLevel compression;
-
+@interface RTRLocalizer : NSObject<RTRLocalizer>
 @end
 
-@implementation RTRImageCaptureOptions
+@implementation RTRLocalizer
+
+- (NSString*)localizedStringForKey:(NSString*)key
+{
+	return key.rtr_localized;
+}
+
 @end
 
 @interface RTRPlugin () <AUIImageCaptureScenarioDelegate>
@@ -35,8 +34,6 @@
 @property (nonatomic) RTRManager* rtrManager;
 
 @property (nonatomic) CDVInvokedUrlCommand* currentCommand;
-
-@property (nonatomic, strong) RTRImageCaptureViewController* imageCaptureHolder;
 
 @end
 
@@ -67,7 +64,15 @@
 		NSSet* selectedLanguages = [NSSet setWithArray:selectedLanguagesArray];
 
 		RTRTextCaptureViewController* rtrViewController = [RTRTextCaptureViewController new];
-		rtrViewController.supportedInterfaceOrientations = [params rtr_orientationMaskForKey:RTROrientationPolicy];
+		NSInteger enumValue;
+		NSError* error;
+		if(![params rtr_parseEnum:RTROrientationPolicy defaultValue:UIInterfaceOrientationMaskAll variants:NSDictionary.rtr_stringToOrientationMask outValue:&enumValue error:&error]) {
+			[self.commandDelegate
+				sendPluginResult:[CDVPluginResult rtrResultWithError:error]
+				callbackId:command.callbackId];
+			return;
+		}
+		rtrViewController.supportedInterfaceOrientations = enumValue;
 		rtrViewController.settingsTableContent = languages;
 		rtrViewController.selectedRecognitionLanguages = [selectedLanguages mutableCopy];
 		rtrViewController.languageSelectionEnabled = languages.count != 0;
@@ -103,7 +108,15 @@
 		NSDictionary* scenarioParams = params[RTRCustomDataCaptureScenarioKey];
 
 		RTRDataCaptureViewController* rtrViewController = [RTRDataCaptureViewController new];
-		rtrViewController.supportedInterfaceOrientations = [params rtr_orientationMaskForKey:RTROrientationPolicy];
+		NSInteger enumValue;
+		NSError* error;
+		if(![params rtr_parseEnum:RTROrientationPolicy defaultValue:UIInterfaceOrientationMaskAll variants:NSDictionary.rtr_stringToOrientationMask outValue:&enumValue error:&error]) {
+			[self.commandDelegate
+			 sendPluginResult:[CDVPluginResult rtrResultWithError:error]
+			 callbackId:command.callbackId];
+			return;
+		}
+		rtrViewController.supportedInterfaceOrientations = enumValue;
 
 		NSString* errorDescription = nil;
 
@@ -135,7 +148,7 @@
 		}
 
 		if(errorDescription.length != 0) {
-			NSError* error = [NSError errorWithDomain:RTRCordovaPluginErrorDomain code:3 userInfo:@{
+			NSError* error = [NSError errorWithDomain:RTRPluginErrorDomain code:3 userInfo:@{
 				NSLocalizedDescriptionKey : errorDescription
 			}];
 			CDVPluginResult* result = [CDVPluginResult rtrResultWithError:error];
@@ -160,140 +173,236 @@
 
 - (void)startImageCapture:(CDVInvokedUrlCommand*)command
 {
-	[self.commandDelegate runInBackground:^{
-		self.currentCommand = command;
-
+	__weak RTRPlugin* weakSelf = self;
+	dispatch_async(dispatch_get_main_queue(), ^{
 		if(![self initializeRtrManager:command]) {
 			return;
 		}
-
-		dispatch_async(dispatch_get_main_queue(), ^{
-			self.imageCaptureHolder = [RTRImageCaptureViewController new];
-
-			__weak RTRPlugin* weakSelf = self;
-
-			self.imageCaptureHolder.config = [[RTRMultipageScenarioConfiguration alloc] initWithManager:self.rtrManager args:command.arguments.firstObject];
-			self.imageCaptureHolder.onSuccess = ^(BOOL manuallyStopped, NSDictionary* response) {
-				NSMutableDictionary* mutableResponce = response.mutableCopy;
-				if(manuallyStopped) {
-					mutableResponce[RTRCallbackResultInfoKey] =
-					@{
-					  RTRCallbackUserActionKey : @"Manually Stopped"
-					};
-				}
-
-				CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:mutableResponce];
-				[weakSelf.viewController dismissViewControllerAnimated:YES completion:^{
-					[weakSelf.commandDelegate sendPluginResult:pluginResult callbackId:weakSelf.currentCommand.callbackId];
-				}];
-			};
-			self.imageCaptureHolder.onCancel = ^{
-				NSMutableDictionary* result = [@{
-					RTRCallbackResultInfoKey : @{
-						RTRCallbackUserActionKey : @"Canceled"
-					}
-				} mutableCopy];
-
-				CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
-				[weakSelf.viewController dismissViewControllerAnimated:YES completion:^{
-					[weakSelf.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-				}];
-			};
-			self.imageCaptureHolder.onError = ^(NSError* error) {
-				CDVPluginResult* result = [CDVPluginResult rtrResultWithError:error];
-				[weakSelf.viewController dismissViewControllerAnimated:YES completion:^{
-					[weakSelf.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-				}];
-			};
-			self.imageCaptureHolder.modalPresentationStyle = UIModalPresentationFullScreen;
-			[self.viewController presentViewController:self.imageCaptureHolder animated:YES completion:nil];
-		});
-
-	}];
+		RTRImageCapturePluginAdapter* imageCapture = [[RTRImageCapturePluginAdapter alloc] initWithEngine:self.rtrManager.engine];
+		[imageCapture
+			startImageCapture:command.arguments.firstObject
+			rootController:self.viewController
+			localizer:[RTRLocalizer new]
+			onError:^(NSError* error) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult rtrResultWithError:error]
+					callbackId:command.callbackId];
+			}
+		 	onSuccess:^(NSDictionary* response) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:response]
+					callbackId:command.callbackId];
+			}
+		];
+	});
 }
 
 - (void)recognizeText:(CDVInvokedUrlCommand*)command
 {
+	__weak RTRPlugin* weakSelf = self;
 	[self.commandDelegate runInBackground:^{
 		if(![self initializeRtrManager:command]) {
 			return;
 		}
-		id<RTRCoreAPI> coreApi = [self.rtrManager.engine createCoreAPI];
-
 		NSArray* args = command.arguments;
-		NSDictionary* settings = args.firstObject;
-		NSString* base64Image = args[1];
+		NSDictionary* query = args.firstObject;
+		RTRCoreApiPluginAdapter* coreApi = [[RTRCoreApiPluginAdapter alloc] initWithEngine:self.rtrManager.engine];
 
-		NSData* imageData = [[NSData alloc] initWithBase64EncodedString:base64Image options:0];
-		UIImage* image = [UIImage imageWithData:imageData];
-
-		__weak RTRPlugin* weakSelf = self;
-		RTRProgressCallbackBlock onProgress = ^BOOL(NSInteger percentage, RTRCallbackWarningCode warning) {
-			[weakSelf.commandDelegate evalJs:[NSString
-				stringWithFormat:@"AbbyyRtrSdk.events.onProgress({ %@: %@ })", RTRCAProgressPercentage, @(percentage)]];
-			return YES;
-		};
-
-		NSError* error;
-		NSArray* languages = settings[RTRRecognitionLanguagesKey] ?: @[RTRLanguageNameEnglish];
-		[coreApi.textRecognitionSettings
-			setRecognitionLanguages:[NSSet setWithArray:languages]];
-		if(settings[RTRCAEnableTextOrientationDetection] != nil) {
-			coreApi.textRecognitionSettings.textOrientationDetectionEnabled = [settings[RTRCAEnableTextOrientationDetection] boolValue];
-		}
-
-		NSArray<RTRTextBlock*>* result = [coreApi
-			recognizeTextOnImage:image
-			onProgress:onProgress
-			onTextOrientationDetected:nil
-			error:&error];
-		[self.commandDelegate
-			sendPluginResult:[CDVPluginResult rtrResultForCoreApiTextCapture:result]
-			callbackId:command.callbackId];
+		[coreApi
+			recognizeText:query
+			onError:^(NSError* error) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult rtrResultWithError:error]
+					callbackId:command.callbackId];
+			}
+			onSuccess:^(NSDictionary* result) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result]
+					callbackId:command.callbackId];
+			}];
 	}];
 }
 
 - (void)extractData:(CDVInvokedUrlCommand*)command
 {
+	__weak RTRPlugin* weakSelf = self;
 	[self.commandDelegate runInBackground:^{
 		if(![self initializeRtrManager:command]) {
 			return;
 		}
-		id<RTRCoreAPI> coreApi = [self.rtrManager.engine createCoreAPI];
-
 		NSArray* args = command.arguments;
-		NSDictionary* settings = args.firstObject;
-		NSString* base64Image = args[1];
+		NSDictionary* query = args.firstObject;
+		RTRCoreApiPluginAdapter* coreApi = [[RTRCoreApiPluginAdapter alloc] initWithEngine:self.rtrManager.engine];
 
-		NSData* imageData = [[NSData alloc] initWithBase64EncodedString:base64Image options:0];
-		UIImage* image = [UIImage imageWithData:imageData];
-
-		coreApi.dataCaptureSettings.profile = settings[RTRDataCaptureProfileKey];
-		NSArray* languages = settings[RTRRecognitionLanguagesKey] ?: @[RTRLanguageNameEnglish];
-		[[coreApi.dataCaptureSettings configureDataCaptureProfile] setRecognitionLanguages:[NSSet setWithArray:languages]];
-		if(settings[RTRCAEnableTextOrientationDetection] != nil) {
-			coreApi.textRecognitionSettings.textOrientationDetectionEnabled = [settings[RTRCAEnableTextOrientationDetection] boolValue];
-		}
-
-		__weak RTRPlugin* weakSelf = self;
-		RTRProgressCallbackBlock onProgress = ^BOOL(NSInteger percentage, RTRCallbackWarningCode warning) {
-			[weakSelf.commandDelegate evalJs:[NSString
-				stringWithFormat:@"AbbyyRtrSdk.events.onProgress({ %@: %@ })", RTRCAProgressPercentage, @(percentage)]];
-			return YES;
-		};
-
-		NSError* error;
-		NSArray<RTRDataField*>* result = [coreApi
-			extractDataFromImage:image
-			onProgress:onProgress
-			onTextOrientationDetected:nil
-			error:&error];
-		[self.commandDelegate
-			sendPluginResult:[CDVPluginResult rtrResultForCoreApiDataCapture:result]
-			callbackId:command.callbackId];
+		[coreApi
+			extractData:query
+			onError:^(NSError* error) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult rtrResultWithError:error]
+					callbackId:command.callbackId];
+			}
+			onSuccess:^(NSDictionary* result) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result]
+					callbackId:command.callbackId];
+			}];
 	}];
+}
 
+- (void)exportImage:(CDVInvokedUrlCommand*)command
+{
+	__weak RTRPlugin* weakSelf = self;
+	[self.commandDelegate runInBackground:^{
+		if(![self initializeRtrManager:command]) {
+			return;
+		}
+		NSArray* args = command.arguments;
+		NSDictionary* query = args.firstObject;
+		RTRCoreApiPluginAdapter* coreApi = [[RTRCoreApiPluginAdapter alloc] initWithEngine:self.rtrManager.engine];
 
+		[coreApi
+			exportImage:query
+			onError:^(NSError* error) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult rtrResultWithError:error]
+					callbackId:command.callbackId];
+			}
+			onSuccess:^(NSDictionary* result) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result]
+					callbackId:command.callbackId];
+			}];
+	}];
+}
+
+- (void)exportImagesToPdf:(CDVInvokedUrlCommand*)command
+{
+	__weak RTRPlugin* weakSelf = self;
+	[self.commandDelegate runInBackground:^{
+		if(![self initializeRtrManager:command]) {
+			return;
+		}
+		NSArray* args = command.arguments;
+		NSDictionary* query = args.firstObject;
+		RTRCoreApiPluginAdapter* coreApi = [[RTRCoreApiPluginAdapter alloc] initWithEngine:self.rtrManager.engine];
+
+		[coreApi
+			exportImagesToPdf:query
+			onError:^(NSError* error) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult rtrResultWithError:error]
+					callbackId:command.callbackId];
+			}
+			onSuccess:^(NSDictionary* result) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result]
+					callbackId:command.callbackId];
+			}];
+	}];
+}
+
+- (void)detectDocumentBoundary:(CDVInvokedUrlCommand*)command
+{
+	__weak RTRPlugin* weakSelf = self;
+	[self.commandDelegate runInBackground:^{
+		if(![self initializeRtrManager:command]) {
+			return;
+		}
+		NSArray* args = command.arguments;
+		NSDictionary* query = args.firstObject;
+		RTRCoreApiPluginAdapter* coreApi = [[RTRCoreApiPluginAdapter alloc] initWithEngine:self.rtrManager.engine];
+
+		[coreApi
+			detectBoundaryOnImage:query
+			onError:^(NSError* error) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult rtrResultWithError:error]
+					callbackId:command.callbackId];
+			}
+		 	onSuccess:^(NSDictionary* result) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result]
+					callbackId:command.callbackId];
+			}];
+	}];
+}
+
+- (void)assessQualityForOcr:(CDVInvokedUrlCommand*)command
+{
+	__weak RTRPlugin* weakSelf = self;
+	[self.commandDelegate runInBackground:^{
+		if(![self initializeRtrManager:command]) {
+			return;
+		}
+		NSArray* args = command.arguments;
+		NSDictionary* query = args.firstObject;
+		RTRCoreApiPluginAdapter* coreApi = [[RTRCoreApiPluginAdapter alloc] initWithEngine:self.rtrManager.engine];
+
+		[coreApi
+			assessOCRQualityOnImage:query
+			onError:^(NSError* error) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult rtrResultWithError:error]
+					callbackId:command.callbackId];
+			}
+		 	onSuccess:^(NSDictionary* result) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result]
+					callbackId:command.callbackId];
+			}];
+	}];
+}
+
+- (void)cropImage:(CDVInvokedUrlCommand*)command
+{
+	__weak RTRPlugin* weakSelf = self;
+	[self.commandDelegate runInBackground:^{
+		if(![self initializeRtrManager:command]) {
+			return;
+		}
+		NSArray* args = command.arguments;
+		NSDictionary* query = args.firstObject;
+		RTRCoreApiPluginAdapter* coreApi = [[RTRCoreApiPluginAdapter alloc] initWithEngine:self.rtrManager.engine];
+
+		[coreApi
+			cropImage:query
+			onError:^(NSError* error) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult rtrResultWithError:error]
+					callbackId:command.callbackId];
+			}
+		 	onSuccess:^(NSDictionary* result) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result]
+					callbackId:command.callbackId];
+			}];
+	}];
+}
+
+- (void)rotateImage:(CDVInvokedUrlCommand*)command
+{
+	__weak RTRPlugin* weakSelf = self;
+	[self.commandDelegate runInBackground:^{
+		if(![self initializeRtrManager:command]) {
+			return;
+		}
+		NSArray* args = command.arguments;
+		NSDictionary* query = args.firstObject;
+		RTRCoreApiPluginAdapter* coreApi = [[RTRCoreApiPluginAdapter alloc] initWithEngine:self.rtrManager.engine];
+
+		[coreApi
+			rotateImage:query
+			onError:^(NSError* error) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult rtrResultWithError:error]
+					callbackId:command.callbackId];
+			}
+		 	onSuccess:^(NSDictionary* result) {
+				[weakSelf.commandDelegate
+					sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result]
+					callbackId:command.callbackId];
+			}];
+	}];
 }
 
 #pragma mark - Helpers
@@ -358,7 +467,7 @@
 
 	if(self.rtrManager == nil) {
 		if(error == nil) {
-			error = [NSError errorWithDomain:RTRCordovaPluginErrorDomain code:2 userInfo:@{
+			error = [NSError errorWithDomain:RTRPluginErrorDomain code:2 userInfo:@{
 				NSLocalizedDescriptionKey : @"Real-Time Recognition SDK isn't initialized. Please check your license file."
 			}];
 		}
@@ -410,6 +519,43 @@
 	[self.viewController dismissViewControllerAnimated:YES completion:^{
 		[self.commandDelegate sendPluginResult:pluginResult callbackId:self.currentCommand.callbackId];
 	}];
+}
+
+@end
+
+@implementation NSDictionary (rtr_Plugin)
+
+
+- (RTRImageDestinationType)rtr_destinationTypeForKey:(NSString*)key
+{
+	static NSDictionary* predefined = nil;
+	if(predefined == nil) {
+		predefined = @{
+			@"base64": @(RTRImageDestinationTypeBase64),
+			@"file": @(RTRImageDestinationTypeFile)
+		};
+	}
+	NSString* value = [self valueForKey:key];
+	if(![value isKindOfClass:[NSString class]]) {
+		return RTRImageDestinationTypeFile;
+	}
+	if([predefined valueForKey:value] != nil) {
+		return (RTRImageDestinationType)[predefined[value] integerValue];
+	}
+	return RTRImageDestinationTypeFile;
+}
+
+- (RTRImageCaptureEncodingType)rtr_exportTypeForKey:(NSString*)key
+{
+	NSDictionary* predefined = [NSDictionary rtr_stringToExportType];
+	NSString* value = [self valueForKey:key];
+	if(![value isKindOfClass:[NSString class]]) {
+		return RTRImageCaptureEncodingTypeJpg;
+	}
+	if([predefined valueForKey:value] != nil) {
+		return (RTRImageCaptureEncodingType)[predefined[value] integerValue];
+	}
+	return RTRImageCaptureEncodingTypeJpg;
 }
 
 @end

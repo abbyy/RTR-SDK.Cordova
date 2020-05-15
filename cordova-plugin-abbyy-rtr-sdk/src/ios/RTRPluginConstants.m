@@ -3,7 +3,7 @@
 
 #import "RTRPluginConstants.h"
 
-NSString* const RTRCordovaPluginErrorDomain = @"com.abbyy.rtr-cordova-plugin";
+NSString* const RTRPluginErrorDomain = @"com.abbyy.rtr-cordova-plugin";
 NSString* const RTRRecognitionLanguagesKey = @"recognitionLanguages";
 NSString* const RTRSelectableRecognitionLanguagesKey = @"selectableRecognitionLanguages";
 NSString* const RTRLicenseFileNameKey = @"licenseFileName";
@@ -30,6 +30,9 @@ NSString* const RTRICCameraResolutionKey = @"cameraResolution";
 NSString* const RTRICFlashlightButtonVisibleKey = @"isFlashlightButtonVisible";
 NSString* const RTRICCaptureButtonVisibleKey = @"isCaptureButtonVisible";
 NSString* const RTRICGalleryButtonVisibleKey = @"isGalleryButtonVisible";
+NSString* const RTRICImageFromGalleryMaxSize = @"imageFromGalleryMaxSize";
+NSString* const RTRICAspectRatioMin = @"aspectRatioMin";
+NSString* const RTRICAspectRatioMax = @"aspectRatioMax";
 NSString* const RTRICShowPreviewKey = @"showPreview";
 NSString* const RTRICImagesCountKey = @"maxImagesCount";
 NSString* const RTRICRequiredPageCountKey = @"requiredPageCount";
@@ -42,4 +45,15 @@ NSString* const RTRICMinimumDocumentToViewRatioKey = @"minimumDocumentToViewRati
 
 NSString* const RTRCAProgressPercentage = @"percentage";
 NSString* const RTRCAProgressWarning = @"warning";
-NSString* const RTRCAEnableTextOrientationDetection = @"textOrientationDetectionEnabled";
+NSString* const RTRCAEnableTextOrientationDetection = @"isTextOrientationDetectionEnabled";
+NSString* const RTRCAImageUri = @"imageUri";
+NSString* const RTRCAImageSize = @"imageSize";
+NSString* const RTRCARotationAngleDegrees = @"angle";
+NSString* const RTRCADocumentBoundary = @"documentBoundary";
+NSString* const RTRCAImageResolution = @"resolution";
+NSString* const RTRCABoundaryDetectionMode = @"boundaryDetectionMode";
+NSString* const RTRCAExportResultOptions = @"result";
+NSString* const RTRCAExportFilePath = @"filePath";
+NSString* const RTRCAExportPdfImages = @"images";
+NSString* const RTRCAPdfUri = @"pdfUri";
+

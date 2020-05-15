@@ -3,24 +3,19 @@
 
 #import <Foundation/Foundation.h>
 #import <Cordova/CDVPlugin.h>
-
-typedef NS_ENUM(NSUInteger, RTRImageCaptureDestintationType) {
-	RTRImageCaptureDestintationDataUrl,
-	RTRImageCaptureDestintationUri,
-	RTRImageCaptureDestintationNativeUri,
-};
-
-typedef NS_ENUM(NSUInteger, RTRImageCaptureEncodingType) {
-	RTRImageCaptureEncodingTypeJpeg2000,
-	RTRImageCaptureEncodingTypeJpg,
-	RTRImageCaptureEncodingTypePng,
-	RTRImageCaptureEncodingTypePdf,
-};
+#import "RTRPluginConstants.h"
 
 @interface RTRPlugin : CDVPlugin
 
 - (void)startTextCapture:(CDVInvokedUrlCommand*)command;
 - (void)startDataCapture:(CDVInvokedUrlCommand*)command;
 - (void)startImageCapture:(CDVInvokedUrlCommand*)command;
+
+@end
+
+@interface NSDictionary (rtr_Plugin)
+
+- (RTRImageCaptureEncodingType)rtr_exportTypeForKey:(NSString*)key;
+- (RTRImageDestinationType)rtr_destinationTypeForKey:(NSString*)key;
 
 @end

@@ -5,18 +5,21 @@
 
 #import <AbbyyRtrSDK/AbbyyRtrSDK.h>
 #import <AbbyyUI/AbbyyUI.h>
-#import "RTRMultipageScenarioConfiguration.h"
+#import "RTRImageCapturePluginAdapter.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /// Root controller
-@interface RTRImageCaptureViewController : AUICaptureController<AUIMultiPageImageCaptureScenarioDelegate>
+@interface RTRImageCaptureViewController : AUICaptureController
 
-@property (nonatomic, copy) void (^onCancel)(void);
-@property (nonatomic, copy) void (^onSuccess)(BOOL manuallyStopped, NSDictionary* capturedData);
-@property (nonatomic, copy) void (^onError)(NSError* error);
+@property (nonatomic, copy) void (^onCancel)(id<AUIMultiPageImageCaptureResult>);
+@property (nonatomic, copy) void (^onSuccess)(id<AUIMultiPageImageCaptureResult>);
+@property (nonatomic, copy) void (^onError)(id<AUIMultiPageImageCaptureResult>, NSError* error);
 
-@property (nonatomic, strong) RTRMultipageScenarioConfiguration* config;
+- (nullable instancetype)initWithEngine:(RTREngine*)engine
+	localizer:(id<RTRLocalizer>)localizer
+	settings:(RTRImageCaptureSettings*)settings
+	error:(NSError**)error;
 
 @end
 

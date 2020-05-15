@@ -2,6 +2,7 @@
 /// ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
 
 #import "CDVPluginResult+RTRPluginResult.h"
+#import "NSDictionary+RTRSettings.h"
 
 extern NSString* const RTRCallbackErrorKey;
 extern NSString* const RTRCallbackErrorDescriptionKey;
@@ -21,126 +22,10 @@ extern NSString* const RTRCallbackUserActionKey;
 	return [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:pluginResult];
 }
 
-static NSString* stringFromPoint(CGPoint point)
-{
-	return [NSString stringWithFormat:@"%.lf %.lf", point.x, point.y];
-}
-
-static NSString* stringFromCGRect(CGRect rect)
-{
-	if(CGRectIsEmpty(rect)) {
-		return @"";
-	}
-
-	return [NSString stringWithFormat:@"%.lf %.lf %.lf %.lf", CGRectGetMinX(rect), CGRectGetMinY(rect), CGRectGetWidth(rect), CGRectGetHeight(rect)];
-}
-
-static NSString* stringFromQuadrangle(NSArray* quadrangle)
-{
-	if(quadrangle.count == 0) {
-		return @"";
-	}
-
-	NSMutableArray* quadrangleParts = [NSMutableArray arrayWithCapacity:quadrangle.count];
-	for(NSValue* point in quadrangle) {
-		[quadrangleParts addObject:stringFromPoint([point CGPointValue])];
-	}
-
-	return [quadrangleParts componentsJoinedByString:@" "];
-}
-
-static NSDictionary* dictionaryFromTextLine(RTRTextLine* textLine)
-{
-	return @{
-		@"text" : textLine.text ?: @"",
-		@"rect" : stringFromCGRect(textLine.rect),
-		@"quadrangle" : stringFromQuadrangle(textLine.quadrangle),
-	};
-}
-
-static NSArray* arrayFromTextLines(NSArray<RTRTextLine*>* textLines)
-{
-	if(textLines.count == 0) {
-		return @[];
-	}
-
-	NSMutableArray* result = [NSMutableArray arrayWithCapacity:textLines.count];
-	for(RTRTextLine* line in textLines) {
-		[result addObject:dictionaryFromTextLine(line)];
-	}
-
-	return result;
-}
-
-static NSDictionary* dictionaryFromDataField(RTRDataField* field)
-{
-	return @{
-		@"id" : field.id ?: @"",
-		@"name" : field.name ?: @"",
-		@"text" : field.text ?: @"",
-		@"quadrangle" : stringFromQuadrangle(field.quadrangle),
-		@"components" : arrayFromDataFields(field.components),
-	};
-}
-
-static NSArray* arrayFromDataFields(NSArray<RTRDataField*>* dataFields)
-{
-	if(dataFields.count == 0) {
-		return @[];
-	}
-
-	NSMutableArray* result = [NSMutableArray arrayWithCapacity:dataFields.count];
-	for(RTRDataField* field in dataFields) {
-		[result addObject:dictionaryFromDataField(field)];
-	}
-
-	return result;
-}
-
-static NSDictionary* dictionaryFromTextBlock(RTRTextBlock* block)
-{
-	return @{
-		@"textLines": arrayFromTextLines(block.textLines)
-	};
-}
-
-static NSArray* arrayFromTextBlocks(NSArray<RTRTextBlock*>* blocks)
-{
-	NSMutableArray* array = @[].mutableCopy;
-	for(RTRTextBlock* block in blocks) {
-		[array addObject:dictionaryFromTextBlock(block)];
-	}
-	return array;
-}
-
-static NSString* NSStringFromStabilityStatus(RTRResultStabilityStatus stabilityStatus)
-{
-	switch(stabilityStatus) {
-		case RTRResultStabilityNotReady:
-			return @"NotReady";
-			break;
-		case RTRResultStabilityTentative:
-			return @"Tentative";
-			break;
-		case RTRResultStabilityVerified:
-			return @"Verified";
-			break;
-		case RTRResultStabilityAvailable:
-			return @"Available";
-			break;
-		case RTRResultStabilityTentativelyStable:
-			return @"TentativelyStable";
-			break;
-		case RTRResultStabilityStable:
-			return @"Stable";
-			break;
-	}
-}
-
 static NSDictionary* resultInfo(RTRViewController* controller, BOOL stoppedByUser)
 {
 	NSMutableDictionary* info = [@{
-		@"stabilityStatus" : NSStringFromStabilityStatus(controller.currentStabilityStatus),
+		@"stabilityStatus" : [NSString rtr_stringFromStabilityStatus:controller.currentStabilityStatus],
 		@"frameSize" : [NSString stringWithFormat:@"%.lf %.lf", controller.imageBufferSize.width, controller.imageBufferSize.height],
 	} mutableCopy];
 	if(stoppedByUser) {
@@ -157,7 +42,9 @@ static NSDictionary* resultInfo(RTRViewController* controller, BOOL stoppedByUse
 	info[@"recognitionLanguages"] = textCaptureController.selectedRecognitionLanguages.allObjects ?: @[];
 	NSDictionary* result = @{
 		RTRCallbackResultInfoKey : info,
-		@"textLines" : arrayFromTextLines(textCaptureController.textLines),
+		@"textLines" :  [textCaptureController.textLines rtr_map:^id _Nonnull(RTRTextLine* line) {
+			return [NSDictionary rtr_dictionaryFromTextLine:line];
+		}] ?: @[]
 	};
 
 	return [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
@@ -172,25 +59,11 @@ static NSDictionary* resultInfo(RTRViewController* controller, BOOL stoppedByUse
 			@"id" : dataCaptureController.dataScheme.id ?: @"",
 			@"name" : dataCaptureController.dataScheme.name ?: @"",
 		},
-		@"dataFields" : arrayFromDataFields(dataCaptureController.dataFields),
+		@"dataFields" : [dataCaptureController.dataFields rtr_map:^id(RTRDataField* field) {
+			return [NSDictionary rtr_dictionaryFromDataField:field];
+		}] ?: @[]
 	};
 	
-	return [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
-}
-
-+ (CDVPluginResult*)rtrResultForCoreApiTextCapture:(NSArray<RTRTextBlock*>*)blocks
-{
-	NSDictionary* result = @{
-		RTRCallbackResultInfoKey: arrayFromTextBlocks(blocks)
-	};
-	return [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
-}
-
-+ (CDVPluginResult*)rtrResultForCoreApiDataCapture:(NSArray<RTRDataField*>*)fields
-{
-	NSDictionary* result = @{
-		RTRCallbackResultInfoKey: arrayFromDataFields(fields)
-	};
 	return [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
 }
 
