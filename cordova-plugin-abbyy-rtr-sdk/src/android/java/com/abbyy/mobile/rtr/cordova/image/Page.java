@@ -20,9 +20,6 @@ public class Page implements Parcelable {
 	{
 		file = (File) source.readSerializable();
 		imageSize = source.readSize();
-
-		int[] boundary = new int[8];
-		source.readIntArray( boundary );
 	}
 
 	public void setFile( File file )
