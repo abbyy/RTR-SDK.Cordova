@@ -14,7 +14,7 @@
 		<info>Thank you for choosing ABBYY Mobile Capture SDK.
 To get started:
 	* Request ABBYY Mobile Capture trial version on the ABBYY website: https://www.abbyy.com/mobile-capture-sdk/#request-demo 
-	* Copy assets and the license file (`AbbyyRtrSdk.License`) to `www/rtr_assets` in your project.
+	* Copy assets and the license file (`MobileCapture.License`) to `www/rtr_assets` in your project.
 	* Copy `abbyy-rtr-sdk-1.0.aar` and `abbyy-ui-1.0.aar` to `libs/android` in your project.
 	* Build and run:
 	** `cordova build android`
@@ -158,7 +158,7 @@ To get started:
 		<info>Thank you for choosing ABBYY Mobile Capture SDK.
 To get started:
 	* Request ABBYY Mobile Capture trial version on the ABBYY website: https://www.abbyy.com/mobile-capture-sdk/#request-demo. 
-	* Copy assets and the license file (`AbbyyRtrSdk.License`) to `www/rtr_assets` in your project.
+	* Copy assets and the license file (`MobileCapture.License`) to `www/rtr_assets` in your project.
 	* Copy iOS frameworks (`AbbyyRtrSDK.framework` and other modules) to `libs/ios`.
 	* Add `libs/ios` to linker search paths:
 	** In `platforms/ios/cordova/build.xcconfig`, add `FRAMEWORK_SEARCH_PATHS = "../../libs/ios"`.
