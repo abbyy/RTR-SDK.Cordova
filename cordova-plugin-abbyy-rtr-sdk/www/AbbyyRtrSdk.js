@@ -4,6 +4,7 @@
 var exec = require('cordova/exec');
 
 module.exports = {
+
 	/// Open modal dialog for Text Capture Scenario.
 	startTextCapture: function (callback, options) {
 		exec(callback, callback, "AbbyyRtrSdk", "startTextCapture", [options]);
@@ -18,4 +19,20 @@ module.exports = {
 	startImageCapture: function (callback, options) {
 		exec(callback, callback, "AbbyyRtrSdk", "startImageCapture", [options]);
 	},
+
+	recognizeText: function (image, options, successCallback, errorCallback, progressCallback) {
+		exec(successCallback, errorCallback, "AbbyyRtrSdk", "recognizeText", [options, image]);
+	},
+
+	extractData: function (image, options, successCallback, errorCallback) {
+		exec(successCallback, errorCallback, "AbbyyRtrSdk", "extractData", [options, image]);
+	},
+
+	events: {
+		onProgress: function(args) {
+			return document.dispatchEvent(new CustomEvent("coreApiOnProgress", {
+				detail: args
+			}));
+		}
+	}
 }
