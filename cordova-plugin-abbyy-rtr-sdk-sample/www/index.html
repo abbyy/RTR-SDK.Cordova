@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
-	ABBYY® Real-Time Recognition SDK 1 © 2016 ABBYY Production LLC.
-	ABBYY is either a registered trademark or a trademark of ABBYY Software Ltd.
+	ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+	ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
 -->
 <html>
 
@@ -24,95 +24,99 @@
 			<p class="event received">Device is Ready</p>
 		</div>
 		<div class="settings_container">
-			<input type="radio" name="inset" value="" id="tab_settings_ic" checked>
+			<input type="radio" name="scenario" value="" id="tab_settings_ic" checked>
 			<label for="tab_settings_ic">Image Capture</label>
-			<input type="radio" name="inset" value="" id="tab_settings_tc">
+			<input type="radio" name="scenario" value="" id="tab_settings_tc">
 			<label for="tab_settings_tc">Text Capture</label>
-			<input type="radio" name="inset" value="" id="tab_settings_regex">
+			<input type="radio" name="scenario" value="" id="tab_settings_regex">
 			<label for="tab_settings_regex">Reg Ex</label>
-			<input type="radio" name="inset" value="" id="tab_settings_mrz">
+			<input type="radio" name="scenario" value="" id="tab_settings_mrz">
 			<label for="tab_settings_mrz">MRZ</label>
-			<input type="radio" name="inset" value="" id="tab_settings_bcr">
+			<input type="radio" name="scenario" value="" id="tab_settings_bcr">
 			<label for="tab_settings_bcr">BCR</label>
-			<input type="radio" name="inset" value="" id="tab_settings_coreapi">
+			<input type="radio" name="scenario" value="" id="tab_settings_coreapi">
 			<label for="tab_settings_coreapi">Core Api</label>
+			<input type="radio" name="scenario" value="" id="tab_settings_imaging">
+			<label for="tab_settings_imaging">Img Core Api</label>
 
-			<div class="settings" id="settings_ic">
-				<div class="row">
-					<label for="orientationIC">orientation</label>
-					<select id="orientationIC">
-						<option value="default" selected="selected">default</option>
+			<div class="settings" id="settings">
+				<div class="row" id="setting_operation_type">
+					<label for="operationType">Operation Type</label>
+					<select id="operationType">
+						<option value="crop" selected>Crop</option>
+						<option value="rotate">Rotate</option>
+						<option value="detect_boundary">Detect document boundary</option>
+						<option value="assess_quality">Assess quality for OCR</option>
+						<option value="export">Export</option>
+						<option value="exportPDF">Export PDF</option>
+					</select>
+				</div>
+				<div class="row" id="setting_orientation">
+					<label for="orientation">orientation</label>
+					<select id="orientation">
+						<option value="default" selected>default</option>
 						<option value="portrait">portrait</option>
 						<option value="landscape">landscape</option>
 					</select>
 				</div>
-				<div class="row">
-					<label for="isFlashlightButtonVisibleIC">isFlashlightButtonVisible</label>
-					<div>
-						<input id="isFlashlightButtonVisibleIC" type="checkbox" checked>
-					</div>
+				<div class="row" id="setting_flashlight_visible">
+					<label for="isFlashlightButtonVisible">isFlashlightButtonVisible</label>
+					<input id="isFlashlightButtonVisible" type="checkbox" checked>
 				</div>
-				<div class="row">
-					<label for="showPreviewIC">showPreview</label>
-					<div>
-						<input id="showPreviewIC" type="checkbox">
-					</div>
+				<div class="row" id="setting_show_preview">
+					<label for="showPreview">showPreview</label>
+					<input id="showPreview" type="checkbox">
 				</div>
-                <div class="row">
-                    <label for="isCaptureButtonVisible">isCaptureButtonVisible</label>
-                    <div>
-                        <input id="isCaptureButtonVisible" type="checkbox">
-                    </div>
-                </div>
-                <div class="row">
-                    <label for="isGalleryButtonVisible">isGalleryButtonVisible</label>
-                    <div>
-                        <input id="isGalleryButtonVisible" type="checkbox">
-                    </div>
-                </div>
-				<div class="row">
+				<div class="row" id="setting_capture_visible">
+					<label for="isCaptureButtonVisible">isCaptureButtonVisible</label>
+					<input id="isCaptureButtonVisible" type="checkbox">
+				</div>
+				<div class="row" id="setting_gallery_visible">
+					<label for="isGalleryButtonVisible">isGalleryButtonVisible</label>
+					<input id="isGalleryButtonVisible" type="checkbox">
+				</div>
+				<div class="row" id="setting_page_count">
 					<label for="requiredPageCount">requiredPageCount</label>
 					<input type="number" id="requiredPageCount" name="requiredPageCount" min="0" max="100" value="0">
 				</div>
-				<div class="row">
+				<div class="row" id="setting_resolution">
 					<label for="cameraResolution">cameraResolution</label>
 					<select id="cameraResolution">
 						<option value="HD">HD</option>
-						<option value="FullHD" selected="selected">FullHD</option>
+						<option value="FullHD" selected>FullHD</option>
 						<option value="4K">4K</option>
 					</select>
 				</div>
-				<div class="row">
+				<div class="row" id="setting_destination">
 					<label for="destination">destination</label>
 					<select id="destination">
-						<option value="file" selected="selected">file</option>
+						<option value="file" selected>file</option>
 						<option value="base64">base64</option>
 					</select>
 				</div>
-				<div class="row">
+				<div class="row" id="setting_export_type">
 					<label for="exportType">exportType</label>
 					<select id="exportType">
-						<option value="jpg" selected="selected">jpg</option>
-						<option value="jpeg2000">jpeg2000</option>
+						<option value="jpg" selected>jpg</option>
 						<option value="png">png</option>
 						<option value="pdf">pdf</option>
 					</select>
 				</div>
-				<div class="row">
+				<div class="row" id="setting_compression">
 					<label for="compressionLevel">compressionLevel</label>
 					<select id="compressionLevel">
 						<option value="Low">Low</option>
-						<option value="Normal" selected="selected">Normal</option>
+						<option value="Normal" selected>Normal</option>
 						<option value="High">High</option>
 						<option value="ExtraHigh">ExtraHigh</option>
 					</select>
 				</div>
-				<fieldset>
+				<fieldset id="setting_default_ic">
 					<legend>Default Image Settings</legend>
 					<div class="row">
 						<label for="documentSize">documentSize</label>
 						<select id="documentSize">
-							<option value="Any" selected="selected">Any</option>
+							<option value="Any" selected>Any</option>
 							<option value="A4">A4</option>
 							<option value="BusinessCard">BusinessCard</option>
 							<option value="Letter">Letter</option>
@@ -120,100 +124,91 @@
 						</select>
 					</div>
 					<div class="row">
+						<label for="aspectRatioMin">aspectRatioMin</label>
+						<div id="aspectRatioMinValue"></div>
+						<input id="aspectRatioMin" max="10.0" min="0.0" step="0.1" value="0" type="range" />
+					</div>
+					<div class="row">
+						<label for="aspectRatioMax">aspectRatioMax</label>
+						<div id="aspectRatioMaxValue"></div>
+						<input id="aspectRatioMax" max="10.0" min="0.0" step="0.1" value="0" type="range" />
+					</div>
+					<div class="row">
 						<label for="minimumDocumentToViewRatio">minDocToViewRatio</label>
 						<div id="minimumDocumentToViewRatioValue"></div>
-						<div>
-							<input id="minimumDocumentToViewRatio" max="1.0" min="0.0" step="0.01" value="0.15" type="range" />
-						</div>
+						<input id="minimumDocumentToViewRatio" max="1.0" min="0.0" step="0.01" value="0.15" type="range" />
+					</div>
+					<div class="row">
+						<label for="imageFromGalleryMaxSize">imageFromGalleryMaxSize</label>
+						<input type="number" id="imageFromGalleryMaxSize" name="imageFromGalleryMaxSize" min="1" max="10000" value="4096">
 					</div>
 				</fieldset>
-			</div>
-			<div class="settings" id="settings">
-				<div class="row">
-					<label for="orientation">orientation</label>
-					<select id="orientation">
-						<option value="default" selected="selected">default</option>
-						<option value="portrait">portrait</option>
-						<option value="landscape">landscape</option>
-					</select>
-				</div>
-				<div class="row">
-					<label for="isFlashlightVisible">isFlashlightVisible</label>
-					<div>
-						<input id="isFlashlightVisible" type="checkbox" checked>
-					</div>
-				</div>
-				<div class="row">
+				<div class="row" id="setting_stop_visible">
 					<label for="isStopButtonVisible">isStopButtonVisible</label>
-					<div>
-						<input id="isStopButtonVisible" type="checkbox" checked>
-					</div>
+					<input id="isStopButtonVisible" type="checkbox" checked>
 				</div>
-				<div class="row">
+				<div class="row" id="setting_stop_when_stable">
 					<label for="stopWhenStable">stopWhenStable</label>
-					<div>
-						<input id="stopWhenStable" type="checkbox" checked>
-					</div>
+					<input id="stopWhenStable" type="checkbox" checked>
 				</div>
-				<fieldset>
+				<fieldset id="setting_area_of_interest">
 					<legend>Area of interest</legend>
 					<div class="row">
 						<label for="areaOfInterestHeight">Height</label>
 						<div id="heightValue"></div>
-						<div>
-							<input id="areaOfInterestHeight" max="1.0" min="0.0" step="0.1" value="0.3" type="range" />
-						</div>
+						<input id="areaOfInterestHeight" max="1.0" min="0.0" step="0.1" value="0.3" type="range" />
 					</div>
 					<div class="row">
 						<label for="areaOfInterestWidth">Width</label>
 						<div id="widthValue"></div>
-						<div>
-							<input id="areaOfInterestWidth" max="1.0" min="0.0" step="0.1" value="0.8" type="range" />
-						</div>
+						<input id="areaOfInterestWidth" max="1.0" min="0.0" step="0.1" value="0.8" type="range" />
 					</div>
 				</fieldset>
-			</div>
-			<div class="settings" id="settings_coreapi">
-				<div class="row">
+				<div class="row" id="setting_recognition_type">
 					<label for="recognitionType">Recognition Type</label>
 					<select id="recognitionType">
-						<option value="text" checked>Text Capture</option>
+						<option value="text" selected>Text Capture</option>
 						<option value="bcr">BCR</option>
 					</select>
 				</div>
-				<div class="row">
-					<label for="selectedLanguages">Languages Set</label>
+				<div class="row" id="setting_languages">
+					<label for="selectedLanguagesValue">Languages Set</label>
 					<div id="selectedLanguagesValue"></div>
-					<div>
-						<select id="coreApiLanguagesSelect" multiple>
-							<option value="English" selected>English</option>
-							<option value="Russian">Russian</option>
-							<option value="German">German</option>
-							<option value="French">French</option>
-						</select>
-					</div>
+					<select id="coreApiLanguagesSelect" multiple>
+						<option value="English" selected>English</option>
+						<option value="Russian">Russian</option>
+						<option value="German">German</option>
+						<option value="French">French</option>
+					</select>
 				</div>
-				<div class="row">
+				<div class="row" id="setting_text_orientation_detection_enabled">
 					<label for="textOrientationDetectionEnabled">textOrientationDetectionEnabled</label>
-					<div>
-						<input id="textOrientationDetectionEnabled" type="checkbox" checked>
-					</div>
+					<input id="textOrientationDetectionEnabled" type="checkbox" checked>
 				</div>
-				<div class="row">
-					<div>
-						<button type="button" id="pickImageButton" class="scenario-button">Choose Image</button>
-					</div>
+				<div class="row" id="setting_angle">
+					<label for="angle">angle</label>
+					<select id="angle">
+						<option value="0" selected>0</option>
+						<option value="90">90</option>
+						<option value="180">180</option>
+						<option value="270">270</option>
+					</select>
+				</div>
+				<div class="row" id="setting_pick_image">
+					<button type="button" id="pickImageButton" class="scenario-button">Choose Image</button>
+				</div>
+				<div class="row" id="setting_share">
+					<button type="button" id="shareButton" class="scenario-button">Share</button>
 				</div>
 			</div>
 		</div>
-		<div class="row">
-			<div>
-				<button type="button" id="startCaptureButton" class="scenario-button">Start Capture</button>
-			</div>
+		<div class="row" id="setting_start_capture">
+			<button type="button" id="startCaptureButton" class="scenario-button">Start Capture</button>
 		</div>
 		<div class="rtr-sdk-plugin-result">
-			<pre id="AbbyyRtrSdkPluginResult"></pre>
 			<img id="AbbyyRtrSdkPluginCapturedImage"/>
+			<canvas id="AbbyyRtrSdkPluginCapturedImageCanvas"></canvas>
+			<pre id="AbbyyRtrSdkPluginResult"></pre>
 		</div>
 	</div>
 	<script type="text/javascript" src="cordova.js"></script>

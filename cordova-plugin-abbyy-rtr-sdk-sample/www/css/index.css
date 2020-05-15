@@ -1,6 +1,6 @@
 /*
- 	ABBYY® Real-Time Recognition SDK 1 © 2016 ABBYY Production LLC.
- 	ABBYY is either a registered trademark or a trademark of ABBYY Software Ltd.
+    // ABBYY® Mobile Capture © 2019 ABBYY Production LLC.
+    // ABBYY is a registered trademark or a trademark of ABBYY Software Ltd.
  */
 * {
 	-webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -16,31 +16,31 @@ body {
 	-webkit-text-size-adjust: none;
 	-webkit-user-select: none;
 	user-select: none;
-	background-color:#E4E4E4;
+	background-color: #E4E4E4;
 
-	background-attachment:fixed;
+	background-attachment: fixed;
 	font-family: Calibri, sans-serif;
-	font-size:12px;
-	height:100%;
-	margin:0px;
-	padding:0px;
+	font-size: 12px;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
 
-	width:100%;
+	width: 100%;
 }
 
 .app {
-	text-align:center;
+	text-align: center;
 	padding: 20px;
 	padding: 10vh 10vw;
 }
 
 h1 {
-	font-size:24px;
-	font-weight:normal;
-	margin:0px;
-	overflow:visible;
-	padding:0px;
-	text-align:center;
+	font-size: 24px;
+	font-weight: normal;
+	margin: 0px;
+	overflow: visible;
+	padding: 0px;
+	text-align: center;
 }
 
 .event {
@@ -86,7 +86,7 @@ h1 {
 
 .settings_container>input { display:none; }
 .settings_container>div {
-    display: none;
+    width: 100%;
 }
 .settings_container>label {
     display: inline-block;
@@ -104,16 +104,9 @@ h1 {
     border-bottom: 1px solid #FFFFFF;
     background: #FFFFFF;
 }
-#tab_settings_ic:checked ~ #settings_ic,
-#tab_settings_tc:checked ~ #settings { display: block; }
-#tab_settings_regex:checked ~ #settings { display: block; }
-#tab_settings_mrz:checked ~ #settings { display: block; }
-#tab_settings_bcr:checked ~ #settings { display: block; }
-#tab_settings_coreapi:checked ~ #settings_coreapi { display: block; }
 
 .settings {
 	font-size: 16px;
-	display: none;
 }
 
 .row {
