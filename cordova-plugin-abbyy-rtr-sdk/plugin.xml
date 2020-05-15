@@ -14,7 +14,7 @@
 		<info>Thank you for choosing ABBYY Mobile Capture SDK.
 To get started:
 	* Request ABBYY Mobile Capture trial version on the ABBYY website: https://www.abbyy.com/mobile-capture-sdk/#request-demo 
-	* Copy assets and the license file (`AbbyyRtrSdk.license`) to `www/rtr_assets` in your project.
+	* Copy assets and the license file (`AbbyyRtrSdk.License`) to `www/rtr_assets` in your project.
 	* Copy `abbyy-rtr-sdk-1.0.aar` and `abbyy-ui-1.0.aar` to `libs/android` in your project.
 	* Build and run:
 	** `cordova build android`
@@ -68,16 +68,25 @@ To get started:
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/RtrManager.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/ResourcesUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/DataCaptureScenario.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
-		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/ImageCaptureSettings.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/SharedEngine.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/ImageType.java" target-dir="src/com/abbyy/mobile/rtr/cordova"/>
 
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/exceptions/InitializationException.java" target-dir="src/com/abbyy/mobile/rtr/cordova/exceptions"/>
 
-		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/multipage/MultiCaptureResult.java" target-dir="src/com/abbyy/mobile/rtr/cordova/multipage"/>
-		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/multipage/PageHolder.java" target-dir="src/com/abbyy/mobile/rtr/cordova/multipage"/>
-		
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/image/Page.java" target-dir="src/com/abbyy/mobile/rtr/cordova/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/image/MultiPagesProcessor.java" target-dir="src/com/abbyy/mobile/rtr/cordova/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/image/MultiCaptureResult.java" target-dir="src/com/abbyy/mobile/rtr/cordova/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/image/ImageCaptureResult.java" target-dir="src/com/abbyy/mobile/rtr/cordova/image"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/image/ImageCaptureSettings.java" target-dir="src/com/abbyy/mobile/rtr/cordova/image"/>
+
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/data/DataCaptureSettings.java" target-dir="src/com/abbyy/mobile/rtr/cordova/data"/>
+
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/text/TextRecognitionSettings.java" target-dir="src/com/abbyy/mobile/rtr/cordova/text"/>
+
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/ImageUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/TextUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
+		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/DataUtils.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/BackgroundWorker.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
-		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/utils/MultiPagesProcessor.java" target-dir="src/com/abbyy/mobile/rtr/cordova/utils"/>
 
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/ImageCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities"/>
 		<source-file src="src/android/java/com/abbyy/mobile/rtr/cordova/activities/DataCaptureActivity.java" target-dir="src/com/abbyy/mobile/rtr/cordova/activities"/>
@@ -92,6 +101,7 @@ To get started:
 
 		<resource-file src="src/android/res/layout/activity_capture.xml" target="res/layout/activity_capture.xml"/>
 		<resource-file src="src/android/res/layout/activity_image_capture.xml" target="res/layout/activity_image_capture.xml"/>
+		<resource-file src="src/android/res/layout/ic_dialog_progress.xml" target="res/layout/ic_dialog_progress.xml"/>
 		<resource-file src="src/android/res/layout/scenarios_list_item.xml" target="res/layout/scenarios_list_item.xml"/>
 		<resource-file src="src/android/res/layout/languages_setting_activity.xml" target="res/layout/languages_setting_activity.xml"/>
 
@@ -124,7 +134,7 @@ To get started:
 				<info>Thank you for choosing ABBYY Mobile Capture SDK.
 To get started:
 	* Request ABBYY Mobile Capture trial version on the ABBYY website: https://www.abbyy.com/mobile-capture-sdk/#request-demo. 
-	* Copy assets and the license file (`AbbyyRtrSdk.license`) to `www/rtr_assets` in your project.
+	* Copy assets and the license file (`AbbyyRtrSdk.License`) to `www/rtr_assets` in your project.
 	* Copy iOS frameworks (`AbbyyRtrSDK.framework` and other modules) to `libs/ios`.
 	* Add `libs/ios` to linker search paths:
 	** In `platforms/ios/cordova/build.xcconfig`, add `FRAMEWORK_SEARCH_PATHS = "../../libs/ios"`.
@@ -166,6 +176,9 @@ To get started:
 		<header-file src="src/ios/RTRProgressView.h" />
 		<source-file src="src/ios/RTRProgressView.m" />
 		<resource-file src="src/ios/RTRProgressView.xib" />
+
+		<header-file src="src/ios/RTRTextCaptureExtensions.h" />
+		<source-file src="src/ios/RTRTextCaptureExtensions.m" />
 
 		<header-file src="src/ios/RTRTextCaptureViewController.h" />
 		<source-file src="src/ios/RTRTextCaptureViewController.m" />
