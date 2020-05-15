@@ -16,32 +16,34 @@ import java.util.List;
 import androidx.annotation.NonNull;
 
 public class TextUtils {
-	public static ArrayList<HashMap<String, String>> toJsonTextLines( ITextCaptureService.TextLine[] lines )
+	public static ArrayList<HashMap<String, Object>> toJsonTextLines( ITextCaptureService.TextLine[] lines )
 	{
-		ArrayList<HashMap<String, String>> lineList = new ArrayList<>();
+		ArrayList<HashMap<String, Object>> lineList = new ArrayList<>();
 		for( ITextCaptureService.TextLine line : lines ) {
-			HashMap<String, String> lineInfo = new HashMap<>();
+			HashMap<String, Object> lineInfo = new HashMap<>();
 			lineInfo.put( "text", line.Text );
-			String quadrangle = convertQuadrangleToString( line.Quadrangle );
+			ArrayList<HashMap<String, String>> quadrangle = getPointArray( line.Quadrangle );
 			lineInfo.put( "quadrangle", quadrangle );
 			lineList.add( lineInfo );
 		}
 		return lineList;
 	}
 
-	@NonNull
-	static String convertQuadrangleToString( Point[] quadrangle )
+	public static ArrayList<HashMap<String, String>> getPointArray( Point[] points )
 	{
-		StringBuilder builder = new StringBuilder();
-		for( int i = 0; i < quadrangle.length; i++ ) {
-			builder.append( quadrangle[i].x );
-			builder.append( ' ' );
-			builder.append( quadrangle[i].y );
-			if( i != quadrangle.length - 1 ) {
-				builder.append( ' ' );
-			}
+		ArrayList<HashMap<String, String>> pointArray = new ArrayList<>();
+		for( Point point : points ) {
+			pointArray.add( getPoint( point ) );
 		}
-		return builder.toString();
+		return pointArray;
+	}
+
+	private static HashMap<String, String> getPoint( Point point )
+	{
+		HashMap<String, String> json = new HashMap<>();
+		json.put( "x", Integer.toString( point.x ) );
+		json.put( "y", Integer.toString( point.y ) );
+		return json;
 	}
 
 	private static Language parseLanguageName( String name )

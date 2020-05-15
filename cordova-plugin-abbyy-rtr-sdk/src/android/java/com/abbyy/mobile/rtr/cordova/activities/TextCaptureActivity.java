@@ -128,7 +128,7 @@ public class TextCaptureActivity extends BaseActivity {
 					resultInfo.put( "userAction", "Manually Stopped" );
 				}
 
-				ArrayList<HashMap<String, String>> lineList;
+				ArrayList<HashMap<String, Object>> lineList;
 				if( lines != null ) {
 					lineList = TextUtils.toJsonTextLines(lines);
 				} else {

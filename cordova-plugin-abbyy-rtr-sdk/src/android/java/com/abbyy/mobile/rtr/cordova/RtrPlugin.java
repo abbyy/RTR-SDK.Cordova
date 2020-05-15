@@ -632,7 +632,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private String parseLicenseName( JSONObject arg ) throws JSONException
 	{
-		String licenseFileName = "AbbyyRtrSdk.License";
+		String licenseFileName = "MobileCapture.License";
 		if( arg.has( RTR_LICENSE_FILE_NAME_KEY ) ) {
 			licenseFileName = arg.getString( RTR_LICENSE_FILE_NAME_KEY );
 		}

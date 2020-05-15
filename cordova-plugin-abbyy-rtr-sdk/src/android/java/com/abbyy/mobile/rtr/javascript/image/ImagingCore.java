@@ -348,7 +348,7 @@ public class ImagingCore {
 	private static String exportImageAsBase64Data( Bitmap image, ExportSettings exportSettings, IImagingCoreAPI api ) throws Exception
 	{
 		try( ByteArrayOutputStream baos = new ByteArrayOutputStream() ) {
-			try( ExportOperation exportOperation = getExportOperation( exportSettings.exportType, api, baos ) ) {
+			try( ExportOperation exportOperation = getExportOperation( exportSettings.exportType, api, exportSettings.compression, baos ) ) {
 				exportOperation.addPage( image );
 			}
 			byte[] bytes = baos.toByteArray();
@@ -378,7 +378,7 @@ public class ImagingCore {
 	{
 		File file = getFile( context, exportSettings.filePath, getExtension( exportSettings.exportType ) );
 		try( OutputStream outputStream = new FileOutputStream( file ) ) {
-			try( ExportOperation exportOperation = getExportOperation( exportSettings.exportType, api, outputStream ) ) {
+			try( ExportOperation exportOperation = getExportOperation( exportSettings.exportType, api, exportSettings.compression, outputStream ) ) {
 				exportOperation.addPage( image );
 			}
 		}
@@ -397,12 +397,14 @@ public class ImagingCore {
 		}
 	}
 
-	private static ExportOperation getExportOperation( ExportType exportType, IImagingCoreAPI api, OutputStream outputStream )
+	private static ExportOperation getExportOperation( ExportType exportType, IImagingCoreAPI api, ExportOperation.Compression compressionLevel, OutputStream outputStream )
 	{
 		ExportOperation exportOperation;
 		switch( exportType ) {
 			case JPG:
-				exportOperation = api.createExportToJpgOperation( outputStream );
+				IImagingCoreAPI.ExportToJpgOperation opJpg = api.createExportToJpgOperation( outputStream );
+				opJpg.Compression = compressionLevel;
+				exportOperation = opJpg;
 				break;
 			case PNG:
 				exportOperation = api.createExportToPngOperation( outputStream );

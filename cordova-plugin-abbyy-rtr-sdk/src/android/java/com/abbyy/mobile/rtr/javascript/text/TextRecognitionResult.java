@@ -3,6 +3,8 @@
 
 package com.abbyy.mobile.rtr.javascript.text;
 
+import android.text.TextUtils;
+
 import com.abbyy.mobile.rtr.IRecognitionCoreAPI.CharInfo;
 import com.abbyy.mobile.rtr.IRecognitionCoreAPI.TextBlock;
 import com.abbyy.mobile.rtr.IRecognitionCoreAPI.TextLine;
@@ -13,6 +15,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static com.abbyy.mobile.rtr.IRecognitionCoreAPI.CHAR_ATTRIBUTE_BOLD;
@@ -111,15 +115,20 @@ class TextRecognitionResult {
 
 	private static String getRecognizedText( TextBlock[] textBlocks )
 	{
-		StringBuilder builder = new StringBuilder();
+		List<String> textBlockStrings = new ArrayList<>();
 		for( TextBlock textBlock : textBlocks ) {
-			for( TextLine textLine : textBlock.TextLines ) {
-				builder.append( textLine.Text );
-				builder.append( "\n" );
-			}
-			builder.append( "\n" );
+			textBlockStrings.add( TextUtils.join( "\n", getTextLineStrings( textBlock.TextLines ) ) );
 		}
-		return builder.toString();
+		return TextUtils.join( "\n\n", textBlockStrings );
+	}
+
+	private static List<String> getTextLineStrings( TextLine[] textLines )
+	{
+		List<String> strings = new ArrayList<>();
+		for( TextLine textLine : textLines ) {
+			strings.add( textLine.Text );
+		}
+		return strings;
 	}
 
 }
