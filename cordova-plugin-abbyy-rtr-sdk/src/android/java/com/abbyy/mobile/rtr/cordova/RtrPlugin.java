@@ -532,7 +532,7 @@ public class RtrPlugin extends CordovaPlugin {
 	{
 		for( int result : grantResults ) {
 			if( result == PackageManager.PERMISSION_DENIED ) {
-				Toast.makeText( cordova.getActivity(), ResourcesUtils.getResId( "string", "runtime_permissions_txt", cordova.getActivity() ), Toast.LENGTH_SHORT ).show();
+				Toast.makeText( cordova.getActivity(), ResourcesUtils.getResId( "string", "cordova_rtr_runtime_permissions_txt", cordova.getActivity() ), Toast.LENGTH_SHORT ).show();
 				onError( "Camera access denied" );
 				return;
 			}

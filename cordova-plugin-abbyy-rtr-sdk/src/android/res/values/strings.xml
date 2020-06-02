@@ -3,22 +3,14 @@
     <string name="app_name" tools:override="true">RTRCordovaSample</string>
     <string name="activity_name">@string/app_name</string>
     <string name="launcher_name">@string/app_name</string>
-    <string name="text_capture">Text capture</string>
-    <string name="data_capture">Data capture</string>
-    <string name="runtime_permissions_txt">Please enable ALL permissions from app settings.</string>
-    <string name="title_activity_settings">Settings</string>
-    <string name="languages_text">Languages</string>
-    <string name="start_text">Start</string>
+    <string name="cordova_rtr_runtime_permissions_txt">Please enable ALL permissions from app settings.</string>
+    <string name="cordova_rtr_languages">Languages</string>
+    <string name="cordova_rtr_start">Start</string>
+    <string name="cordova_rtr_stop">Stop</string>
+    <string name="cordova_rtr_starting">Starting…</string>
     <string name="ic_delete_on_cancel_warning_message">You will lose captured pages</string>
     <string name="ic_delete_on_cancel_warning_title">Discard pages</string>
     <string name="ic_delete_on_cancel_warning_negative_button">Cancel</string>
     <string name="ic_delete_on_cancel_warning_positive_button">Discard</string>
     <string name="ic_saving_pages_warning_message">Saving pages…</string>
-    <string name="add_page">Add New Page</string>
-    <string name="unknown_error">Something has gone wrong</string>
-    <string name="add_pages">Add Pages</string>
-    <string name="done">Done</string>
-    <string name="page">Page %1$d of %2$d</string>
-    <string name="retake">Retake</string>
-    <string name="delete">Delete</string>
 </resources>

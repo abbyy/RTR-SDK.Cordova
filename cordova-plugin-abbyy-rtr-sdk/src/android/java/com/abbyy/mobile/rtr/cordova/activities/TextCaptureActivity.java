@@ -193,14 +193,14 @@ public class TextCaptureActivity extends BaseActivity {
 
 	public void onStartButtonClick( View view )
 	{
-		if( startButton.getText().equals( BUTTON_TEXT_STOP ) ) {
+		if( state == State.Stop ) {
 			stopRecognition();
 			dispatchResults( currentLines, currentStabilityStatus, true );
 		} else {
 			errorOccurred = null;
 			clearRecognitionResults();
 			startButton.setEnabled( false );
-			startButton.setText( BUTTON_TEXT_STARTING );
+			updateStartButton( State.Starting );
 			if( !isContinuousVideoFocusModeEnabled( camera ) ) {
 				autoFocus( startRecognitionCameraAutoFocusCallback );
 			} else {

@@ -85,12 +85,11 @@ abstract class BaseActivity extends Activity {
 	protected TextView warningTextView; // Show warnings from recognizer
 	protected TextView errorTextView; // Show errors from recognizer
 
-	// Text displayed on start button
-	protected static final String BUTTON_TEXT_START = "Start";
-	protected static final String BUTTON_TEXT_STOP = "Stop";
-	protected static final String BUTTON_TEXT_STARTING = "Starting...";
+	enum State {
+		Start, Starting, Stop
+	}
 
-	//private IRecognitionService captureService;
+	protected State state = State.Start;
 
 	// This callback will be used to obtain frames from the camera
 	protected Camera.PreviewCallback cameraPreviewCallback = new Camera.PreviewCallback() {
@@ -368,6 +367,21 @@ abstract class BaseActivity extends Activity {
 		}
 	}
 
+	protected void updateStartButton(State state) {
+		this.state = state;
+		switch( state ) {
+			case Start:
+				startButton.setText( ResourcesUtils.getResId( "string", "cordova_rtr_start", BaseActivity.this ) );
+				break;
+			case Starting:
+				startButton.setText( ResourcesUtils.getResId( "string", "cordova_rtr_starting", BaseActivity.this ) );
+				break;
+			case Stop:
+				startButton.setText( ResourcesUtils.getResId( "string", "cordova_rtr_stop", BaseActivity.this ) );
+				break;
+		}
+	}
+
 	// Enable 'Start' button and switching to continuous focus mode (if possible) when autofocus completes
 	protected Camera.AutoFocusCallback finishCameraInitialisationAutoFocusCallback = new Camera.AutoFocusCallback() {
 		@Override
@@ -375,7 +389,7 @@ abstract class BaseActivity extends Activity {
 		{
 			cameraInitialisation = false;
 			onAutoFocusFinished( success, camera );
-			startButton.setText( BUTTON_TEXT_START );
+			updateStartButton( State.Start );
 			startButton.setEnabled( true );
 			if( startRecognitionWhenReady ) {
 				startRecognition();
@@ -426,7 +440,7 @@ abstract class BaseActivity extends Activity {
 		public void onClick( View v )
 		{
 			// if BUTTON_TEXT_STARTING autofocus is already in progress, it is incorrect to interrupt it
-			if( !startButton.getText().equals( BUTTON_TEXT_STARTING ) ) {
+			if( state != State.Starting ) {
 				autoFocus( simpleCameraAutoFocusCallback );
 			}
 		}
@@ -468,7 +482,7 @@ abstract class BaseActivity extends Activity {
 				previewSurfaceHolder.setKeepScreenOn( false );
 			}
 			// Change the text on the stop button back to 'Start'
-			startButton.setText( BUTTON_TEXT_START );
+			updateStartButton( State.Start );
 			startButton.setEnabled( true );
 		}
 	};
@@ -493,7 +507,7 @@ abstract class BaseActivity extends Activity {
 		// Start the service
 		getCaptureService().start( cameraPreviewSize.width, cameraPreviewSize.height, orientation, areaOfInterest );
 		// Change the text on the start button to 'Stop'
-		startButton.setText( BUTTON_TEXT_STOP );
+		updateStartButton( State.Stop );
 		startButton.setEnabled( true );
 	}
 
@@ -716,7 +730,7 @@ abstract class BaseActivity extends Activity {
 		if( getCaptureService() != null ) {
 			getCaptureService().stop();
 		}
-		startButton.setText( BUTTON_TEXT_START );
+		updateStartButton( State.Start );
 		// Clear recognition results
 		clearRecognitionResults();
 		stopPreviewAndReleaseCamera();
