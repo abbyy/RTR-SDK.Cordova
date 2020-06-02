@@ -9,8 +9,8 @@ const xcodeprojPath = findInDirectory('platforms/ios', '.xcodeproj');
 const pbxprojPath = xcodeprojPath + '/project.pbxproj';
 const pbxproj = xcode.project(pbxprojPath);
 
-var options_libs = { shellPath: '/bin/sh', shellScript: '/bin/sh "../../libs/ios/copy_frameworks.sh"' };
-var options_assets = { shellPath: '/bin/sh', shellScript: '[ -d "$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/www/rtr_assets" ] && rsync -Lrav "$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/www/rtr_assets/" "$TARGET_BUILD_DIR/$WRAPPER_NAME"' };
+var optionsLibs = { shellPath: '/bin/sh', shellScript: '/bin/sh "../../libs/ios/copy_frameworks.sh"' };
+var optionsAssets = { shellPath: '/bin/sh', shellScript: '[ -d "$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/www/rtr_assets" ] && rsync -Lrav "$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/www/rtr_assets/" "$TARGET_BUILD_DIR/$WRAPPER_NAME"' };
 
 var frameworksPath = {
 	path:'../../libs/ios',
@@ -19,9 +19,28 @@ var frameworksPath = {
 }
 
 pbxproj.parse(function(err) {
-	pbxproj.addBuildPhase([], 'PBXShellScriptBuildPhase', 'Copy Frameworks', pbxproj.getFirstTarget().uuid, options_libs);
-	pbxproj.addBuildPhase([], 'PBXShellScriptBuildPhase', 'Copy Assets', pbxproj.getFirstTarget().uuid, options_assets);
-	pbxproj.addToFrameworkSearchPaths(frameworksPath);
+	let copyFrameworksPhaseName = 'Copy ABBYY Frameworks';
+	let copyAssetsPhaseName = 'Copy ABBYY Assets';
+	let requiredBuildPhases = new Set();
+	requiredBuildPhases.add(copyAssetsPhaseName);
+	requiredBuildPhases.add(copyFrameworksPhaseName)
+
+	var buildPhases = pbxproj.getFirstTarget().firstTarget.buildPhases;
+	buildPhases.forEach(phase => requiredBuildPhases.delete(phase.comment));
+
+	if(requiredBuildPhases.has(copyFrameworksPhaseName)) {
+		pbxproj.addBuildPhase([], 'PBXShellScriptBuildPhase', copyFrameworksPhaseName, pbxproj.getFirstTarget().uuid, optionsLibs);	
+		pbxproj.addToFrameworkSearchPaths(frameworksPath);
+		console.log(copyFrameworksPhaseName, ' successfully added');
+	} else {
+		console.log(copyFrameworksPhaseName, ' phase already added. Skipping');
+	}
+	if(requiredBuildPhases.has(copyAssetsPhaseName)) {
+		pbxproj.addBuildPhase([], 'PBXShellScriptBuildPhase', copyAssetsPhaseName, pbxproj.getFirstTarget().uuid, optionsAssets);
+		console.log(copyAssetsPhaseName, ' successfully added');
+	} else {
+		console.log(copyAssetsPhaseName, ' phase already added. Skipping');
+	}
 	fs.writeFileSync(pbxprojPath, pbxproj.writeSync());
 })
 

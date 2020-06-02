@@ -240,6 +240,7 @@ To get started:
 		<resource-file src="src/ios/Icons/ui_flash_on_button/ui_flash_on_button@2x.png" target="Icons/ui_flash_on_button@2x.png" />
 		<resource-file src="src/ios/Icons/ui_flash_on_button/ui_flash_on_button@3x.png" target="Icons/ui_flash_on_button@3x.png" />
 
+		<hook type="after_platform_add" src="scripts/ios_copy_frameworks.js" />
 		<hook type="after_plugin_add" src="scripts/ios_copy_frameworks.js" />
 
 		<framework src="CoreGraphics.framework" />
