@@ -827,7 +827,7 @@ public class RtrPlugin extends CordovaPlugin {
 
 	private void parseToggleFlash( JSONObject arg ) throws JSONException
 	{
-		boolean isFlashlightVisible = RtrManager.isFlashlightVisible();
+		boolean isFlashlightVisible = true;
 		if( arg.has( RTR_IS_FLASHLIGHT_VISIBLE_KEY ) ) {
 			isFlashlightVisible = arg.getBoolean( RTR_IS_FLASHLIGHT_VISIBLE_KEY );
 		}
