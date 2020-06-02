@@ -340,7 +340,7 @@
 		if(![dict rtr_parseBool:RTRICFlashlightButtonVisibleKey defaultValue:YES outValue:&_isFlashlightButtonVisible error:error]) {
 			return nil;
 		}
-		if(![dict rtr_parseBool:RTRICGalleryButtonVisibleKey defaultValue:NO outValue:&_isGalleryButtonVisible error:error]) {
+		if(![dict rtr_parseBool:RTRICGalleryButtonVisibleKey defaultValue:YES outValue:&_isGalleryButtonVisible error:error]) {
 			return nil;
 		}
 		if(![dict rtr_parseBool:RTRICCaptureButtonVisibleKey defaultValue:NO outValue:&_isCaptureButtonVisible error:error]) {
