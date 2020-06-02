@@ -42,7 +42,7 @@ The native libraries support the following systems:
 1. Install [Cordova](https://cordova.apache.org).
 2. Get the example project and navigate to the project directory.
     ```sh
-    cd <path>/cordova-plugin-abbyy-rtr-sdk-sample
+    cd <path>/sample-cordova
     ```
 3. Add platforms and plugins from the project `config.xml`.
     ```sh
