@@ -3,7 +3,6 @@
 
 #import "RTRPluginConstants.h"
 
-NSString* const RTRPluginErrorDomain = @"com.abbyy.rtr-cordova-plugin";
 NSString* const RTRRecognitionLanguagesKey = @"recognitionLanguages";
 NSString* const RTRSelectableRecognitionLanguagesKey = @"selectableRecognitionLanguages";
 NSString* const RTRLicenseFileNameKey = @"licenseFileName";

@@ -16,6 +16,8 @@
 #import "NSString+RTRPluginLocalization.h"
 #import "RTRPluginConstants.h"
 
+NSString* const RTRPluginErrorDomain = @"com.abbyy.rtr-cordova-plugin";
+
 @interface RTRLocalizer : NSObject<RTRLocalizer>
 @end
 
