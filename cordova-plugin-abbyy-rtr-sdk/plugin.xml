@@ -7,6 +7,8 @@
 	<js-module src="www/AbbyyRtrSdk.js" name="AbbyyRtrSdk">
 		<clobbers target="AbbyyRtrSdk" />
 	</js-module>
+	
+	<hook type="after_prepare" src="scripts/android_gradle_properties_patch.js" />
 
 	<!-- Android -->
 	<platform name="android">

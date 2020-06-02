@@ -33,7 +33,7 @@ module.exports = function (context) {
 			}
 		});
 	} else {
-		throw new Error('Unable to find build.gradle: ' + error);
+		throw new Error('Unable to find build.gradle');
 	}
 	
 	var propertiesFile = path.join(platformRoot, 'gradle.properties');
@@ -53,7 +53,5 @@ module.exports = function (context) {
 				});
 			}
 		});
-	} else {
-		throw new Error('Unable to find gradle.properties: ' + error);
 	}
 };
