@@ -1,0 +1,40 @@
+platform :ios, '11.0'
+use_frameworks!
+
+# workaround to avoid Xcode caching of Pods that requires
+# Product -> Clean Build Folder after new Cordova plugins installed
+# Requires CocoaPods 1.6 or newer
+install! 'cocoapods', :disable_input_output_paths => true
+
+def capacitor_pods
+  # Automatic Capacitor Pod dependencies, do not delete
+  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
+  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
+  pod 'CordovaPlugins', :path => '../capacitor-cordova-ios-plugins'
+  pod 'CordovaPluginsResources', :path => '../capacitor-cordova-ios-plugins'
+  # Do not delete
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+
+      # fix xcodebuild error: Capacitor does not support provisioning profiles.
+      config.build_settings['EXPANDED_CODE_SIGN_IDENTITY'] = ""
+      config.build_settings['CODE_SIGNING_REQUIRED'] = "NO"
+      config.build_settings['CODE_SIGNING_ALLOWED'] = "NO"
+
+      # Settings to use Mobile Capture SDK.
+      config.build_settings['ENABLE_BITCODE'] = "NO"
+      config.build_settings['FRAMEWORK_SEARCH_PATHS'] = "$(inherited) ../../../../libs/ios"
+    end
+  end
+end
+
+target 'App' do
+  capacitor_pods
+
+  # Settings to use Mobile Capture SDK.
+  script_phase :name => 'Copy Assets', :script => "python ../../../assets/copy_assets.py\ncp ../../../assets/MobileCapture.License \"$TARGET_BUILD_DIR/$WRAPPER_NAME/\"\n"
+  script_phase :name => 'Copy Frameworks', :script => "sh ../../../libs/ios/copy_frameworks.sh\n"
+end

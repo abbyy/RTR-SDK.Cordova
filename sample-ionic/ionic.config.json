@@ -1,0 +1,7 @@
+{
+  "name": "sample-ui-imagecapture",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
