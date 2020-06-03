@@ -39,7 +39,7 @@ class SettingsParser {
 		// Utility class
 	}
 
-	static DetectDocumentBoundarySettings parseDetectDocumentBoundarySettings(@NonNull JSONObject json) throws Exception
+	static DetectDocumentBoundarySettings parseDetectDocumentBoundarySettings( @NonNull JSONObject json ) throws Exception
 	{
 		DetectDocumentBoundarySettings settings = new DetectDocumentBoundarySettings();
 		settings.detectionMode = parseEnumValue( json, DETECTION_MODE, DETECTION_MODE_VALUES, settings.detectionMode );
@@ -52,7 +52,7 @@ class SettingsParser {
 		return settings;
 	}
 
-	static ExportSettings parseExportSettings(@NonNull JSONObject json) throws Exception
+	static ExportSettings parseExportSettings( @NonNull JSONObject json ) throws Exception
 	{
 		ExportSettings settings = new ExportSettings();
 		if( !json.has( RESULT ) ) {
@@ -74,7 +74,7 @@ class SettingsParser {
 		return settings;
 	}
 
-	static CropSettings parseCropSettings(@NonNull JSONObject json) throws Exception
+	static CropSettings parseCropSettings( @NonNull JSONObject json ) throws Exception
 	{
 		ExportSettings exportSettings = parseExportSettings( json );
 		Point[] documentBoundary = parseDocumentBoundary( json );
@@ -87,7 +87,7 @@ class SettingsParser {
 		return settings;
 	}
 
-	static RotateSettings parseRotateSettings(@NonNull JSONObject json) throws Exception
+	static RotateSettings parseRotateSettings( @NonNull JSONObject json ) throws Exception
 	{
 		RotateSettings settings = new RotateSettings();
 		if( !json.has( ANGLE ) ) {
@@ -99,14 +99,14 @@ class SettingsParser {
 		return settings;
 	}
 
-	static QualityAssessmentForOcrSettings parseQualityAssessmentForOcrSettings(@NonNull JSONObject json) throws Exception
+	static QualityAssessmentForOcrSettings parseQualityAssessmentForOcrSettings( @NonNull JSONObject json ) throws Exception
 	{
 		QualityAssessmentForOcrSettings settings = new QualityAssessmentForOcrSettings();
 		settings.documentBoundary = parseDocumentBoundary( json, settings.documentBoundary );
 		return settings;
 	}
 
-	static PdfSettings parsePdfSettings(@NonNull JSONObject jsonObject) throws Exception
+	static PdfSettings parsePdfSettings( @NonNull JSONObject jsonObject ) throws Exception
 	{
 		PdfSettings settings = new PdfSettings();
 		settings.images = parsePdfImages( jsonObject );
