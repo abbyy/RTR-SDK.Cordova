@@ -5,6 +5,7 @@ node_modules
 /ios
 /assets
 /android
+/.gradle
 
 # local env files
 .env.local

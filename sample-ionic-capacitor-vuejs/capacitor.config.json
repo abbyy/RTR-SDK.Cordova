@@ -1,0 +1,13 @@
+{
+  "appId": "io.geilehner.abbyy",
+  "appName": "sample-ionic-capacitor-vuejs",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {}
+}
