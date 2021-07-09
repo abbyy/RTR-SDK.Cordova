@@ -32,7 +32,7 @@ allprojects {
     repositories {
         flatDir {
             // Search path for Mobile Capture libs
-            dirs '../../../libs/android'
+            dirs '../../libs/android'
         }
         google()
         jcenter()
@@ -64,7 +64,7 @@ android {
    sourceSets {
       main {
          // Mobile Capture assets
-         assets.srcDirs += ['../../../assets']
+         assets.srcDirs += ['../../assets']
       }
    }
 }
@@ -92,7 +92,7 @@ post_install do |installer|
 
          # Settings to use Mobile Capture SDK.
          config.build_settings['ENABLE_BITCODE'] = "NO"
-         config.build_settings['FRAMEWORK_SEARCH_PATHS'] = "$(inherited) ../../../../libs/ios"
+         config.build_settings['FRAMEWORK_SEARCH_PATHS'] = "$(inherited) ../../../libs/ios"
       end
    end
 end
@@ -101,22 +101,22 @@ end
 To add the license file, the resource files and set up the copying rules, in **Build Phases** add one more Run Script phase. The **copy_assets.py** script, added to the phase, will automatically copy all resource files to corresponding destinations and add necessary dictionaries.
 
 ```
-python "${SRCROOT}/../../../assets/copy_assets.py"
-cp ../../../assets/MobileCapture.License" $TARGET_BUILD_DIR/$WRAPPER_NAME/"
+python "${SRCROOT}/../../assets/copy_assets.py"
+cp "${SRCROOT}/../../assets/MobileCapture.License" "${TARGET_BUILD_DIR}/${WRAPPER_NAME}/"
 ```
 
 In **Build Phases**, add a new **Run Script** phase. Run the **copy_frameworks.sh** script that removes the frameworks for the non-active CPU architectures (the complete list depends on the project settings), and sign the resulting framework. This is a required step before uploading your application to App Store.
 
 ```
-/bin/sh "${SRCROOT}/../../../libs/ios/copy_frameworks.sh"
+/bin/sh "${SRCROOT}/../../libs/ios/copy_frameworks.sh"
 ```
 
 Select your project in the **Target** group and open the **Build Settings** tab. In the **Search Paths** section add to the **Framework Search Paths** the following path:
 ```
-../../../libs/ios
+"../../libs/ios"
 ```
 
-On the **Build Options** tab set **Enable Bitcode** option to **No**.
+On the **Build Settings** tab set **Enable Bitcode** option to **No**.
 
 In the **info.plist** file add permission for working with camera and gallery if necessary.
 
