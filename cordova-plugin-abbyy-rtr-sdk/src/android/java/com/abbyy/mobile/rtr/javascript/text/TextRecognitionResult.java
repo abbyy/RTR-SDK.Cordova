@@ -5,9 +5,9 @@ package com.abbyy.mobile.rtr.javascript.text;
 
 import android.text.TextUtils;
 
-import com.abbyy.mobile.rtr.IRecognitionCoreAPI.CharInfo;
+import com.abbyy.mobile.rtr.TextCapture.CharInfo;
 import com.abbyy.mobile.rtr.IRecognitionCoreAPI.TextBlock;
-import com.abbyy.mobile.rtr.IRecognitionCoreAPI.TextLine;
+import com.abbyy.mobile.rtr.TextCapture.TextLine;
 import com.abbyy.mobile.rtr.IRecognitionCoreAPI.Warning;
 import com.abbyy.mobile.rtr.javascript.JsonResult;
 
